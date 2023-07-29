@@ -1,8 +1,8 @@
 # 🛡 Membership 🛡 
 
-[![Coverage Status](https://img.shields.io/coveralls/github/mithereal/membership.svg?style=flat-square)](https://coveralls.io/github/mithereal/membership)
-[![Build Status](https://img.shields.io/travis/MilosMosovsky/membership.svg?style=flat-square)](https://travis-ci.org/mithereal/membership)
-[![Version](https://img.shields.io/hexpm/v/membership.svg?style=flat-square)](https://hex.pm/packages/membership)
+[![Coverage Status](https://img.shields.io/coveralls/github/mithereal/ex_membership.svg?style=flat-square)](https://coveralls.io/github/mithereal/ex_membership)
+[![Build Status](https://img.shields.io/travis/mithereal/ex_membership.svg?style=flat-square)](https://travis-ci.org/mithereal/ex_membership)
+[![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 
 Membership is toolkit for granular ability management for members. It allows you to define granular abilities such as:
 
