@@ -1,4 +1,4 @@
-defmodule Membership.Repo.Migrations.CreateAbilitiesTable do
+defmodule Membership.Repo.Migrations.CreatePlansTable do
   use Ecto.Migration
 
   def change do

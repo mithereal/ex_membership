@@ -1,23 +1,22 @@
-defmodule Membership.MembersEntities do
+defmodule Membership.MemberPlans do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
   alias __MODULE__
 
-  schema "membership_members_entities" do
+  schema "membership_member_plans" do
     belongs_to(:member, Membership.Member)
     field(:assoc_id, :integer)
-    field(:assoc_type, :string)
     field(:plans, {:array, :string}, default: [])
 
     timestamps()
   end
 
-  def changeset(%MembersEntities{} = struct, params \\ %{}) do
+  def changeset(%Membership.MemberPlans{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :assoc_type, :assoc_id, :plans])
-    |> validate_required([:member_id, :assoc_type, :assoc_id, :plans])
+    |> cast(params, [:member_id, :assoc_id, :plans])
+    |> validate_required([:member_id, :assoc_id, :plans])
   end
 
   def create(
@@ -27,7 +26,6 @@ defmodule Membership.MembersEntities do
       ) do
     changeset(%MembersEntities{
       member_id: id,
-      assoc_type: entity_name |> normalize_struct_name,
       assoc_id: entity_id,
       plans: plans
     })

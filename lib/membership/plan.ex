@@ -14,6 +14,10 @@ defmodule Membership.Plan do
     field(:identifier, :string)
     field(:name, :string)
 
+    field(:features, {:array, :string}, default: [])
+
+    has_many(:features, Membership.PlanFeatures)
+
     timestamps()
   end
 
