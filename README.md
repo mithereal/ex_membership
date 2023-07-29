@@ -5,7 +5,7 @@
 [![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 
 Membership is toolkit for granular ability management for members. It allows you to define granular abilities such as:
-
+this is basically terminator but with methods and dsl for membership plans
 - `Member -> Plan`
 - `Member -> [Plan, Plan, ...]`
 
