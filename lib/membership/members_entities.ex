@@ -24,7 +24,7 @@ defmodule Membership.MemberPlans do
         %{__struct__: entity_name, id: entity_id},
         plans \\ []
       ) do
-    changeset(%MembersEntities{
+    changeset(%Membership.MemberPlans{
       member_id: id,
       assoc_id: entity_id,
       plans: plans
