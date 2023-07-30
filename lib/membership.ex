@@ -13,6 +13,9 @@ defmodule Membership do
   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can hold multiple plans
   this allows you to have very granular set of plans per each member
 
+  `Membership.Member` -> `Membership.Plan.Feature` [1-n] - Any given member can hold multiple plan features
+  this allows you to have very granular set of which plan features each member has access to.
+
 
   ## Available functions
 
