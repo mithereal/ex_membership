@@ -51,16 +51,16 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_authorized do
+          as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
       end
   """
 
-  defmacro as_authorized(do: block) do
+  defmacro as_member(do: block) do
     quote do
-      with :ok <- perform_authorization!() do
+      with :ok <- member_authorization!() do
         unquote(block)
       end
     end
@@ -76,7 +76,7 @@ defmodule Membership do
 
         def test_authorization do
 
-          as_authorized do
+          as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -89,7 +89,7 @@ defmodule Membership do
 
         def test_authorization do
 
-          as_authorized do
+          as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -105,7 +105,7 @@ defmodule Membership do
           post = %Post{owner_id: 1}
 
 
-          as_authorized do
+          as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -123,15 +123,15 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          case is_authorized? do
+          case member_authorized? do
             :ok -> "Member is authorized"
             {:error, message: _message} -> "Member is not authorized"
         end
       end
   """
-  @spec is_authorized?() :: :ok | {:error, String.t()}
-  def is_authorized? do
-    perform_authorization!()
+  @spec member_authorized?() :: :ok | {:error, String.t()}
+  def member_authorized? do
+    member_authorization!()
   end
 
   @doc """
@@ -139,7 +139,7 @@ defmodule Membership do
   """
   @spec has_plan?(Membership.Member.t(), atom()) :: boolean()
   def has_plan?(%Membership.Member{} = member, plan_name) do
-    perform_authorization!(member, [Atom.to_string(plan_name)], []) == :ok
+    member_authorization!(member, [Atom.to_string(plan_name)], []) == :ok
   end
 
   def has_plan?(
@@ -157,7 +157,7 @@ defmodule Membership do
   end
 
   @doc false
-  def perform_authorization!(
+  def member_authorization!(
         current_member \\ nil,
         required_plans \\ [],
         extra_rules \\ []
@@ -172,8 +172,8 @@ defmodule Membership do
           current_member
       end
 
-    required_plans = ensure_array_from_ets(required_plans, :required_plans)
-    extra_rules = ensure_array_from_ets(extra_rules, :extra_rules)
+    required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
+    extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
 
     # If no member is given we can assume that permissions are not granted
     if is_nil(current_member) do
@@ -186,7 +186,7 @@ defmodule Membership do
       else
         # 1st layer of authorization (optimize db load)
         first_layer =
-          authorize!(
+          member_authorize!(
             [
               authorize_plans(current_member.plans, required_plans)
             ] ++ extra_rules
@@ -201,7 +201,7 @@ defmodule Membership do
     end
   end
 
-  defp ensure_array_from_ets(value, name) do
+  defp ensure_membership_array_from_ets(value, name) do
     value =
       case value do
         [] ->
@@ -285,7 +285,7 @@ defmodule Membership do
   end
 
   @doc false
-  def authorize!(conditions) do
+  def member_authorize!(conditions) do
     # Authorize empty conditions as true
 
     conditions =
