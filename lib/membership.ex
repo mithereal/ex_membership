@@ -5,6 +5,7 @@ defmodule Membership do
   Membership has 3 main components:
 
     * `Membership.Plan` - Representation of a single plan e.g. :gold, :silver, :copper
+    * `Membership.Feature` - Representation of a single plan feature e.g. :feature_a, :feature_b, :feature_c
     * `Membership.Member` - Main actor which is holding given plans
 
   ## Relations between models

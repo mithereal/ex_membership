@@ -6,28 +6,28 @@ defmodule Membership.PlanFeatures do
   alias __MODULE__
 
   schema "membership_plan_features" do
-    belongs_to(:feature, Membership.Feature)
-    field(:assoc_id, :integer)
-    field(:features, {:array, :string}, default: [])
+    belongs_to(:feature, Membership.PlanFeatures)
+    field(:plan_id, :integer)
+    field(:plan_name, :string)
 
     timestamps()
   end
 
   def changeset(%PlanFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :assoc_id, :features])
-    |> validate_required([:member_id, :assoc_id, :features])
+    |> cast(params, [:feature_id, :plan_id, :plan_name])
+    |> validate_required([:feature_id, :plan_id, :plan_name])
   end
 
   def create(
         %Membership.PlanFeatures{id: id},
-        %{__struct__: entity_name, id: entity_id},
+        %{__struct__: plan_name, id: plan_id},
         features \\ []
       ) do
     changeset(%PlanFeatures{
-      member_id: id,
-      assoc_id: entity_id,
-      features: features
+      feature_id: id,
+      plan_id: plan_id,
+      plan_name: plan_name |> normalize_struct_name
     })
     |> Membership.Repo.insert!()
   end

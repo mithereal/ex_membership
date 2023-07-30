@@ -13,15 +13,13 @@ defmodule Membership.Member do
   alias __MODULE__
   alias Membership.Plan
   alias Membership.Repo
-  alias Membership.MembersEntities
+  alias Membership.MemberPlans
 
   @typedoc "A member struct"
   @type t :: %Member{}
 
   schema "membership_members" do
-    field(:plans, {:array, :string}, default: [])
-
-    has_many(:entities, MembersEntities)
+    has_many(:plans, MemberPlans)
 
     timestamps()
   end
