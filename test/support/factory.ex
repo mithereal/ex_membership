@@ -1,23 +1,23 @@
 defmodule Membership.Factory do
   use ExMachina.Ecto, repo: Membership.Repo
   alias Membership.Member
-  alias Membership.Ability
-  alias Membership.Role
+  alias Membership.Feature
+  alias Membership.Plan
 
   def member_factory do
     %Member{}
   end
 
-  def ability_factory do
-    %Ability{
-      identifier: sequence(:role, ["view_post", "delete_post", "create_post"])
+  def plan_factory do
+    %plan{
+      identifier: sequence(:plan, ["Free", "Silver", "Gold"])
     }
   end
 
-  def role_factory do
-    %Role{
-      identifier: sequence(:role, ["admin", "editor", "user"]),
-      name: sequence(:role_name, &"Generated role-#{&1}")
+  def feature_factory do
+    %Feature{
+      identifier: sequence(:feature, ["feature_id"]),
+      name: sequence(:feature_name, &"Generated feature-#{&1}")
     }
   end
 end
