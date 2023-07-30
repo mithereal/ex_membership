@@ -5,9 +5,6 @@ defmodule Membership.Repo.Migrations.CreatePlanFeaturesTable do
     create table(:membership_plan_features) do
       add(:plan_id, references(Membership.Plan.table()))
       add(:assoc_id, :integer)
-      add(:features, {:array, :string})
-
-      timestamps()
     end
   end
 end

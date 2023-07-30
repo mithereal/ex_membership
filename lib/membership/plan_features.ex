@@ -7,7 +7,7 @@ defmodule Membership.PlanFeatures do
 
   schema "membership_plan_features" do
     belongs_to(:feature, Membership.PlanFeatures)
-    field(:plan_id, :integer)
+    field(:assoc_id, :integer)
     field(:plan_name, :string)
 
     timestamps()
@@ -15,18 +15,18 @@ defmodule Membership.PlanFeatures do
 
   def changeset(%PlanFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:feature_id, :plan_id, :plan_name])
-    |> validate_required([:feature_id, :plan_id, :plan_name])
+    |> cast(params, [:feature_id, :assoc_id, :plan_name])
+    |> validate_required([:feature_id, :assoc_id, :plan_name])
   end
 
   def create(
         %Membership.PlanFeatures{id: id},
-        %{__struct__: plan_name, id: plan_id},
+        %{__struct__: plan_name, id: assoc_id},
         features \\ []
       ) do
     changeset(%PlanFeatures{
       feature_id: id,
-      plan_id: plan_id,
+      plan_id: assoc_id,
       plan_name: plan_name |> normalize_struct_name
     })
     |> Membership.Repo.insert!()
