@@ -496,4 +496,14 @@ defmodule Membership do
     Membership.Registry.add(:required_features, Atom.to_string(feature))
     {:ok, feature}
   end
+
+  @doc """
+  List version.
+
+  ## Examples
+
+      iex> Membership.version()
+  """
+  @version Mix.Project.config()[:version]
+  def version, do: @version
 end

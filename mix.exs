@@ -2,6 +2,8 @@ defmodule Membership.MixProject do
   use Mix.Project
 
   @version "0.5.2"
+  @source_url "https://github.com/mithereal/ExMembership"
+
   def project do
     [
       app: :ex_membership,
@@ -49,7 +51,7 @@ defmodule Membership.MixProject do
   end
 
   defp description() do
-    "Elixir ACL library for managing user abilities and permissions with support of ecto and compatibility with absinthe"
+    "Elixir ACL library for managing user features and roles with support of ecto and compatibility with absinthe"
   end
 
   defp package() do
@@ -64,7 +66,7 @@ defmodule Membership.MixProject do
     [
       extras: ["README.md"],
       main: "readme",
-      source_url: "https://github.com/mithereal/ex_membership",
+      source_url: @source_url,
       groups_for_modules: [
         Models: [
           Membership.Member,
