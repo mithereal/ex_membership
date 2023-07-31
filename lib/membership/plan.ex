@@ -2,7 +2,7 @@ defmodule Membership.Plan do
   @moduledoc """
   Plan is main representation of a single plan
   """
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
 
   alias __MODULE__

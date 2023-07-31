@@ -2,7 +2,7 @@ defmodule Membership.Feature do
   @moduledoc """
   Feature is main representation of a single feature flag assigned to a plan
   """
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
 
   alias __MODULE__

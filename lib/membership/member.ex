@@ -6,16 +6,17 @@ defmodule Membership.Member do
   @moduledoc """
   Member is a main actor for determining features
   """
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
   import Ecto.Query
 
   alias __MODULE__
   alias Membership.Plan
-  alias Membership.Repo
   alias Membership.Feature
   alias Membership.MemberPlans
   alias Membership.MemberFeatures
+
+  @repo Membership.Config.repo()
 
   @typedoc "A member struct"
   @type t :: %Member{}
@@ -56,7 +57,7 @@ defmodule Membership.Member do
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload member plans
-    member = Member |> Repo.get!(id) |> Repo.preload([:plans])
+    member = Member |> @repo.get!(id) |> @repo.preload([:plans])
 
     plans = merge_uniq_grants(member.plans ++ [plan])
 
@@ -64,7 +65,7 @@ defmodule Membership.Member do
       changeset(member)
       |> put_assoc(:plans, plans)
 
-    changeset |> Repo.update!()
+    changeset |> @repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -72,28 +73,28 @@ defmodule Membership.Member do
   end
 
   def grant(%{member_id: id}, %Plan{id: _id} = plan) do
-    member = Member |> Repo.get!(id)
+    member = Member |> @repo.get!(id)
     grant(member, plan)
   end
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> @repo.get!(id)
     features = Enum.uniq(member.features ++ [feature.identifier])
 
     changeset =
       changeset(member)
       |> put_change(:features, features)
 
-    changeset |> Repo.update!()
+    changeset |> @repo.update!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> @repo.get!(id)
     grant(member, feature)
   end
 
   def grant(%{member_id: id}, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> @repo.get!(id)
     grant(member, feature)
   end
 
@@ -115,7 +116,7 @@ defmodule Membership.Member do
 
         MembersEntities.changeset(feature)
         |> put_change(:features, features)
-        |> Repo.update!()
+        |> @repo.update!()
     end
 
     member
@@ -160,7 +161,7 @@ defmodule Membership.Member do
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     from(pa in MembersPlans)
     |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
-    |> Repo.delete_all()
+    |> @repo.delete_all()
   end
 
   def revoke(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -172,7 +173,7 @@ defmodule Membership.Member do
   end
 
   def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> @repo.get!(id)
 
     features =
       Enum.filter(member.features, fn grant ->
@@ -183,7 +184,7 @@ defmodule Membership.Member do
       changeset(member)
       |> put_change(:features, features)
 
-    changeset |> Repo.update!()
+    changeset |> @repo.update!()
   end
 
   def revoke(
@@ -217,11 +218,11 @@ defmodule Membership.Member do
           end)
 
         if length(features) == 0 do
-          feature |> Repo.delete!()
+          feature |> @repo.delete!()
         else
           MembersEntities.changeset(feature)
           |> put_change(:features, features)
-          |> Repo.update!()
+          |> @repo.update!()
         end
 
         member
@@ -253,7 +254,7 @@ defmodule Membership.Member do
       e.member_id == ^member.id and e.assoc_id == ^feature_id and
         e.assoc_type == ^MembersEntities.normalize_struct_name(feature_name)
     )
-    |> Repo.one()
+    |> @repo.one()
   end
 
   def table, do: :membership_members

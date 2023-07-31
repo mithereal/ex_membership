@@ -1,7 +1,7 @@
 defmodule Membership.PlanFeatures do
   @moduledoc false
 
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
   alias __MODULE__
 

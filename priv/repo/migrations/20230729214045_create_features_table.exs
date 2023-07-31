@@ -2,7 +2,10 @@ defmodule Membership.Repo.Migrations.CreateFeaturesTable do
   use Ecto.Migration
 
   def change do
-    create table(:membership_features) do
+    key_type = Membership.Config.key_type(:migration)
+
+    create table(:membership_features, primary_key: false) do
+      add(:id, key_type, primary_key: true)
       add(:identifier, :string)
       add(:name, :string, size: 255)
 

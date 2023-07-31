@@ -3,7 +3,7 @@ defmodule Membership.MemberPlans do
   MemberPlans is the association linking the member to the plan you can also set specific features for the membership
   """
 
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
   alias __MODULE__
 

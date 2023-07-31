@@ -2,7 +2,9 @@ defmodule Membership.Repo.Migrations.CreatePlansTable do
   use Ecto.Migration
 
   def change do
-    create table(:membership_plans) do
+    key_type = Membership.Config.key_type(:migration)
+    create table(:membership_plans, primary_key: false) do
+      add(:id, key_type, primary_key: true)
       add(:identifier, :string)
       add(:name, :string, size: 255)
 

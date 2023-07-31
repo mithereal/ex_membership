@@ -3,7 +3,7 @@ defmodule Membership.MemberFeatures do
   MemberFeatures is the association linking the member to the feature you can also set specific features for the membership
   """
 
-  use Ecto.Schema
+  use Membership.Schema
   import Ecto.Changeset
   alias __MODULE__
 
