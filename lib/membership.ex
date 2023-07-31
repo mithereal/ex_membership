@@ -10,6 +10,8 @@ defmodule Membership do
 
   ## Relations between models
 
+  `Membership.Plan` -> `Membership.Plan.Feature` [1-n] - Any given plan can hold multiple features
+
   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can hold multiple plans
   this allows you to have very granular set of plans per each member
 
@@ -23,8 +25,8 @@ defmodule Membership do
 
   Calculation of plans is done by *OR* and *DISTINCT* plans. That means if you have
 
-  `MemberPlans[:admin, plans: [:delete]]`, `MemberPlans[:editor, plans: [:update]]`, `MemberPlans[:user, plans: [:view]]`
-  and all plans are granted to single member, resulting plans will be `[:delete, :update, :view]`
+  `MemberPlans[:admin, plans: [:gold]]`, `MemberPlans[:editor, plans: [:silver]]`, `MemberPlans[:user, plans: [:bromze]]`
+  and all plans are granted to single member, resulting plans will be `[:gold, :silver, :bronze]`
 
 
   ## Available as_member
@@ -113,7 +115,7 @@ defmodule Membership do
 
         def test_authorization do
           as_member do
-            calculated(fn member ->
+            calculated_member(fn member ->
               member.email_confirmed?
             end)
           end
@@ -131,7 +133,7 @@ defmodule Membership do
 
         def test_authorization do
           as_member do
-            calculated(:email_confirmed)
+            calculated_member(:email_confirmed)
           end
 
           as_member do
@@ -153,8 +155,8 @@ defmodule Membership do
           post = %Post{owner_id: 1}
 
           as_member do
-            calculated(:is_owner, [post])
-            calculated(fn member, [post] ->
+            calculated_member(:is_owner, [post])
+            calculated_member(fn member, [post] ->
               post.owner_id == member.id
             end)
           end
@@ -170,7 +172,7 @@ defmodule Membership do
       end
 
   """
-  defmacro calculated(func_name) when is_atom(func_name) do
+  defmacro calculated_member(func_name) when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
 
@@ -181,7 +183,7 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated(callback) do
+  defmacro calculated_member(callback) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
 
@@ -194,7 +196,7 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated(func_name, bindings) when is_atom(func_name) do
+  defmacro calculated_member(func_name, bindings) when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
 
@@ -207,7 +209,7 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated(callback, bindings) do
+  defmacro calculated_member(callback, bindings) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
 
@@ -229,14 +231,14 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          case is_authorized? do
+          case member_authorized? do
             :ok -> "Member is authorized"
             {:error, message: _message} -> "Member is not authorized"
         end
       end
   """
-  @spec is_authorized?() :: :ok | {:error, String.t()}
-  def is_authorized? do
+  @spec member_authorized?() :: :ok | {:error, String.t()}
+  def member_authorized? do
     member_authorization!()
   end
 
@@ -286,10 +288,10 @@ defmodule Membership do
           current_member
       end
 
-    required_plans = ensure_array_from_ets(required_plans, :required_plans)
-    required_features = ensure_array_from_ets(required_features, :required_features)
-    extra_rules = ensure_array_from_ets(extra_rules, :extra_rules)
-    calculated_as_member = ensure_array_from_ets([], :calculated_as_member)
+    required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
+    required_features = ensure_membership_array_from_ets(required_features, :required_features)
+    extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
+    calculated_as_member = ensure_membership_array_from_ets([], :calculated_as_member)
 
     # If no member is given we can assume that as_member are not granted
     if is_nil(current_member) do
@@ -330,7 +332,7 @@ defmodule Membership do
     end
   end
 
-  defp ensure_array_from_ets(value, name) do
+  defp ensure_membership_array_from_ets(value, name) do
     value =
       case value do
         [] ->
