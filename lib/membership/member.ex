@@ -12,8 +12,8 @@ defmodule Membership.Member do
 
   alias __MODULE__
   alias Membership.Plan
-  alias Membership.Feature
   alias Membership.Repo
+  alias Membership.Feature
   alias Membership.MemberPlans
   alias Membership.MemberFeatures
 
