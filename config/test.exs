@@ -5,7 +5,7 @@
 use Mix.Config
 
 # Configure your database
-config :membership, Membership.Repo,
+config :ex_membership, Membership.Repo,
   username: "postgres",
   password: "postgres",
   database: "ex_membership",

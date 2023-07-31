@@ -21,7 +21,7 @@ defmodule Sample.Post
     load_and_authorize_member(member)
     post = %Post{id: 1}
 
-    as_member do
+    member_permissions do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
@@ -136,7 +136,7 @@ defmodule Sample.Post
     #  * %AnyStruct{member_id: id} (this will perform database preload)
 
 
-    as_member do
+    member_permissions do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
@@ -169,7 +169,7 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    as_member do
+    member_permissions do
       calculated_member(fn member -> do
         member.email_confirmed?
       end)
@@ -186,7 +186,7 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    as_member do
+    member_permissions do
       calculated_member(:confirmed_email)
     end
   end
@@ -208,7 +208,7 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    as_member do
+    member_permissions do
       calculated_member(:confirmed_email)
       calculated_member(:is_owner, [post])
     end
@@ -233,7 +233,7 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    as_member do
+    member_permissions do
       has_plan(:editor)
     end
 
@@ -248,7 +248,7 @@ defmodule Sample.Post do
   def is_owner(member, post) do
     load_and_authorize_member(member)
 
-    as_member do
+    member_permissions do
       calculated_member(fn p, [post] ->
         p.id == post.owner_id
       end)
@@ -299,7 +299,7 @@ defmodule Sample.Post do
     post = %Post{id: 1}
     load_and_authorize_member(user)
 
-    as_member do
+    member_permissions do
       has_feature(:delete, post)
     end
 

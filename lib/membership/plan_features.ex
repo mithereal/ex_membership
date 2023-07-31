@@ -26,7 +26,7 @@ defmodule Membership.PlanFeatures do
       ) do
     changeset(%PlanFeatures{
       feature_id: id,
-      plan_id: assoc_id,
+      assoc_id: assoc_id,
       plan_name: plan_name |> normalize_struct_name
     })
     |> Membership.Repo.insert!()

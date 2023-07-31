@@ -53,7 +53,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             has_feature(:admin)
             has_plan(:view)
           end
@@ -61,7 +61,7 @@ defmodule Membership do
       end
   """
 
-  defmacro as_member(do: block) do
+  defmacro member_permissions(do: block) do
     quote do
       reset_session()
       unquote(block)
@@ -87,7 +87,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -111,7 +111,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             calculated_member(fn member ->
               member.email_confirmed?
             end)
@@ -129,7 +129,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             calculated_member(:email_confirmed)
           end
 
@@ -151,7 +151,7 @@ defmodule Membership do
         def test_authorization do
           post = %Post{owner_id: 1}
 
-          as_member do
+          member_permissions do
             calculated_member(:is_owner, [post])
             calculated_member(fn member, [post] ->
               post.owner_id == member.id
@@ -253,7 +253,7 @@ defmodule Membership do
         %{__struct__: _entity_name, id: _entity_id} = entity
       ) do
     active_plans =
-      case Membership.Member.load_member_entities(member, entity) do
+      case Membership.Member.load_member_features(member, entity) do
         nil -> []
         entity -> entity.plans
       end
@@ -352,17 +352,17 @@ defmodule Membership do
       import Membership, only: [store_member!: 1, load_and_store_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
-          do: store_member!(member)
+        do: store_member!(member)
 
       def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}),
-          do: store_member!(member)
+        do: store_member!(member)
 
       def load_and_authorize_member(%{member_id: member_id})
           when not is_nil(member_id),
           do: load_and_store_member!(member_id)
 
       def load_and_authorize_member(member),
-          do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")
+        do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")
     end
   end
 
@@ -457,7 +457,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             has_plan(:can_run_test_authorization)
           end
         end
@@ -485,7 +485,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          as_member do
+          member_permissions do
             has_feature(:admin)
           end
         end

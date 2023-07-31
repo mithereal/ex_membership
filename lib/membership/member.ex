@@ -22,7 +22,7 @@ defmodule Membership.Member do
   @type t :: %Member{}
 
   schema "membership_members" do
-    field(:features, {:array, :string}, default: [])
+    field(:feature, {:array, :string}, default: [])
 
     has_many(:features, MemberFeatures)
     has_many(:plans, MemberPlans)
@@ -109,12 +109,12 @@ defmodule Membership.Member do
 
     case feature_features do
       nil ->
-        MembersEntities.create(member, feature, [feature.identifier])
+        MemberFeatures.create(member, feature, [feature.identifier])
 
       feature ->
         features = Enum.uniq(feature.features ++ [feature.identifier])
 
-        MembersEntities.changeset(feature)
+        MemberFeatures.changeset(feature)
         |> put_change(:features, features)
         |> @repo.update!()
     end
@@ -159,7 +159,7 @@ defmodule Membership.Member do
   """
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    from(pa in MembersPlans)
+    from(pa in MemberPlans)
     |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
     |> @repo.delete_all()
   end
@@ -220,7 +220,7 @@ defmodule Membership.Member do
         if length(features) == 0 do
           feature |> @repo.delete!()
         else
-          MembersEntities.changeset(feature)
+          MemberFeatures.changeset(feature)
           |> put_change(:features, features)
           |> @repo.update!()
         end
@@ -248,11 +248,11 @@ defmodule Membership.Member do
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
   def load_member_features(member, %{__struct__: feature_name, id: feature_id}) do
-    MembersEntities
+    MemberFeatures
     |> where(
       [e],
       e.member_id == ^member.id and e.assoc_id == ^feature_id and
-        e.assoc_type == ^MembersEntities.normalize_struct_name(feature_name)
+        e.assoc_type == ^MemberFeatures.normalize_struct_name(feature_name)
     )
     |> @repo.one()
   end
@@ -263,5 +263,12 @@ defmodule Membership.Member do
     Enum.uniq_by(grants, fn grant ->
       grant.identifier
     end)
+  end
+
+  def normalize_struct_name(name) do
+    name
+    |> Atom.to_string()
+    |> String.replace(".", "_")
+    |> String.downcase()
   end
 end

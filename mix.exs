@@ -4,7 +4,7 @@ defmodule Membership.MixProject do
   @version "0.5.2"
   def project do
     [
-      app: :membership,
+      app: :ex_membership,
       version: @version,
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
