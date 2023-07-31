@@ -8,7 +8,7 @@ config :membership,
 config :membership, Membership.Repo,
   username: "postgres",
   password: "postgres",
-  database: "ex_membership_dev",
+  database: "ex_membership",
   hostname: "localhost"
 
 if File.exists?(Path.join(Path.dirname(__ENV__.file), "#{Mix.env()}.exs")) do
