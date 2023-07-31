@@ -279,7 +279,7 @@ defmodule Sample.Post do
 end
 ```
 
-### Entity related features
+### Member related features
 
 Membership allows you to grant features on any particular struct. Struct needs to have signature of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete` feature on particular `Post` for our member:
 
@@ -312,7 +312,7 @@ end
 
 ### Granting features
 
-Let's assume we want to create new `Plan` - _admin_ which is able to delete accounts inside our system. We want to have special `Member` who is given this _plan_ but also he is able to have `Feature` for banning users.
+Let's assume we want to create new `Plan` - _gold_ which is able to delete accounts inside our system. We want to have special `Member` who is given this _plan_ but also he is able to have `Feature` for banning users.
 
 1. Create member
 
@@ -330,7 +330,7 @@ iex> {:ok, feature_ban} = Membership.Feature.build("ban_accounts", "Ban users") 
 3. Create plan
 
 ```elixir
-iex> {:ok, plan} = Membership.Plan.build("admin", [], "Site administrator") |> Membership.Repo.insert()
+iex> {:ok, plan} = Membership.Plan.build("gold", [], "Gold Package") |> Membership.Repo.insert()
 ```
 
 4. Grant features to a plan
@@ -361,7 +361,7 @@ iex> member |> Membership.Repo.preload([:plans, :features])
   ]
   plans: [
     %Membership.Plan{
-      identifier: "admin"
+      identifier: "gold"
       features: ["delete_accounts"]
     }
   ]
