@@ -18,9 +18,6 @@ defmodule Membership do
   `Membership.Member` -> `Membership.MemberPlans` [1-n] - Any given member can act as multiple plans
   this allows you to manage multple sets of plans for multiple members at once
 
-  `Membership.MemberPlans` -> `Membership.Plan` [m-n] - Any feature can have multiple plans therefore
-  you can have multiple plans to have different/same plans
-
   ## Calculating plans
 
   Calculation of plans is done by *OR* and *DISTINCT* plans. That means if you have
