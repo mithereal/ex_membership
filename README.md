@@ -6,6 +6,7 @@
 
 Membership is toolkit for granular feature management for members. It allows you to define granular features such as:
 this is basically terminator but with methods and dsl for membership plans and features
+also we can now coexist with terminator and have our own custom dsl/ets etc.
 - `Member -> Plan`
 - `Member -> [Plan, Plan, ...]`
 
@@ -20,12 +21,12 @@ defmodule Sample.Post
     load_and_authorize_member(member)
     post = %Post{id: 1}
 
-    permissions do
+    as_member do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
       has_feature(:delete, post) # Entity related features
-      calculated(fn member ->
+      calculated_member(fn member ->
         member.email_confirmed?
       end)
     end
@@ -135,7 +136,7 @@ defmodule Sample.Post
     #  * %AnyStruct{member_id: id} (this will perform database preload)
 
 
-    permissions do
+    as_member do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
@@ -168,8 +169,8 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    permissions do
-      calculated(fn member -> do
+    as_member do
+      calculated_member(fn member -> do
         member.email_confirmed?
       end)
     end
@@ -177,7 +178,7 @@ defmodule Sample.Post do
 end
 ```
 
-We can also use DSL form of `calculated` keyword
+We can also use DSL form of `calculated_member` keyword
 
 ```elixir
 defmodule Sample.Post do
@@ -185,8 +186,8 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    permissions do
-      calculated(:confirmed_email)
+    as_member do
+      calculated_member(:confirmed_email)
     end
   end
 
@@ -198,7 +199,7 @@ end
 
 ### Composing calculations
 
-When we need to member calculation based on external data we can invoke bindings to `calculated/2`
+When we need to member calculation based on external data we can invoke bindings to `calculated_member/2`
 
 ```elixir
 defmodule Sample.Post do
@@ -207,9 +208,9 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    permissions do
-      calculated(:confirmed_email)
-      calculated(:is_owner, [post])
+    as_member do
+      calculated_member(:confirmed_email)
+      calculated_member(:is_owner, [post])
     end
   end
 
@@ -232,7 +233,7 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    permissions do
+    as_member do
       has_plan(:editor)
     end
 
@@ -247,13 +248,13 @@ defmodule Sample.Post do
   def is_owner(member, post) do
     load_and_authorize_member(member)
 
-    permissions do
-      calculated(fn p, [post] ->
+    as_member do
+      calculated_member(fn p, [post] ->
         p.id == post.owner_id
       end)
     end
 
-    is_authorized?
+    member_authorized?
   end
 end
 ```
@@ -298,7 +299,7 @@ defmodule Sample.Post do
     post = %Post{id: 1}
     load_and_authorize_member(user)
 
-    permissions do
+    as_member do
       has_feature(:delete, post)
     end
 
