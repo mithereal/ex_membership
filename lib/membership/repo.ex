@@ -4,7 +4,7 @@ defmodule Membership.Repo do
   """
 
   use Ecto.Repo,
-    otp_app: :membership,
+    otp_app: :ex_membership,
     adapter: Ecto.Adapters.Postgres
 
   @doc """

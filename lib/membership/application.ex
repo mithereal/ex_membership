@@ -16,7 +16,7 @@ defmodule Membership.Application do
   end
 
   defp load_repos do
-    case Application.get_env(:membership, :ecto_repos) do
+    case Application.get_env(:ex_membership, :ecto_repos) do
       nil -> [Membership.Repo]
       repos -> repos
     end

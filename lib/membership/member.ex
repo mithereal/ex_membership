@@ -257,7 +257,7 @@ defmodule Membership.Member do
     |> @repo.one()
   end
 
-  def table, do: :membership_members
+  def table, do: :ex_membership_members
 
   defp merge_uniq_grants(grants) do
     Enum.uniq_by(grants, fn grant ->
