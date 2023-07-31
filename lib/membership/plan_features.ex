@@ -2,8 +2,9 @@ defmodule Membership.PlanFeatures do
   @moduledoc false
 
   use Membership.Schema
+
   import Ecto.Changeset
-  alias __MODULE__
+
   alias Membership.Feature
   alias Membership.Plan
 
@@ -14,8 +15,8 @@ defmodule Membership.PlanFeatures do
 
   def changeset(%PlanFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:feature, :plan])
-    |> validate_required([:feature, :plan])
+    |> cast(params, [:feature_id, :plan_id])
+    |> validate_required([:feature_id, :feature_id])
   end
 
   def create(

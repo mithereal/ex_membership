@@ -20,12 +20,12 @@ defmodule Membership.MemberPlans do
 
   def create(
         %Membership.Member{id: id},
-        %{__struct__: _plan_name, id: assoc_id},
+        %{__struct__: _plan_name, id: plan_id},
         features \\ []
       ) do
     changeset(%Membership.MemberPlans{
       member_id: id,
-      plan_id: assoc_id
+      plan_id: plan_id
     })
     |> Membership.Repo.insert!()
   end

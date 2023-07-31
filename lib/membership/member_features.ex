@@ -14,19 +14,18 @@ defmodule Membership.MemberFeatures do
 
   def changeset(%Membership.MemberFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :assoc_id, :features])
-    |> validate_required([:member_id, :assoc_id, :features])
+    |> cast(params, [:member_id, :feature_id])
+    |> validate_required([:member_id, :feature_id])
   end
 
   def create(
         %Membership.Member{id: id},
-        %{__struct__: _feature_name, id: assoc_id},
+        %{__struct__: _feature_name, id: feature_id},
         features \\ []
       ) do
     changeset(%Membership.MemberFeatures{
       member_id: id,
-      assoc_id: assoc_id,
-      features: features
+      feature_id: feature_id
     })
     |> Membership.Repo.insert!()
   end

@@ -2,14 +2,13 @@ defmodule Membership.Application do
   @moduledoc false
   use Application
 
-  alias Membership.Config
+  alias Membership.Repo
 
   @impl true
   def start(_type, args) do
-    repo = Config.repo()
 
     children = [
-     {repo, args},
+     {Repo, args},
       {Membership.Registry, []}
     ]
 
