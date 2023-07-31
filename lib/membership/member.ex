@@ -4,7 +4,7 @@ end
 
 defmodule Membership.Member do
   @moduledoc """
-  Member is a main actor for determining abilities
+  Member is a main actor for determining features
   """
   use Ecto.Schema
   import Ecto.Changeset
@@ -39,82 +39,82 @@ defmodule Membership.Member do
 
   ## Examples
 
-  Function accepts either `Membership.Ability` or `Membership.Role` grants.
+  Function accepts either `Membership.Feature` or `Membership.Plan` grants.
   Function is merging existing grants with the new ones, so calling grant with same
   grants will not duplicate entries in table.
 
-  To grant particular ability to a given member
+  To grant particular feature to a given member
 
-      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Ability{id: 1})
+      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
 
-  To grant particular role to a given member
+  To grant particular plan to a given member
 
-      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Role{id: 1})
+      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
 
   """
 
-  @spec grant(Member.t(), Ability.t() | Role.t()) :: Member.t()
-  def grant(%Member{id: id} = _member, %Role{id: _id} = role) do
-    # Preload member roles
-    member = Member |> Repo.get!(id) |> Repo.preload([:roles])
+  @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
+  def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
+    # Preload member plans
+    member = Member |> Repo.get!(id) |> Repo.preload([:plans])
 
-    roles = merge_uniq_grants(member.roles ++ [role])
+    plans = merge_uniq_grants(member.plans ++ [plan])
 
     changeset =
       changeset(member)
-      |> put_assoc(:roles, roles)
+      |> put_assoc(:plans, plans)
 
     changeset |> Repo.update!()
   end
 
-  def grant(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
-    grant(member, role)
+  def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
+    grant(member, plan)
   end
 
-  def grant(%{member_id: id}, %Role{id: _id} = role) do
+  def grant(%{member_id: id}, %Plan{id: _id} = plan) do
     member = Member |> Repo.get!(id)
-    grant(member, role)
+    grant(member, plan)
   end
 
-  def grant(%Member{id: id} = _member, %Ability{id: _id} = ability) do
+  def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id)
-    abilities = Enum.uniq(member.abilities ++ [ability.identifier])
+    features = Enum.uniq(member.features ++ [feature.identifier])
 
     changeset =
       changeset(member)
-      |> put_change(:abilities, abilities)
+      |> put_change(:features, features)
 
     changeset |> Repo.update!()
   end
 
-  def grant(%{member: %Member{id: id}}, %Ability{id: _id} = ability) do
+  def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id)
-    grant(member, ability)
+    grant(member, feature)
   end
 
-  def grant(%{member_id: id}, %Ability{id: _id} = ability) do
+  def grant(%{member_id: id}, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id)
-    grant(member, ability)
+    grant(member, feature)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
   def grant(
         %Member{id: _pid} = member,
-        %Ability{id: _aid} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _aid} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    entity_abilities = load_member_entities(member, entity)
+    feature_features = load_member_features(member, feature)
 
-    case entity_abilities do
+    case feature_features do
       nil ->
-        MembersEntities.create(member, entity, [ability.identifier])
+        MembersEntities.create(member, feature, [feature.identifier])
 
-      entity ->
-        abilities = Enum.uniq(entity.abilities ++ [ability.identifier])
+      feature ->
+        features = Enum.uniq(feature.features ++ [feature.identifier])
 
-        MembersEntities.changeset(entity)
-        |> put_change(:abilities, abilities)
+        MembersEntities.changeset(feature)
+        |> put_change(:features, features)
         |> Repo.update!()
     end
 
@@ -123,18 +123,18 @@ defmodule Membership.Member do
 
   def grant(
         %{member_id: id},
-        %Ability{id: _id} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    grant(%Member{id: id}, ability, entity)
+    grant(%Member{id: id}, feature, feature)
   end
 
   def grant(
         %{member: %Member{id: _pid} = member},
-        %Ability{id: _id} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    grant(member, ability, entity)
+    grant(member, feature, feature)
   end
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -144,83 +144,83 @@ defmodule Membership.Member do
 
   ## Examples
 
-  Function accepts either `Membership.Ability` or `Membership.Role` grants.
+  Function accepts either `Membership.Feature` or `Membership.Plan` grants.
   Function is directly opposite of `Membership.Member.grant/2`
 
-  To revoke particular ability from a given member
+  To revoke particular feature from a given member
 
-      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Ability{id: 1})
+      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
 
-  To revoke particular role from a given member
+  To revoke particular plan from a given member
 
-      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Role{id: 1})
+      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
 
   """
-  @spec revoke(Member.t(), Ability.t() | Role.t()) :: Member.t()
-  def revoke(%Member{id: id} = _member, %Role{id: _id} = role) do
-    from(pa in MembersRoles)
-    |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
+  @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
+  def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
+    from(pa in MembersPlans)
+    |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
     |> Repo.delete_all()
   end
 
-  def revoke(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
-    revoke(member, role)
+  def revoke(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
+    revoke(member, plan)
   end
 
-  def revoke(%{member_id: id}, %Role{id: _id} = role) do
-    revoke(%Member{id: id}, role)
+  def revoke(%{member_id: id}, %Plan{id: _id} = plan) do
+    revoke(%Member{id: id}, plan)
   end
 
-  def revoke(%Member{id: id} = _member, %Ability{id: _id} = ability) do
+  def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id)
 
-    abilities =
-      Enum.filter(member.abilities, fn grant ->
-        grant != ability.identifier
+    features =
+      Enum.filter(member.features, fn grant ->
+        grant != feature.identifier
       end)
 
     changeset =
       changeset(member)
-      |> put_change(:abilities, abilities)
+      |> put_change(:features, features)
 
     changeset |> Repo.update!()
   end
 
   def revoke(
         %{member: %Member{id: _pid} = member},
-        %Ability{id: _id} = ability
+        %Feature{id: _id} = feature
       ) do
-    revoke(member, ability)
+    revoke(member, feature)
   end
 
-  def revoke(%{member_id: id}, %Ability{id: _id} = ability) do
-    revoke(%Member{id: id}, ability)
+  def revoke(%{member_id: id}, %Feature{id: _id} = feature) do
+    revoke(%Member{id: id}, feature)
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
   def revoke(
         %Member{id: _pid} = member,
-        %Ability{id: _id} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    entity_abilities = load_member_entities(member, entity)
+    feature_features = load_member_features(member, feature)
 
-    case entity_abilities do
+    case feature_features do
       nil ->
         member
 
-      entity ->
-        abilities =
-          Enum.filter(entity.abilities, fn grant ->
-            grant != ability.identifier
+      feature ->
+        features =
+          Enum.filter(feature.features, fn grant ->
+            grant != feature.identifier
           end)
 
-        if length(abilities) == 0 do
-          entity |> Repo.delete!()
+        if length(features) == 0 do
+          feature |> Repo.delete!()
         else
-          MembersEntities.changeset(entity)
-          |> put_change(:abilities, abilities)
+          MembersEntities.changeset(feature)
+          |> put_change(:features, features)
           |> Repo.update!()
         end
 
@@ -230,28 +230,28 @@ defmodule Membership.Member do
 
   def revoke(
         %{member_id: id},
-        %Ability{id: _id} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    revoke(%Member{id: id}, ability, entity)
+    revoke(%Member{id: id}, feature, feature)
   end
 
   def revoke(
         %{member: %Member{id: _pid} = member},
-        %Ability{id: _id} = ability,
-        %{__struct__: _entity_name, id: _entity_id} = entity
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    revoke(member, ability, entity)
+    revoke(member, feature, feature)
   end
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_member_entities(member, %{__struct__: entity_name, id: entity_id}) do
+  def load_member_features(member, %{__struct__: feature_name, id: feature_id}) do
     MembersEntities
     |> where(
       [e],
-      e.member_id == ^member.id and e.assoc_id == ^entity_id and
-        e.assoc_type == ^MembersEntities.normalize_struct_name(entity_name)
+      e.member_id == ^member.id and e.assoc_id == ^feature_id and
+        e.assoc_type == ^MembersEntities.normalize_struct_name(feature_name)
     )
     |> Repo.one()
   end
