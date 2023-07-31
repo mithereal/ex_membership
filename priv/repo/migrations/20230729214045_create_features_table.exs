@@ -8,8 +8,6 @@ defmodule Membership.Repo.Migrations.CreateFeaturesTable do
       add(:id, key_type, primary_key: true)
       add(:identifier, :string)
       add(:name, :string, size: 255)
-
-      timestamps()
     end
 
     create(unique_index(:membership_features, [:identifier]))

@@ -6,11 +6,9 @@ defmodule Membership.Repo.Migrations.CreateMembershipFeaturesTable do
 
     create table(:membership_member_features, primary_key: false) do
       add(:id, key_type, primary_key: true)
-      add(:member_id, references(Membership.Member.table()))
-      add(:assoc_id, :integer)
-      add(:features, {:array, :string})
 
-      timestamps()
+      add(:member_id, references(Membership.Member.table()))
+      add(:feature_id, references(Membership.Feature.table()))
     end
   end
 end
