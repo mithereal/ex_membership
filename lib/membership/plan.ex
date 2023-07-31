@@ -14,9 +14,7 @@ defmodule Membership.Plan do
     field(:identifier, :string)
     field(:name, :string)
 
-    has_many(:features, Membership.PlanFeatures)
-
-    timestamps()
+    has_many(:features, Membership.Feature, through: Membership.PlanFeatures)
   end
 
   def changeset(%Plan{} = struct, params \\ %{}) do

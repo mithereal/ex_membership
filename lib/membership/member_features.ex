@@ -9,10 +9,7 @@ defmodule Membership.MemberFeatures do
 
   schema "membership_member_features" do
     belongs_to(:member, Membership.Member)
-    field(:assoc_id, :integer)
-    field(:features, {:array, :string}, default: [])
-
-    timestamps()
+    belongs_to(:feature, Membership.Feature)
   end
 
   def changeset(%Membership.MemberFeatures{} = struct, params \\ %{}) do

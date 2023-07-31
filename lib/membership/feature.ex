@@ -13,8 +13,6 @@ defmodule Membership.Feature do
   schema "membership_features" do
     field(:identifier, :string)
     field(:name, :string)
-
-    timestamps()
   end
 
   def changeset(%Feature{} = struct, params \\ %{}) do

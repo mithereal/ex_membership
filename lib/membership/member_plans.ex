@@ -10,8 +10,6 @@ defmodule Membership.MemberPlans do
   schema "membership_member_plans" do
     belongs_to(:member, Membership.Member)
     belongs_to(:plan, Membership.Plan)
-
-    timestamps()
   end
 
   def changeset(%Membership.MemberPlans{} = struct, params \\ %{}) do

@@ -4,38 +4,29 @@ defmodule Membership.PlanFeatures do
   use Membership.Schema
   import Ecto.Changeset
   alias __MODULE__
+  alias Membership.Feature
+  alias Membership.Plan
 
   schema "membership_plan_features" do
-    belongs_to(:feature, Membership.PlanFeatures)
-    field(:assoc_id, :integer)
-    field(:plan_name, :string)
-
-    timestamps()
+    belongs_to(:feature, Feature)
+    belongs_to(:plan, Plan)
   end
 
   def changeset(%PlanFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:feature_id, :assoc_id, :plan_name])
-    |> validate_required([:feature_id, :assoc_id, :plan_name])
+    |> cast(params, [:feature, :plan])
+    |> validate_required([:feature, :plan])
   end
 
   def create(
         %Membership.PlanFeatures{id: id},
-        %{__struct__: plan_name, id: assoc_id},
+        %{__struct__: _plan_name, id: assoc_id},
         features \\ []
       ) do
     changeset(%PlanFeatures{
       feature_id: id,
-      assoc_id: assoc_id,
-      plan_name: plan_name |> normalize_struct_name
+      plan_id: assoc_id
     })
     |> Membership.Repo.insert!()
-  end
-
-  def normalize_struct_name(name) do
-    name
-    |> Atom.to_string()
-    |> String.replace(".", "_")
-    |> String.downcase()
   end
 end

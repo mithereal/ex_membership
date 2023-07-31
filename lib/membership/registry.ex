@@ -3,7 +3,7 @@ defmodule Membership.Registry do
 
   use GenServer
 
-  def start_link() do
+  def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, %{table: nil})
     GenServer.call(pid, :init_table)
     {:ok, pid}
