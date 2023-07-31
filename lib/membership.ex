@@ -4,22 +4,33 @@ defmodule Membership do
 
   Membership has 3 main components:
 
-    * `Membership.Plan` - Representation of a single plan e.g. :gold, :silver, :copper
-    * `Membership.Feature` - Representation of a single plan feature e.g. :feature_a, :feature_b, :feature_c
+    * `Membership.Plan` -  Representation of a single plan e.g. :gold, :silver, :copper
     * `Membership.Member` - Main actor which is holding given plans
+    * `Membership.MemberPlans` - Grouped set of multiple plans, e.g. :admin, :manager, :editor
 
   ## Relations between models
 
   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can hold multiple plans
   this allows you to have very granular set of plans per each member
 
-  `Membership.Member` -> `Membership.Plan.Feature` [1-n] - Any given member can hold multiple plan features
-  this allows you to have very granular set of which plan features each member has access to.
+  `Membership.Member` -> `Membership.MemberPlans` [1-n] - Any given member can act as multiple plans
+  this allows you to manage multple sets of plans for multiple members at once
+
+  `Membership.MemberPlans` -> `Membership.Plan` [m-n] - Any feature can have multiple plans therefore
+  you can have multiple plans to have different/same plans
+
+  ## Calculating plans
+
+  Calculation of plans is done by *OR* and *DISTINCT* plans. That means if you have
+
+  `MemberPlans[:admin, plans: [:delete]]`, `MemberPlans[:editor, plans: [:update]]`, `MemberPlans[:user, plans: [:view]]`
+  and all plans are granted to single member, resulting plans will be `[:delete, :update, :view]`
 
 
-  ## Available functions
+  ## Available as_member
 
     * `Membership.has_plan/1` - Requires single plan to be present on member
+    * `Membership.has_feature/1` - Requires single feature to be present on member
 
   """
 
@@ -35,10 +46,36 @@ defmodule Membership do
   end
 
   @doc """
+  Macro for defining required as_member
+
+  ## Example
+
+      defmodule HelloTest do
+        use Membership
+
+        def test_authorization do
+          as_member do
+            has_feature(:admin)
+            has_plan(:view)
+          end
+        end
+      end
+  """
+
+  defmacro as_member(do: block) do
+    quote do
+      reset_session()
+      unquote(block)
+    end
+  end
+
+  @doc """
   Resets ETS table
   """
   def reset_session() do
     Membership.Registry.insert(:required_plans, [])
+    Membership.Registry.insert(:required_features, [])
+    Membership.Registry.insert(:calculated_as_member, [])
     Membership.Registry.insert(:extra_rules, [])
   end
 
@@ -75,6 +112,11 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
+          as_member do
+            calculated(fn member ->
+              member.email_confirmed?
+            end)
+          end
 
           as_member do
             IO.inspect("This code is executed only for authorized member")
@@ -88,12 +130,18 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
+          as_member do
+            calculated(:email_confirmed)
+          end
 
           as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
 
+        def email_confirmed(member) do
+          member.email_confirmed?
+        end
       end
 
     For more complex calculation you need to pass bindings to the function
@@ -104,18 +152,76 @@ defmodule Membership do
         def test_authorization do
           post = %Post{owner_id: 1}
 
+          as_member do
+            calculated(:is_owner, [post])
+            calculated(fn member, [post] ->
+              post.owner_id == member.id
+            end)
+          end
 
           as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
 
+        def is_owner(member, [post]) do
+          post.owner_id == member.id
+        end
       end
 
   """
+  defmacro calculated(func_name) when is_atom(func_name) do
+    quote do
+      {:ok, current_member} = Membership.Registry.lookup(:current_member)
+
+      Membership.Registry.add(
+        :calculated_as_member,
+        unquote(func_name)(current_member)
+      )
+    end
+  end
+
+  defmacro calculated(callback) do
+    quote do
+      {:ok, current_member} = Membership.Registry.lookup(:current_member)
+
+      result = apply(unquote(callback), [current_member])
+
+      Membership.Registry.add(
+        :calculated_as_member,
+        result
+      )
+    end
+  end
+
+  defmacro calculated(func_name, bindings) when is_atom(func_name) do
+    quote do
+      {:ok, current_member} = Membership.Registry.lookup(:current_member)
+
+      result = unquote(func_name)(current_member, unquote(bindings))
+
+      Membership.Registry.add(
+        :calculated_as_member,
+        result
+      )
+    end
+  end
+
+  defmacro calculated(callback, bindings) do
+    quote do
+      {:ok, current_member} = Membership.Registry.lookup(:current_member)
+
+      result = apply(unquote(callback), [current_member, unquote(bindings)])
+
+      Membership.Registry.add(
+        :calculated_as_member,
+        result
+      )
+    end
+  end
 
   @doc ~S"""
-  Returns authorization result on collected member and required roles/plans
+  Returns authorization result on collected member and required features/plans
 
   ## Example
 
@@ -123,14 +229,14 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          case member_authorized? do
+          case is_authorized? do
             :ok -> "Member is authorized"
             {:error, message: _message} -> "Member is not authorized"
         end
       end
   """
-  @spec member_authorized?() :: :ok | {:error, String.t()}
-  def member_authorized? do
+  @spec is_authorized?() :: :ok | {:error, String.t()}
+  def is_authorized? do
     member_authorization!()
   end
 
@@ -156,10 +262,18 @@ defmodule Membership do
     Enum.member?(active_plans, Atom.to_string(plan_name))
   end
 
+  @doc """
+  Perform feature check on passed member and feature
+  """
+  def has_feature?(%Membership.Member{} = member, feature_name) do
+    member_authorization!(member, nil, [Atom.to_string(feature_name)], nil) == :ok
+  end
+
   @doc false
   def member_authorization!(
         current_member \\ nil,
         required_plans \\ [],
+        required_features \\ [],
         extra_rules \\ []
       ) do
     current_member =
@@ -172,36 +286,51 @@ defmodule Membership do
           current_member
       end
 
-    required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
-    extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
+    required_plans = ensure_array_from_ets(required_plans, :required_plans)
+    required_features = ensure_array_from_ets(required_features, :required_features)
+    extra_rules = ensure_array_from_ets(extra_rules, :extra_rules)
+    calculated_as_member = ensure_array_from_ets([], :calculated_as_member)
 
-    # If no member is given we can assume that permissions are not granted
+    # If no member is given we can assume that as_member are not granted
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
-      # If no permissions were required then we can assume performe is granted
-      if length(required_plans) +
+      # If no as_member were required then we can assume performe is granted
+      if length(required_plans) + length(required_features) + length(calculated_as_member) +
            length(extra_rules) == 0 do
         :ok
       else
         # 1st layer of authorization (optimize db load)
         first_layer =
-          member_authorize!(
+          authorize!(
             [
               authorize_plans(current_member.plans, required_plans)
-            ] ++ extra_rules
+            ] ++ calculated_as_member ++ extra_rules
           )
 
         if first_layer == :ok do
           first_layer
         else
-          {:error, "Member is not granted to perform this action"}
+          # 2nd layer with DB preloading of features
+          %{features: current_features} = load_member_features(current_member)
+
+          second_layer =
+            authorize!([
+              authorize_features(current_features, required_features),
+              authorize_inherited_plans(current_features, required_plans)
+            ])
+
+          if second_layer == :ok do
+            second_layer
+          else
+            {:error, "Member is not granted to perform this action"}
+          end
         end
       end
     end
   end
 
-  defp ensure_membership_array_from_ets(value, name) do
+  defp ensure_array_from_ets(value, name) do
     value =
       case value do
         [] ->
@@ -224,17 +353,17 @@ defmodule Membership do
       import Membership, only: [store_member!: 1, load_and_store_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
-        do: store_member!(member)
+          do: store_member!(member)
 
       def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}),
-        do: store_member!(member)
+          do: store_member!(member)
 
       def load_and_authorize_member(%{member_id: member_id})
           when not is_nil(member_id),
           do: load_and_store_member!(member_id)
 
       def load_and_authorize_member(member),
-        do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")
+          do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")
     end
   end
 
@@ -246,9 +375,9 @@ defmodule Membership do
   end
 
   @doc false
-  @spec load_member_roles(Membership.Member.t()) :: Membership.Member.t()
-  def load_member_roles(member) do
-    member |> Membership.Repo.preload([:roles])
+  @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
+  def load_member_features(member) do
+    member |> Membership.Repo.preload([:features])
   end
 
   @doc false
@@ -269,9 +398,9 @@ defmodule Membership do
   end
 
   @doc false
-  def authorize_inherited_plans(active_roles \\ [], required_plans \\ []) do
+  def authorize_inherited_plans(active_features \\ [], required_plans \\ []) do
     active_plans =
-      active_roles
+      active_features
       |> Enum.map(& &1.plans)
       |> List.flatten()
       |> Enum.uniq()
@@ -285,7 +414,22 @@ defmodule Membership do
   end
 
   @doc false
-  def member_authorize!(conditions) do
+  def authorize_features(active_features \\ [], required_features \\ []) do
+    active_features =
+      active_features
+      |> Enum.map(& &1.identifier)
+      |> Enum.uniq()
+
+    authorized =
+      Enum.filter(required_features, fn feature ->
+        Enum.member?(active_features, feature)
+      end)
+
+    length(authorized) > 0
+  end
+
+  @doc false
+  def authorize!(conditions) do
     # Authorize empty conditions as true
 
     conditions =
@@ -306,7 +450,7 @@ defmodule Membership do
   end
 
   @doc """
-  Requires an plan within permissions block
+  Requires an plan within as_member block
 
   ## Example
 
@@ -314,6 +458,9 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
+          as_member do
+            has_plan(:can_run_test_authorization)
+          end
         end
       end
   """
@@ -328,5 +475,26 @@ defmodule Membership do
 
     Membership.Registry.add(:extra_rules, has_plan?(current_member, plan, entity))
     {:ok, plan}
+  end
+
+  @doc """
+  Requires a feature within as_member block
+
+  ## Example
+
+      defmodule HelloTest do
+        use Membership
+
+        def test_authorization do
+          as_member do
+            has_feature(:admin)
+          end
+        end
+      end
+  """
+  @spec has_feature(atom()) :: {:ok, atom()}
+  def has_feature(feature) do
+    Membership.Registry.add(:required_features, Atom.to_string(feature))
+    {:ok, feature}
   end
 end

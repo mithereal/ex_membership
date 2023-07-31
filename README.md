@@ -4,8 +4,8 @@
 [![Build Status](https://img.shields.io/travis/mithereal/ex_membership.svg?style=flat-square)](https://travis-ci.org/mithereal/ex_membership)
 [![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 
-Membership is toolkit for granular ability management for members. It allows you to define granular abilities such as:
-this is basically terminator but with methods and dsl for membership plans
+Membership is toolkit for granular feature management for members. It allows you to define granular features such as:
+this is basically terminator but with methods and dsl for membership plans and features
 - `Member -> Plan`
 - `Member -> [Plan, Plan, ...]`
 
@@ -21,22 +21,22 @@ defmodule Sample.Post
     post = %Post{id: 1}
 
     permissions do
-      has_role(:admin) # or
-      has_role(:editor) # or
-      has_ability(:delete_posts) # or
-      has_ability(:delete, post) # Entity related abilities
+      has_plan(:admin) # or
+      has_plan(:editor) # or
+      has_feature(:delete_posts) # or
+      has_feature(:delete, post) # Entity related features
       calculated(fn member ->
         member.email_confirmed?
       end)
     end
 
-    as_authorized do
+    as_member do
       Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
     end
 
     # Notice that you can use both macros or functions
 
-    case is_authorized? do
+    case member_authorized? do
       :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
       {:error, message} -> "Raise error"
       _ -> "Raise error"
@@ -47,10 +47,10 @@ defmodule Sample.Post
 
 ## Features
 
-- [x] `Member` -> `[Ability]` permission schema
-- [x] `Role` -> `[Ability]` permission schema
-- [x] `Member` -> `[Role]` -> `[Ability]` permission schema
-- [x] `Member` -> `Object` -> `[Ability]` permission schema
+- [x] `Member` -> `[Feature]` permission schema
+- [x] `Plan` -> `[Feature]` permission schema
+- [x] `Member` -> `[Plan]` -> `[Feature]` permission schema
+- [x] `Member` -> `Object` -> `[Feature]` permission schema
 - [x] Computed permission in runtime
 - [x] Easily readable DSL
 - [ ] [ueberauth](https://github.com/ueberauth/ueberauth) integration
@@ -136,18 +136,18 @@ defmodule Sample.Post
 
 
     permissions do
-      has_role(:admin) # or
-      has_role(:editor) # or
-      has_ability(:delete_posts) # or
+      has_plan(:admin) # or
+      has_plan(:editor) # or
+      has_feature(:delete_posts) # or
     end
 
-    as_authorized do
+    member_authorized do
       Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
     end
 
     # Notice that you can use both macros or functions
 
-    case is_authorized? do
+    case member_authorized? do
       :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
       {:error, message} -> "Raise error"
       _ -> "Raise error"
@@ -223,7 +223,7 @@ defmodule Sample.Post do
 end
 ```
 
-To perform exclusive abilities such as `when User is owner of post AND is in editor role` we can do so as in following example
+To perform exclusive features such as `when User is owner of post AND is in editor plan` we can do so as in following example
 
 ```elixir
 defmodule Sample.Post do
@@ -233,10 +233,10 @@ defmodule Sample.Post do
     load_and_authorize_member(user)
 
     permissions do
-      has_role(:editor)
+      has_plan(:editor)
     end
 
-    as_authorized do
+    member_authorized do
       case is_owner(member, post) do
         :ok -> ...
         {:error, message} -> ...
@@ -266,8 +266,8 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     post = %Post{owner_id: 1}
 
-    # We can also use has_ability?/2
-    if has_role?(user, :admin) and is_owner(user, post) do
+    # We can also use has_feature?/2
+    if has_plan?(user, :admin) and is_owner(user, post) do
       ...
     end
   end
@@ -278,16 +278,16 @@ defmodule Sample.Post do
 end
 ```
 
-### Entity related abilities
+### Entity related features
 
-Membership allows you to grant abilities on any particular struct. Struct needs to have signature of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete` ability on particular `Post` for our member:
+Membership allows you to grant features on any particular struct. Struct needs to have signature of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete` feature on particular `Post` for our member:
 
 ```elixir
 iex> {:ok, member} = %Membership.Member{} |> Membership.Repo.insert()
 iex> post = %Post{id: 1}
-iex> ability = %Ability{identifier: "delete"}
+iex> feature = %Feature{identifier: "delete"}
 iex> Membership.Member.grant(member, :delete, post)
-iex> Membership.has_ability?(member, :delete, post)
+iex> Membership.has_feature?(member, :delete, post)
 true
 ```
 
@@ -299,19 +299,19 @@ defmodule Sample.Post do
     load_and_authorize_member(user)
 
     permissions do
-      has_ability(:delete, post)
+      has_feature(:delete, post)
     end
 
-    as_authorized do
+    member_authorized do
       :ok
     end
   end
 end
 ```
 
-### Granting abilities
+### Granting features
 
-Let's assume we want to create new `Role` - _admin_ which is able to delete accounts inside our system. We want to have special `Member` who is given this _role_ but also he is able to have `Ability` for banning users.
+Let's assume we want to create new `Plan` - _admin_ which is able to delete accounts inside our system. We want to have special `Member` who is given this _plan_ but also he is able to have `Feature` for banning users.
 
 1. Create member
 
@@ -319,77 +319,77 @@ Let's assume we want to create new `Role` - _admin_ which is able to delete acco
 iex> {:ok, member} = %Membership.Member{} |> Membership.Repo.insert()
 ```
 
-2. Create some abilities
+2. Create some features
 
 ```elixir
-iex> {:ok, ability_delete} = Membership.Ability.build("delete_accounts", "Delete accounts of users") |> Membership.Repo.insert()
-iex> {:ok, ability_ban} = Membership.Ability.build("ban_accounts", "Ban users") |> Membership.Repo.insert()
+iex> {:ok, feature_delete} = Membership.Feature.build("delete_accounts", "Delete accounts of users") |> Membership.Repo.insert()
+iex> {:ok, feature_ban} = Membership.Feature.build("ban_accounts", "Ban users") |> Membership.Repo.insert()
 ```
 
-3. Create role
+3. Create plan
 
 ```elixir
-iex> {:ok, role} = Membership.Role.build("admin", [], "Site administrator") |> Membership.Repo.insert()
+iex> {:ok, plan} = Membership.Plan.build("admin", [], "Site administrator") |> Membership.Repo.insert()
 ```
 
-4. Grant abilities to a role
+4. Grant features to a plan
 
 ```elixir
-iex> Membership.Role.grant(role, ability_delete)
+iex> Membership.Plan.grant(plan, feature_delete)
 ```
 
-5. Grant role to a member
+5. Grant plan to a member
 
 ```elixir
-iex> Membership.Member.grant(member, role)
+iex> Membership.Member.grant(member, plan)
 ```
 
-6. Grant abilities to a member
+6. Grant features to a member
 
 ```elixir
-iex> Membership.Member.grant(member, ability_ban)
+iex> Membership.Member.grant(member, feature_ban)
 ```
 
 ```elixir
-iex> member |> Membership.Repo.preload([:roles, :abilities])
+iex> member |> Membership.Repo.preload([:plans, :features])
 %Membership.Member{
-  abilities: [
-    %Membership.Ability{
+  features: [
+    %Membership.Feature{
       identifier: "ban_accounts"
     }
   ]
-  roles: [
-    %Membership.Role{
+  plans: [
+    %Membership.Plan{
       identifier: "admin"
-      abilities: ["delete_accounts"]
+      features: ["delete_accounts"]
     }
   ]
 }
 ```
 
-### Revoking abilities
+### Revoking features
 
-Same as we can grant any abilities to models we can also revoke them.
+Same as we can grant any features to models we can also revoke them.
 
 ```elixir
-iex> Membership.Member.revoke(member, role)
-iex> member |> Membership.Repo.preload([:roles, :abilities])
+iex> Membership.Member.revoke(member, plan)
+iex> member |> Membership.Repo.preload([:plans, :features])
 %Membership.Member{
-  abilities: [
-    %Membership.Ability{
+  features: [
+    %Membership.Feature{
       identifier: "ban_accounts"
     }
   ]
-  roles: []
+  plans: []
 }
-iex> Membership.Member.revoke(member, ability_ban)
-iex> member |> Membership.Repo.preload([:roles, :abilities])
+iex> Membership.Member.revoke(member, feature_ban)
+iex> member |> Membership.Repo.preload([:plans, :features])
 %Membership.Member{
-  abilities: []
-  roles: []
+  features: []
+  plans: []
 }
 ```
 
 ## License
 
-[MIT © Milos Mosovsky](mailto:milos@mosovsky.com)
+[MIT © Jason Clark](mailto:mithereal@gmail.com)
