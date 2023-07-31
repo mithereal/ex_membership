@@ -9,7 +9,7 @@ defmodule Membership.Factory do
   end
 
   def plan_factory do
-    %plan{
+    %Plan{
       identifier: sequence(:plan, ["Free", "Bronze", "Silver", "Gold"])
     }
   end

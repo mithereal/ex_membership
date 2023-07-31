@@ -252,7 +252,7 @@ defmodule Membership.Member do
     |> where(
       [e],
       e.member_id == ^member.id and e.assoc_id == ^feature_id and
-        e.assoc_type == ^MemberFeatures.normalize_struct_name(feature_name)
+        e.assoc_type == ^normalize_struct_name(feature_name)
     )
     |> @repo.one()
   end
