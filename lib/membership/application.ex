@@ -5,10 +5,10 @@ defmodule Membership.Application do
   alias Membership.Repo
 
   @impl true
-  def start(_type, args) do
+  def start(_type, args \\ []) do
 
     children = [
-     {Repo, args},
+      {Repo, args},
       {Membership.Registry, []}
     ]
 

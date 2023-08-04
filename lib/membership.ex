@@ -5,24 +5,22 @@ defmodule Membership do
   Membership has 3 main components:
 
     * `Membership.Plan` -  Representation of a single plan e.g. :gold, :silver, :copper
+    * `Membership.Feature` - Feature of a plan eg. :edit_feature
     * `Membership.Member` - Main actor which is holding given plans
-    * `Membership.MemberPlans` - Grouped set of multiple plans, e.g. :admin, :manager, :editor
 
   ## Relations between models
 
-  `Membership.Plan` -> `Membership.Plan.Feature` [1-n] - Any given plan can hold multiple features
+  `Membership.Plan` -> `Membership.Plan.Feature` [1-n] - Any given plan can have multiple features
 
-  `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can hold multiple plans
-  this allows you to have very granular set of plans per each member
+  `Membership.Member` -> `Membership.MemberPlans` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
 
-  `Membership.Member` -> `Membership.MemberPlans` [1-n] - Any given member can act as multiple plans
-  this allows you to manage multple sets of plans for multiple members at once
+  `Membership.Member` -> `Membership.MemberFeatures`  -> `Membership.Feature`[1-n] - Any given member have multiple features with this we can have more granular features for each member is adding a specific feature to a member not in his plan
 
   ## Calculating plans
 
   Calculation of plans is done by *OR* and *DISTINCT* plans. That means if you have
 
-  `MemberPlans[:admin, plans: [:gold]]`, `MemberPlans[:editor, plans: [:silver]]`, `MemberPlans[:user, plans: [:bromze]]`
+  `MemberPlans[:user, plans: [:gold]]`, `MemberPlans[:user, plans: [:silver]]`, `MemberPlans[:user, plans: [:bronze]]`
   and all plans are granted to single member, resulting plans will be `[:gold, :silver, :bronze]`
 
 
