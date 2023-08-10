@@ -3,9 +3,9 @@ defmodule Membership.Registry do
 
   use GenServer
 
-  def start_link(_) do
+  def start_link(args) do
     {:ok, pid} = GenServer.start_link(__MODULE__, %{table: nil})
-    GenServer.call(pid, :init_table)
+    GenServer.call(pid, {:init_table, args.identifier})
     {:ok, pid}
   end
 
@@ -15,8 +15,8 @@ defmodule Membership.Registry do
   end
 
   @impl true
-  def handle_call(:init_table, _from, _state) do
-    table = :ets.new(__MODULE__, [:named_table, :set, :public, read_concurrency: true])
+  def handle_call({:init_table, identifier}, _from, _state) do
+    table = :ets.new(identifier, [:named_table, :set, :public, read_concurrency: true])
     {:reply, table, %{table: table}}
   end
 

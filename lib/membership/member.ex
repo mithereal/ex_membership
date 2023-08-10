@@ -10,7 +10,6 @@ defmodule Membership.Member do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias __MODULE__
   alias Membership.Plan
   alias Membership.Feature
   alias Membership.MemberPlans
@@ -22,6 +21,7 @@ defmodule Membership.Member do
   @type t :: %Member{}
 
   schema "membership_members" do
+    field(:identifier, :string)
 
     has_many(:features, Feature, through: MemberPlans)
     has_many(:extra_features, Feature, through: MemberFeatures)
@@ -257,7 +257,7 @@ defmodule Membership.Member do
     |> Repo.one()
   end
 
-  def table, do: :ex_membership_members
+  def table, do: :membership_members
 
   defp merge_uniq_grants(grants) do
     Enum.uniq_by(grants, fn grant ->

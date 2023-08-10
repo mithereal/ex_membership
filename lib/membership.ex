@@ -12,7 +12,7 @@ defmodule Membership do
 
   `Membership.Member`  -> `Membership.Feature`[1-n] - Any given member have multiple features with this we can have more granular features for each member is adding a specific feature to a member not in his plan
 
-   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
+  `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
 
   `Membership.Plan` -> `Membership.Plan.Feature` [m-n] - Any given plan can have multiple features
 
@@ -86,7 +86,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          member_permissions do
+          as_member do
             IO.inspect("This code is executed only for authorized member")
           end
         end
