@@ -5,16 +5,17 @@ defmodule Membership do
   Membership has 3 main components:
 
     * `Membership.Plan` -  Representation of a single plan e.g. :gold, :silver, :copper
-    * `Membership.Feature` - Feature of a plan eg. :edit_feature
     * `Membership.Member` - Main actor which is holding given plans
+    * `Membership.Feature` - Feature of a plan eg. :edit_feature
 
   ## Relations between models
 
-  `Membership.Plan` -> `Membership.Plan.Feature` [1-n] - Any given plan can have multiple features
+  `Membership.Member`  -> `Membership.Feature`[1-n] - Any given member have multiple features with this we can have more granular features for each member is adding a specific feature to a member not in his plan
 
-  `Membership.Member` -> `Membership.MemberPlans` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
+   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
 
-  `Membership.Member` -> `Membership.MemberFeatures`  -> `Membership.Feature`[1-n] - Any given member have multiple features with this we can have more granular features for each member is adding a specific feature to a member not in his plan
+  `Membership.Plan` -> `Membership.Plan.Feature` [m-n] - Any given plan can have multiple features
+
 
   ## Calculating plans
 
@@ -43,7 +44,7 @@ defmodule Membership do
   end
 
   @doc """
-  Macro for defining required as_member
+  Macro for defining required permissions
 
   ## Example
 
@@ -292,7 +293,7 @@ defmodule Membership do
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
-      # If no as_member were required then we can assume performe is granted
+      # If no as_member were required then we can assume member is granted
       if length(required_plans) + length(required_features) + length(calculated_as_member) +
            length(extra_rules) == 0 do
         :ok
