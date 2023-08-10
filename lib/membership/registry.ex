@@ -20,13 +20,13 @@ defmodule Membership.Registry do
     {:reply, table, %{table: table}}
   end
 
-  def insert(name, value) do
-    :ets.insert(__MODULE__, {name, value})
+  def insert(identifier, name, value) do
+    :ets.insert(identifier, {name, value})
   end
 
-  def add(name, value) do
+  def add(identifier,name, value) do
     current =
-      case lookup(name) do
+      case lookup(identifier,name) do
         {:ok, nil} -> []
         {:ok, current} -> current
       end
@@ -36,8 +36,8 @@ defmodule Membership.Registry do
     insert(name, uniq)
   end
 
-  def lookup(name) do
-    case :ets.lookup(__MODULE__, name) do
+  def lookup(identifier, name) do
+    case :ets.lookup(identifier, name) do
       [{^name, value}] -> {:ok, value}
       [] -> {:ok, nil}
     end

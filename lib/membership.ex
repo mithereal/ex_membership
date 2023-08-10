@@ -351,10 +351,10 @@ defmodule Membership do
       import Membership, only: [store_member!: 1, load_and_store_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
-        do: store_member!(member)
+        do: load_and_store_member!(member)
 
       def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}),
-        do: store_member!(member)
+        do: load_and_store_member!(member)
 
       def load_and_authorize_member(%{member_id: member_id})
           when not is_nil(member_id),
@@ -369,8 +369,16 @@ defmodule Membership do
   @spec load_and_store_member!(integer()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(member_id) do
     member = Membership.Repo.get!(Membership.Member, member_id)
-    store_member!(member)
+    Membership.Memberships.Supervisor.start(member)
   end
+
+    @doc false
+    @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
+    def load_and_store_member!(%Membership.Member{id: _id} = member) do
+    Membership.Memberships.Supervisor.start(member)
+      {:ok, member}
+    end
+
 
   @doc false
   @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
@@ -378,12 +386,12 @@ defmodule Membership do
     member |> Membership.Repo.preload([:features])
   end
 
-  @doc false
-  @spec store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
-  def store_member!(%Membership.Member{id: _id} = member) do
-    Membership.Registry.insert(:current_member, member)
-    {:ok, member}
-  end
+#  @doc false
+#  @spec store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
+#  def store_member!(%Membership.Member{id: _id} = member) do
+#    Membership.Registry.insert(:current_member, member)
+#    {:ok, member}
+#  end
 
   @doc false
   def authorize_plans(active_plans \\ [], required_plans \\ []) do
@@ -448,7 +456,7 @@ defmodule Membership do
   end
 
   @doc """
-  Requires an plan within as_member block
+  Requires an plan within member_permissions block
 
   ## Example
 
@@ -476,7 +484,7 @@ defmodule Membership do
   end
 
   @doc """
-  Requires a feature within as_member block
+  Requires a feature within member_permissions block
 
   ## Example
 
