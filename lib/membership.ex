@@ -274,25 +274,17 @@ defmodule Membership do
         required_features \\ [],
         extra_rules \\ []
       ) do
-    current_member =
-      case current_member do
-        nil ->
-          {:ok, current_member} = Membership.Registry.lookup(:current_member)
-          current_member
-
-        _ ->
-          current_member
-      end
-
-    required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
-    required_features = ensure_membership_array_from_ets(required_features, :required_features)
-    extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
-    calculated_as_member = ensure_membership_array_from_ets([], :calculated_as_member)
 
     # If no member is given we can assume that as_member are not granted
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
+
+      required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
+      required_features = ensure_membership_array_from_ets(required_features, :required_features)
+      extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
+      calculated_as_member = ensure_membership_array_from_ets([], :calculated_as_member)
+
       # If no as_member were required then we can assume member is granted
       if length(required_plans) + length(required_features) + length(calculated_as_member) +
            length(extra_rules) == 0 do
@@ -329,10 +321,11 @@ defmodule Membership do
   end
 
   defp ensure_membership_array_from_ets(value, name) do
+    id = __MODULE__
     value =
       case value do
         [] ->
-          {:ok, value} = Membership.Registry.lookup(name)
+          {:ok, value} = Membership.Registry.lookup(id, name)
           value
 
         value ->
