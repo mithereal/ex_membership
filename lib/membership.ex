@@ -489,7 +489,7 @@ end)
         end
       end
   """
-  @spec has_plan(atom()) :: {:ok, atom()}
+  @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, function) do
     registry = function_registry(function)
     Membership.Registry.add(registry,:required_plans, Atom.to_string(plan))
@@ -518,7 +518,7 @@ end)
         end
       end
   """
-  @spec has_feature(atom()) :: {:ok, atom()}
+  @spec has_feature(atom(), atom()) :: {:ok, atom()}
   def has_feature(feature, function) do
     registry = function_registry(function)
     Membership.Registry.add(registry,:required_features, Atom.to_string(feature))
