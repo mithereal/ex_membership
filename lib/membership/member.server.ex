@@ -48,7 +48,6 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_cast(:load, state) do
-    Membership.Registry.start_link(state)
     {:noreply, state}
   end
 

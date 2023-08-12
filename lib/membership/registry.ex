@@ -33,7 +33,7 @@ defmodule Membership.Registry do
 
     uniq = Enum.uniq(current ++ [value])
 
-    insert(name, uniq)
+    :ets.insert(name, uniq)
   end
 
   def lookup(identifier, name) do

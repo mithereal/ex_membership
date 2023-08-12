@@ -18,7 +18,7 @@ defmodule Sample.Post
 
   def delete_post(id) do
     member = Sample.Repo.get(Membership.Member, 1)
-    load_and_authorize_member(member)
+    member = load_and_authorize_member(member)
     post = %Post{id: 1}
 
     member_permissions do
@@ -31,7 +31,7 @@ defmodule Sample.Post
       end)
     end
 
-    as_member do
+    as_member(member) do
       Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
     end
 

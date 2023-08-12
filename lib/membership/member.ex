@@ -22,10 +22,16 @@ defmodule Membership.Member do
 
   schema "membership_members" do
     field(:identifier, :string)
+    field(:plans, [], vitrual: true)
+    field(:features, [], vitrual: true)
 
-    has_many(:features, Feature, through: MemberPlans)
-    has_many(:extra_features, Feature, through: MemberFeatures)
-    has_many(:plans, Plan, through: MemberPlans)
+    has_many(:feature, Feature)
+    has_many(:extra_feature, Feature)
+    has_many(:plan, Plan)
+
+    has_many(:member_plans, through: [:membership_plans, :plan])
+    has_many(:member_features, through: [:membership_features, :feature])
+    has_many(:member_extra_features, through: [:membership_extra_features, :extra_feature])
 
     timestamps()
   end
