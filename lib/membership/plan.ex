@@ -5,8 +5,6 @@ defmodule Membership.Plan do
   use Membership.Schema
   import Ecto.Changeset
 
-  alias __MODULE__
-
   @typedoc "A plan struct"
   @type t :: %Plan{}
 

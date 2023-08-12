@@ -5,7 +5,6 @@ defmodule Membership.MemberPlans do
 
   use Membership.Schema
   import Ecto.Changeset
-  alias __MODULE__
 
   schema "membership_member_plans" do
     belongs_to(:member, Membership.Member)
