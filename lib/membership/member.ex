@@ -17,21 +17,16 @@ defmodule Membership.Member do
 
   alias Membership.Repo
 
+  alias Membership.Member
+
   @typedoc "A member struct"
   @type t :: %Member{}
 
   schema "membership_members" do
-    field(:identifier, :string)
-    field(:plans, {:array, :string}, vitrual: true)
-    field(:features, {:array, :string}, vitrual: true)
-#
-#    has_many(:feature, Feature)
-#    has_many(:extra_feature, Feature)
-#    has_many(:plan, Plan)
-#
-#    has_many(:member_plans, through: [:membership_plans, :plan])
-#    has_many(:member_features, through: [:membership_features, :feature])
-#    has_many(:member_extra_features, through: [:membership_extra_features, :extra_feature])
+    field(:features, {:array, :string}, default: [])
+
+    many_to_many(:plans, Plan, join_through: Membership.MemberPlans)
+    has_many(:extra_features, Membership.MemberFeatures)
 
     timestamps()
   end
@@ -253,12 +248,11 @@ defmodule Membership.Member do
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_member_features(member, %{__struct__: feature_name, id: feature_id}) do
+  def load_member_features(member, %{__struct__: _feature_name, id: feature_id, identifier: identifier}) do
     MemberFeatures
     |> where(
       [e],
-      e.member_id == ^member.id and e.assoc_id == ^feature_id and
-        e.assoc_type == ^normalize_struct_name(feature_name)
+      e.member_id == ^member.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
   end

@@ -8,9 +8,9 @@ defmodule Membership.Application do
   def start(_type, args \\ []) do
 
     children = [
-      {Repo, args},
-      {Registry, keys: :unique, name: :memberships},
-      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},
+      {Repo, []},
+      {Registry, keys: :unique, name: :memberships}, ## store ref to ets
+      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},  ## start/stop members for ref cleanup when killed
     ]
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]

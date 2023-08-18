@@ -81,18 +81,18 @@ defmodule Membership do
   Resets ETS table for all functions in the module
   """
   def reset_session() do
-    Map.__info__(:functions) |> Enum.filter(fn(x) -> Enum.is_member?(x, ignored_functions()) end)
-    |> Enum.each(fn({x,_}) ->
-
-    default = %{
-      required_plans: [],
-      required_features: [],
-      calculated_as_member: [],
-      extra_rules: []
-    }
-
-    Membership.Registry.insert(__MODULE__,x, default)
-end)
+#    Map.__info__(:functions) |> Enum.filter(fn({x,_}) -> Enum.member?(ignored_functions(),x) end)
+#    |> Enum.each(fn({x,_}) ->
+#
+#    default = %{
+#      required_plans: [],
+#      required_features: [],
+#      calculated_as_member: [],
+#      extra_rules: []
+#    }
+#
+#    Membership.Registry.insert(__MODULE__,x, default)
+#end)
   end
 
   @doc """

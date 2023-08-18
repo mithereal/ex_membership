@@ -7,6 +7,7 @@ defmodule Membership.MemberPlans do
   import Ecto.Changeset
 
   schema "membership_member_plans" do
+
     belongs_to(:member, Membership.Member)
     belongs_to(:plan, Membership.Plan)
   end

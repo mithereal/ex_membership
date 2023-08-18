@@ -1,9 +1,9 @@
-use Mix.Config
+import Config
 
 config :ex_membership, Membership.Repo,
   username: "postgres",
   password: "postgres",
-  database: "ex_membership_dev",
+  database: "ex_membership",
   hostname: "localhost",
   primary_key_type: :uuid,
   port: 55432

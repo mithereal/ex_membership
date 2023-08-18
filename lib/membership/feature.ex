@@ -5,6 +5,8 @@ defmodule Membership.Feature do
   use Membership.Schema
   import Ecto.Changeset
 
+  alias Membership.Feature
+
   @typedoc "A Feature struct"
   @type t :: %Feature{}
 

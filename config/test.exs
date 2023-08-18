@@ -2,7 +2,7 @@
 # should only configure the :api application itself
 # and only for organization purposes. All other config goes to
 # the umbrella root.
-use Mix.Config
+import Config
 
 # Configure your database
 config :ex_membership, Membership.Repo,

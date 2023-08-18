@@ -7,13 +7,14 @@ defmodule Membership.MemberFeatures do
   import Ecto.Changeset
 
   schema "membership_member_features" do
+
     belongs_to(:member, Membership.Member)
     belongs_to(:feature, Membership.Feature)
   end
 
   def changeset(%Membership.MemberFeatures{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :feature_id])
+    |> cast(params, [ :member_id, :feature_id])
     |> validate_required([:member_id, :feature_id])
   end
 

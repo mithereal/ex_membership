@@ -5,13 +5,15 @@ defmodule Membership.Plan do
   use Membership.Schema
   import Ecto.Changeset
 
+  alias Membership.Plan
+
   @typedoc "A plan struct"
   @type t :: %Plan{}
 
   schema "membership_plans" do
     field(:identifier, :string)
     field(:name, :string)
-    field(:features, {:array, :string}, vitrual: true)
+    field(:features, {:array, :string})
   end
 
   def changeset(%Plan{} = struct, params \\ %{}) do
