@@ -54,7 +54,7 @@ defmodule Membership do
         def test_authorization do
           member_permissions do
             has_feature(:admin)
-            has_plan(:view)
+            has_plan(:gold)
           end
         end
       end
@@ -305,7 +305,8 @@ defmodule Membership do
         current_member \\ nil,
         required_plans \\ [],
         required_features \\ [],
-        extra_rules \\ []
+        extra_rules \\ [],
+function // nil
       ) do
 
     # If no member is given we can assume that as_member are not granted
@@ -313,22 +314,19 @@ defmodule Membership do
       {:error, "Member is not granted to perform this action"}
     else
 
-      required_plans = ensure_membership_array_from_ets(required_plans, :required_plans)
-      required_features = ensure_membership_array_from_ets(required_features, :required_features)
-      extra_rules = ensure_membership_array_from_ets(extra_rules, :extra_rules)
-      calculated_as_member = ensure_membership_array_from_ets([], :calculated_as_member)
+      rules = fetch_membership_array_from_ets(function)
 
       # If no as_member were required then we can assume member is granted
-      if length(required_plans) + length(required_features) + length(calculated_as_member) +
-           length(extra_rules) == 0 do
+      if length(rules.required_plans) + length(rules.required_features) + length(rules.calculated_as_member) +
+           length(rules.extra_rules) == 0 do
         :ok
       else
         # 1st layer of authorization (optimize db load)
         first_layer =
           authorize!(
             [
-              authorize_plans(current_member.plans, required_plans)
-            ] ++ calculated_as_member ++ extra_rules
+              authorize_plans(current_member.plans, rules.required_plans)
+            ] ++ rules.calculated_as_member ++ rules.extra_rules
           )
 
         if first_layer == :ok do
@@ -353,21 +351,9 @@ defmodule Membership do
     end
   end
 
-  defp ensure_membership_array_from_ets(value, name) do
-    value =
-      case value do
-        [] ->
-          {:ok, value} = Membership.Registry.lookup(__MODULE__, name)
-          value
-
-        value ->
-          value
-      end
-
-    case value do
-      nil -> []
-      _ -> value
-    end
+  defp fetch_membership_array_from_ets(function) do
+          {:ok, value} = Membership.Registry.lookup(__MODULE__, function)
+         value
   end
 
   @doc false
@@ -491,13 +477,12 @@ defmodule Membership do
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, function) do
-    registry = function_registry(function)
-    Membership.Registry.add(registry,:required_plans, Atom.to_string(plan))
+    Membership.Registry.add(__MODULE__, function, %{required_plan: plan})
     {:ok, plan}
   end
 
-  def has_plan(plan, %{__struct__: _entity_name, id: _entity_id} = entity, current_member \\ nil, function \\ nil) do
-    {:ok, current_member} = Membership.Registry.lookup(:current_member)
+  def has_plan(plan, %{__struct__: _entity_name, id: _entity_id} = entity, current_member \\ :current_member, function \\ nil) do
+    {:ok, current_member} = Membership.Registry.lookup(current_member)
     registry = function_registry(function)
     Membership.Registry.add(registry,:extra_rules, has_plan?(current_member, plan, entity))
     {:ok, plan}
