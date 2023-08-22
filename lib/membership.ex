@@ -306,7 +306,7 @@ defmodule Membership do
         required_plans \\ [],
         required_features \\ [],
         extra_rules \\ [],
-function // nil
+        function // nil
       ) do
 
     # If no member is given we can assume that as_member are not granted
@@ -349,6 +349,10 @@ function // nil
         end
       end
     end
+  end
+
+  defp fetch_membership_array_from_ets(nil) do
+          {:error, "Unknown ETS function for Registry __MODULE__"}
   end
 
   defp fetch_membership_array_from_ets(function) do
