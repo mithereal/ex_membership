@@ -314,7 +314,7 @@ defmodule Membership do
       {:error, "Member is not granted to perform this action"}
     else
 
-      rules = fetch_membership_array_from_ets(function)
+      rules = fetch_rules_from_ets(function)
 
       # If no as_member were required then we can assume member is granted
       if length(rules.required_plans) + length(rules.required_features) + length(rules.calculated_as_member) +
@@ -351,11 +351,11 @@ defmodule Membership do
     end
   end
 
-  defp fetch_membership_array_from_ets(nil) do
-          {:error, "Unknown ETS function for Registry __MODULE__"}
+  defp fetch_rules_from_ets(nil) do
+          {:error, "Unknown ETS Record for Registry __MODULE__"}
   end
 
-  defp fetch_membership_array_from_ets(function) do
+  defp fetch_rules_from_ets(function) do
           {:ok, value} = Membership.Registry.lookup(__MODULE__, function)
          value
   end
