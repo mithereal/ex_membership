@@ -306,7 +306,7 @@ defmodule Membership do
         required_plans \\ [],
         required_features \\ [],
         extra_rules \\ [],
-        function // nil
+        function \\ nil
       ) do
 
     # If no member is given we can assume that as_member are not granted
