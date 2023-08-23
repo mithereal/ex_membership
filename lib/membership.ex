@@ -214,7 +214,6 @@ defmodule Membership do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(current_member)
       # {__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
-      registry =
         result = apply(unquote(callback), [current_member])
       ##todo: fix registry name and add the result to the map value
       Membership.Registry.add(
