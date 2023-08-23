@@ -90,7 +90,8 @@ defmodule Membership.MixProject do
   end
 
   defp aliases do
-    [ c: "compile",
+    [
+      c: "compile",
       test: [
         "ecto.drop --quiet",
         "ecto.create --quiet",
@@ -99,7 +100,7 @@ defmodule Membership.MixProject do
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      install: ["ecto.create", "ecto.migrate"],
+      install: ["ecto.create", "ecto.migrate"]
     ]
   end
 end

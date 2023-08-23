@@ -248,7 +248,11 @@ defmodule Membership.Member do
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_member_features(member, %{__struct__: _feature_name, id: feature_id, identifier: identifier}) do
+  def load_member_features(member, %{
+        __struct__: _feature_name,
+        id: feature_id,
+        identifier: identifier
+      }) do
     MemberFeatures
     |> where(
       [e],

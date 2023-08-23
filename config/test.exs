@@ -11,7 +11,7 @@ config :ex_membership, Membership.Repo,
   database: "ex_membership",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
-port: 55432
+  port: 55432
 
 config :logger,
   level: :info

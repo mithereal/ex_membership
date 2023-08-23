@@ -24,9 +24,9 @@ defmodule Membership.Registry do
     :ets.insert(identifier, {name, value})
   end
 
-  def add(identifier,name, value) do
+  def add(identifier, name, value) do
     current =
-      case lookup(identifier,name) do
+      case lookup(identifier, name) do
         {:ok, nil} -> []
         {:ok, current} -> current
       end

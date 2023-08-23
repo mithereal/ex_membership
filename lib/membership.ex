@@ -71,28 +71,28 @@ defmodule Membership do
   The Function list to ignore when building the permissions registrys
   """
   def ignored_functions() do
- [
- :info,
- :version
- ]
- end
+    [
+      :info,
+      :version
+    ]
+  end
 
   @doc """
   Resets ETS table for all functions in the module
   """
   def reset_session() do
-#    Map.__info__(:functions) |> Enum.filter(fn({x,_}) -> Enum.member?(ignored_functions(),x) end)
-#    |> Enum.each(fn({x,_}) ->
-#
-#    default = %{
-#      required_plans: [],
-#      required_features: [],
-#      calculated_as_member: [],
-#      extra_rules: []
-#    }
-#
-#    Membership.Registry.insert(__MODULE__,x, default)
-#end)
+    #    Map.__info__(:functions) |> Enum.filter(fn({x,_}) -> Enum.member?(ignored_functions(),x) end)
+    #    |> Enum.each(fn({x,_}) ->
+    #
+    #    default = %{
+    #      required_plans: [],
+    #      required_features: [],
+    #      calculated_as_member: [],
+    #      extra_rules: []
+    #    }
+    #
+    #    Membership.Registry.insert(__MODULE__,x, default)
+    # end)
   end
 
   @doc """
@@ -106,16 +106,16 @@ defmodule Membership do
         member = load_and_authorize_member(member)
 
         def test_authorization do
-          as_member(member) do
+          as_member(member, :test_authorization) do
             IO.inspect("This code is executed only for authorized member")
           end
         end
       end
   """
 
-  defmacro as_member(member, do: block) do
+  defmacro as_member(member, func_name, do: block) do
     quote do
-      with :ok <- member_authorization!(member) do
+      with :ok <- member_authorization!(member, func_name) do
         unquote(block)
       end
     end
@@ -152,7 +152,7 @@ defmodule Membership do
         def test_authorization do
         use Membership
         member = HelloTest.Repo.get(Membership.Member, 1)
-        member = load_and_authorize_member(member)
+       {:ok, member } = load_and_authorize_member(member)
 
           member_permissions do
             calculated_member(member,:email_confirmed)
@@ -196,24 +196,26 @@ defmodule Membership do
       end
 
   """
-  defmacro calculated_member(current_member,func_name, module_function) when is_atom(func_name) do
+  defmacro calculated_member(current_member, func_name)
+           when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
-      registry = #{__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
-      Membership.Registry.add(
-        registry,
-        :calculated_as_member,
-        unquote(func_name)(current_member)
-      )
+
+      registry =
+        Membership.Registry.add(
+          registry,
+          :calculated_as_member,
+          unquote(func_name)(current_member)
+        )
     end
   end
 
   defmacro calculated_member(current_member, callback) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
-      registry = #{__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
-
-      result = apply(unquote(callback), [current_member])
+      # {__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
+      registry =
+        result = apply(unquote(callback), [current_member])
 
       Membership.Registry.add(
         registry,
@@ -237,7 +239,7 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated_member(current_member,callback, bindings) do
+  defmacro calculated_member(current_member, callback, bindings) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(:current_member)
 
@@ -275,8 +277,8 @@ defmodule Membership do
   Perform authorization on passed member and plans
   """
   @spec has_plan?(Membership.Member.t(), atom()) :: boolean()
-  def has_plan?(%Membership.Member{} = member, plan_name) do
-    member_authorization!(member, [Atom.to_string(plan_name)], []) == :ok
+  def has_plan?(%Membership.Member{} = member, func_name, plan_name) do
+    member_authorization!(member, func_name, [Atom.to_string(plan_name)], []) == :ok
   end
 
   def has_plan?(
@@ -296,28 +298,27 @@ defmodule Membership do
   @doc """
   Perform feature check on passed member and feature
   """
-  def has_feature?(%Membership.Member{} = member, feature_name) do
-    member_authorization!(member, nil, [Atom.to_string(feature_name)], nil) == :ok
+  def has_feature?(%Membership.Member{} = member, func_name, feature_name) do
+    member_authorization!(member, func_name, nil, [Atom.to_string(feature_name)], nil) == :ok
   end
 
   @doc false
   def member_authorization!(
         current_member \\ nil,
+        func_name \\ nil,
         required_plans \\ [],
         required_features \\ [],
-        extra_rules \\ [],
-        function \\ nil
+        extra_rules \\ []
       ) do
-
     # If no member is given we can assume that as_member are not granted
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
-
-      rules = fetch_rules_from_ets(function)
+      rules = fetch_rules_from_ets(func_name)
 
       # If no as_member were required then we can assume member is granted
-      if length(rules.required_plans) + length(rules.required_features) + length(rules.calculated_as_member) +
+      if length(rules.required_plans) + length(rules.required_features) +
+           length(rules.calculated_as_member) +
            length(rules.extra_rules) == 0 do
         :ok
       else
@@ -352,12 +353,12 @@ defmodule Membership do
   end
 
   defp fetch_rules_from_ets(nil) do
-          {:error, "Unknown ETS Record for Registry __MODULE__"}
+    {:error, "Unknown ETS Record for Registry __MODULE__"}
   end
 
-  defp fetch_rules_from_ets(function) do
-          {:ok, value} = Membership.Registry.lookup(__MODULE__, function)
-         value
+  defp fetch_rules_from_ets(func_name) do
+    {:ok, value} = Membership.Registry.lookup(__MODULE__, func_name)
+    value
   end
 
   @doc false
@@ -384,17 +385,16 @@ defmodule Membership do
   @spec load_and_store_member!(integer()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(member_id) do
     member = Membership.Repo.get!(Membership.Member, member_id)
-    {status,_} = Membership.Memberships.Supervisor.start(member)
+    {status, _} = Membership.Memberships.Supervisor.start(member)
     {status, member}
   end
 
-    @doc false
-    @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
-    def load_and_store_member!(%Membership.Member{id: _id} = member) do
-    {status,_} =Membership.Memberships.Supervisor.start(member)
+  @doc false
+  @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
+  def load_and_store_member!(%Membership.Member{id: _id} = member) do
+    {status, _} = Membership.Memberships.Supervisor.start(member)
     {status, member}
-    end
-
+  end
 
   @doc false
   @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
@@ -474,21 +474,26 @@ defmodule Membership do
 
         def test_authorization do
           member_permissions do
-            has_plan(:gold)
+            has_plan(:gold, :test_authorization)
           end
         end
       end
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
-  def has_plan(plan, function) do
-    Membership.Registry.add(__MODULE__, function, %{required_plan: plan})
+  def has_plan(plan, func_name) do
+    Membership.Registry.add(__MODULE__, func_name, %{required_plan: plan})
     {:ok, plan}
   end
 
-  def has_plan(plan, %{__struct__: _entity_name, id: _entity_id} = entity, current_member \\ :current_member, function \\ nil) do
+  def has_plan(
+        plan,
+        %{__struct__: _entity_name, id: _entity_id} = entity,
+        current_member \\ :current_member,
+        func_name \\ nil
+      ) do
     {:ok, current_member} = Membership.Registry.lookup(current_member)
-    registry = function_registry(function)
-    Membership.Registry.add(registry,:extra_rules, has_plan?(current_member, plan, entity))
+    registry = function_registry(func_name)
+    Membership.Registry.add(registry, :extra_rules, has_plan?(current_member, plan, entity))
     {:ok, plan}
   end
 
@@ -508,9 +513,9 @@ defmodule Membership do
       end
   """
   @spec has_feature(atom(), atom()) :: {:ok, atom()}
-  def has_feature(feature, function) do
-    registry = function_registry(function)
-    Membership.Registry.add(registry,:required_features, Atom.to_string(feature))
+  def has_feature(feature, func_name) do
+    registry = function_registry(func_name)
+    Membership.Registry.add(registry, :required_features, Atom.to_string(feature))
     {:ok, feature}
   end
 
@@ -521,12 +526,12 @@ defmodule Membership do
 
       iex> Membership.function_registry("delete")
   """
-  def function_registry(func_name) when is_atom(func_name)do
-     #{__MODULE__} <> "_" <> #{func_name} |> String.to_atom()
+  def function_registry(func_name) when is_atom(func_name) do
+    # {__MODULE__} <> "_" <> #{func_name} |> String.to_atom()
   end
 
   def function_registry(func_name) do
-    #{__MODULE__} <> "_" <> func_name |> String.to_atom()
+    # {__MODULE__} <> "_" <> func_name |> String.to_atom()
   end
 
   @doc """

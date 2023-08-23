@@ -21,7 +21,6 @@ defmodule Membership.Member.Server do
 
   @impl true
   def init(init_arg) do
-
     ref =
       :ets.new(:membership_members, [
         :set,

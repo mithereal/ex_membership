@@ -8,9 +8,7 @@ defmodule Membership.PlanFeatures do
   alias Membership.Feature
   alias Membership.Plan
 
-
   schema "membership_plan_features" do
-
     belongs_to(:feature, Feature)
     belongs_to(:plan, Plan)
   end
