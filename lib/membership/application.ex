@@ -9,7 +9,7 @@ defmodule Membership.Application do
     children = [
       {Repo, []},
       ## store ref to ets
-      {Registry, keys: :unique, name: :memberships},
+      {Registry, keys: :unique, name: :active_memberships},
       ## start/stop members for ref cleanup when killed
       {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor}
     ]

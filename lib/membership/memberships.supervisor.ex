@@ -10,7 +10,7 @@ defmodule Membership.Memberships.Supervisor do
   alias Member.Server, as: SERVER
 
   @name :memberships_supervisor
-  @registry_name :memberships
+  @registry_name :active_memberships
 
   def child_spec() do
     %{

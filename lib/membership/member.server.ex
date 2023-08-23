@@ -7,7 +7,7 @@ defmodule Membership.Member.Server do
   """
 
   require Logger
-  @registry_name :memberships
+  @registry_name :active_memberships
 
   defstruct identifier: nil, ref: nil
 
