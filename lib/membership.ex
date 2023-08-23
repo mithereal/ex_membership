@@ -62,7 +62,7 @@ defmodule Membership do
 
   defmacro member_permissions(do: block) do
     quote do
-      reset_session()
+      load_membership_plans()
       unquote(block)
     end
   end
@@ -78,21 +78,21 @@ defmodule Membership do
   end
 
   @doc """
-  Resets ETS table for all functions in the module
+  Load the plans into ets for the module/functions
   """
-  def reset_session() do
-    #    Map.__info__(:functions) |> Enum.filter(fn({x,_}) -> Enum.member?(ignored_functions(),x) end)
-    #    |> Enum.each(fn({x,_}) ->
-    #
-    #    default = %{
-    #      required_plans: [],
-    #      required_features: [],
-    #      calculated_as_member: [],
-    #      extra_rules: []
-    #    }
-    #
-    #    Membership.Registry.insert(__MODULE__,x, default)
-    # end)
+  def load_membership_plans() do
+    Map.__info__(:functions)
+    |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
+    |> Enum.each(fn {x, _} ->
+      default = %{
+        required_plans: [],
+        required_features: [],
+        calculated_as_member: [],
+        extra_rules: []
+      }
+
+      Membership.Registry.insert(__MODULE__, x, default)
+    end)
   end
 
   @doc """
