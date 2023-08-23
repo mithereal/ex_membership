@@ -79,20 +79,29 @@ defmodule Membership do
 
   @doc """
   Load the plans into ets for the module/functions
-  """b
+  """
   def load_membership_plans() do
-    Map.__info__(:functions)
-    |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
-    |> Enum.each(fn {x, _} ->
-      default = %{
-        required_plans: [],
-        required_features: [],
-        calculated_as_member: [],
-        extra_rules: []
-      }
+    ## todo: echek the ets table for already existing table
+    exists = true
 
-      Membership.Registry.insert(__MODULE__, x, default)
-    end)
+    case exists do
+      true ->
+        :ok
+
+      false ->
+        Map.__info__(:functions)
+        |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
+        |> Enum.each(fn {x, _} ->
+          default = %{
+            required_plans: [],
+            required_features: [],
+            calculated_as_member: [],
+            extra_rules: []
+          }
+
+          Membership.Registry.insert(__MODULE__, x, default)
+        end)
+    end
   end
 
   @doc """
@@ -199,8 +208,9 @@ defmodule Membership do
   defmacro calculated_member(current_member, func_name)
            when is_atom(func_name) do
     quote do
-##todo: fix registry name and add the result to the map value
+      ## todo: fix registry name and add the result to the map value
       {:ok, current_member} = Membership.Registry.lookup(current_member)
+
       registry =
         Membership.Registry.add(
           registry,
@@ -214,8 +224,8 @@ defmodule Membership do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(current_member)
       # {__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
-        result = apply(unquote(callback), [current_member])
-      ##todo: fix registry name and add the result to the map value
+      result = apply(unquote(callback), [current_member])
+      ## todo: fix registry name and add the result to the map value
       Membership.Registry.add(
         registry,
         :calculated_as_member,
@@ -228,7 +238,7 @@ defmodule Membership do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(current_member)
       result = unquote(func_name)(current_member, unquote(bindings))
-      ##todo: fix registry name and add the result to the map value
+      ## todo: fix registry name and add the result to the map value
       Membership.Registry.add(
         __MODULE__,
         :calculated_as_member,
@@ -241,7 +251,7 @@ defmodule Membership do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(current_member)
       result = apply(unquote(callback), [current_member, unquote(bindings)])
-      ##todo: fix registry name and add the result to the map value
+      ## todo: fix registry name and add the result to the map value
       Membership.Registry.add(
         __MODULE__,
         :calculated_as_member,
@@ -478,7 +488,7 @@ defmodule Membership do
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
-    ##todo: fix registry name and add the result to the map value
+    ## todo: fix registry name and add the result to the map value
     Membership.Registry.add(__MODULE__, func_name, %{required_plan: plan})
     {:ok, plan}
   end
@@ -489,7 +499,7 @@ defmodule Membership do
         current_member \\ :current_member,
         func_name \\ nil
       ) do
-    ##todo: fix registry name and add the result to the map value
+    ## todo: fix registry name and add the result to the map value
     {:ok, current_member} = Membership.Registry.lookup(current_member)
     registry = function_registry(func_name)
     Membership.Registry.add(registry, :extra_rules, has_plan?(current_member, plan, entity))
@@ -513,7 +523,7 @@ defmodule Membership do
   """
   @spec has_feature(atom(), atom()) :: {:ok, atom()}
   def has_feature(feature, func_name) do
-    ##todo: fix registry name and add the result to the map value
+    ## todo: fix registry name and add the result to the map value
     registry = function_registry(func_name)
     Membership.Registry.add(registry, :required_features, Atom.to_string(feature))
     {:ok, feature}
