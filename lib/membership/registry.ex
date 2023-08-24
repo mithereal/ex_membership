@@ -31,9 +31,9 @@ defmodule Membership.Registry do
         {:ok, current} -> current
       end
 
-    uniq = Enum.uniq(current ++ [value])
+    uniq = %{current | required_plans: Enum.uniq(current.required_plans ++ [value])}
 
-    :ets.insert(name, uniq)
+    :ets.insert(identifier, name, uniq)
   end
 
   def lookup(identifier, name) do
