@@ -27,7 +27,7 @@ defmodule Membership.Registry do
   def add(identifier, name, value) do
     current =
       case lookup(identifier, name) do
-        {:ok, nil} -> []
+        {:ok, nil} -> %{}
         {:ok, current} -> current
       end
 

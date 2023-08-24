@@ -223,6 +223,7 @@ defmodule Membership do
 
   defmacro calculated_member(current_member, callback, func_name) when is_atom(func_name) do
     quote do
+      ## use other regiustry
       {:ok, current_member} = Membership.Registry.lookup(current_member)
       result = apply(unquote(callback), [current_member])
 
