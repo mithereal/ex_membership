@@ -26,7 +26,7 @@ defmodule Membership.Member do
     field(:features, {:array, :string}, default: [])
 
     many_to_many(:plans, Plan, join_through: Membership.MemberPlans)
-    has_many(:extra_features, Membership.MemberFeatures)
+    many_to_many(:extra_features, Feature, join_through: Membership.MemberFeatures)
 
     timestamps()
   end
@@ -106,9 +106,9 @@ defmodule Membership.Member do
         %Feature{id: _aid} = feature,
         %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    feature_features = load_member_features(member, feature)
+    features = load_member_features(member, feature)
 
-    case feature_features do
+    case features do
       nil ->
         MemberFeatures.create(member, feature, [feature.identifier])
 

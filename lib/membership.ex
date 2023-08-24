@@ -53,7 +53,7 @@ defmodule Membership do
 
         def test_authorization do
           member_permissions do
-            has_feature(:admin)
+            has_feature(:admin_feature)
             has_plan(:gold)
           end
         end
@@ -112,7 +112,7 @@ defmodule Membership do
       defmodule HelloTest do
         use Membership
         member = HelloTest.Repo.get(Membership.Member, 1)
-        member = load_and_authorize_member(member)
+        {:ok, member }  = load_and_authorize_member(member)
 
         def test_authorization do
           as_member(member, :test_authorization) do
@@ -138,7 +138,7 @@ defmodule Membership do
       defmodule HelloTest do
         use Membership
         member = HelloTest.Repo.get(Membership.Member, 1)
-        member = load_and_authorize_member(member)
+        {:ok, member }  = load_and_authorize_member(member)
 
         def test_authorization do
           member_permissions do
@@ -182,7 +182,7 @@ defmodule Membership do
         defmodule HelloTest do
         use Membership
         member = HelloTest.Repo.get(Membership.Member, 1)
-        member = load_and_authorize_member(member)
+        {:ok, member} = load_and_authorize_member(member)
 
         def test_authorization do
           post = %Post{owner_id: 1}
@@ -223,7 +223,6 @@ defmodule Membership do
   defmacro calculated_member(current_member, callback) do
     quote do
       {:ok, current_member} = Membership.Registry.lookup(current_member)
-      # {__MODULE__} <> "_" <> #{module_function} |> String.to_atom()
       result = apply(unquote(callback), [current_member])
       ## todo: fix registry name and add the result to the map value
       Membership.Registry.add(
@@ -527,21 +526,6 @@ defmodule Membership do
     registry = function_registry(func_name)
     Membership.Registry.add(registry, :required_features, Atom.to_string(feature))
     {:ok, feature}
-  end
-
-  @doc """
-  List version.
-
-  ## Examples
-
-      iex> Membership.function_registry("delete")
-  """
-  def function_registry(func_name) when is_atom(func_name) do
-    # {__MODULE__} <> "_" <> #{func_name} |> String.to_atom()
-  end
-
-  def function_registry(func_name) do
-    # {__MODULE__} <> "_" <> func_name |> String.to_atom()
   end
 
   @doc """
