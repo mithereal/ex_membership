@@ -43,7 +43,11 @@ defmodule Membership.Registry do
     end
   end
 
-  def lookup(name) do
+  def lookup(name) when is_binary(name) do
     Membership.Member.Server.show(name)
+  end
+
+  def lookup(name) when is_atom(name) do
+    :ets.lookup(__MODULE__, name)
   end
 end
