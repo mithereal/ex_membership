@@ -28,4 +28,6 @@ defmodule Membership.MemberFeatures do
     })
     |> Membership.Repo.insert!()
   end
+
+  def table, do: :membership_features
 end

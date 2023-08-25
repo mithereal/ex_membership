@@ -29,4 +29,6 @@ defmodule Membership.Plan do
       name: name
     })
   end
+
+  def table, do: :membership_plans
 end

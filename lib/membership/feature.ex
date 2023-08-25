@@ -28,4 +28,6 @@ defmodule Membership.Feature do
       name: name
     })
   end
+
+  def table, do: :membership_features
 end

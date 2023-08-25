@@ -78,13 +78,22 @@ defmodule Membership do
   end
 
   @doc """
+  Check if membership ets exists for the module
+  """
+  def ets_exists() do
+    case :ets.whereis(__MODULE__) do
+      :undefined -> false
+      _ -> true
+    end
+
+    true
+  end
+
+  @doc """
   Load the plans into ets for the module/functions
   """
   def load_membership_plans() do
-    ## todo: echek the ets table for already existing table
-    exists = true
-
-    case exists do
+    case ets_exists() do
       true ->
         :ok
 
