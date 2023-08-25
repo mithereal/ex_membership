@@ -3,7 +3,7 @@ defmodule Membership.FeatureTest do
   alias Membership.Feature
 
   setup do
-    Membership.reset_session()
+    Membership.load_membership_plans()
     :ok
   end
 
@@ -26,7 +26,6 @@ defmodule Membership.FeatureTest do
       classic_changeset =
         Feature.changeset(%Feature{}, %{
           identifier: "admin",
-          abilities: [],
           name: "Global administrator"
         })
 
@@ -43,16 +42,16 @@ defmodule Membership.FeatureTest do
       end
     end
 
-    test "grant ability to Feature" do
-      Feature = insert(:Feature, identifier: "admin", name: "Global Administrator")
-      ability = insert(:ability, identifier: "delete_accounts")
+    test "grant Feature to Plan" do
+      plan = insert(:plan, identifier: "gold", name: "Gold Plan")
+      feature = insert(:feature, identifier: "admin_feature")
 
-      Feature.grant(Feature, ability)
+      Plan.grant(Feature, feature)
 
-      Feature = Repo.get(Feature, Feature.id())
+      feature = Repo.get(Feature, Feature.id())
 
-      assert 1 == length(Feature.abilities())
-      assert ability.identifier == Enum.at(Feature.abilities(), 0)
+      assert 1 == length(plan.features())
+      assert feature.identifier == Enum.at(plan.features(), 0)
     end
 
     test "grant unique abilities to Feature" do

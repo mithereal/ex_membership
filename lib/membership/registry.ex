@@ -44,5 +44,6 @@ defmodule Membership.Registry do
   end
 
   def lookup(name) do
+    Membership.Member.Server.show(name)
   end
 end
