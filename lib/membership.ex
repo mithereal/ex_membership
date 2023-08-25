@@ -208,7 +208,7 @@ defmodule Membership do
   defmacro calculated_member(current_member, func_name)
            when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Registry.lookup(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(current_member)
 
       rules = %{calculated_as_member: unquote(func_name)(current_member)}
 
@@ -225,7 +225,7 @@ defmodule Membership do
     quote do
       ## use other regiustry
       {:ok, current_member} = Membership.Member.Server.show(current_member)
-      #    {:ok, current_member} = Membership.Registry.lookup(current_member)
+      #    {:ok, current_member} = Membership.Member.Server.show(current_member)
       result = apply(unquote(callback), [current_member])
 
       rules = %{calculated_as_member: result}
@@ -240,7 +240,7 @@ defmodule Membership do
 
   defmacro calculated_member(current_member, func_name, bindings) when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Registry.lookup(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(current_member)
       result = unquote(func_name)(current_member, unquote(bindings))
       rules = %{calculated_as_member: result}
 
@@ -255,7 +255,7 @@ defmodule Membership do
   defmacro calculated_member(current_member, callback, bindings, func_name)
            when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Registry.lookup(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(current_member)
       result = apply(unquote(callback), [current_member, unquote(bindings)])
       rules = %{calculated_as_member: result}
 
@@ -290,7 +290,7 @@ defmodule Membership do
   @doc """
   Perform authorization on passed member and plans
   """
-  @spec has_plan?(Membership.Member.t(), atom()) :: boolean()
+  @spec has_plan?(Membership.Member.t(), atom(), string()) :: boolean()
   def has_plan?(%Membership.Member{} = member, func_name, plan_name) do
     member_authorization!(member, func_name, [Atom.to_string(plan_name)], []) == :ok
   end
@@ -505,7 +505,7 @@ defmodule Membership do
         current_member \\ :current_member,
         func_name \\ nil
       ) do
-    {:ok, current_member} = Membership.Registry.lookup(current_member)
+    {:ok, current_member} = Membership.Member.Server.show(current_member)
     rules = %{extra_rules: has_plan?(current_member, plan, entity)}
     Membership.Registry.add(__MODULE__, func_name, rules)
     {:ok, plan}
