@@ -80,4 +80,13 @@ defmodule Membership.Member.Server do
   def handle_info(_msg, state) do
     {:noreply, state}
   end
+
+  @impl true
+  def handle_call(_msg, state) do
+    {:reply, state, state}
+  end
+
+  def show(params) do
+    GenServer.call(__MODULE__, :show)
+  end
 end

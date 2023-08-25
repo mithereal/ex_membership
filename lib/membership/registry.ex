@@ -42,4 +42,7 @@ defmodule Membership.Registry do
       [] -> {:ok, nil}
     end
   end
+
+  def lookup(name) do
+  end
 end
