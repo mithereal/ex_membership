@@ -87,6 +87,6 @@ defmodule Membership.Member.Server do
   end
 
   def show(params) do
-    GenServer.call(__MODULE__, :show)
+    GenServer.call(via_tuple(params), :show)
   end
 end
