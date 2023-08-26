@@ -102,7 +102,7 @@ defmodule Membership.Feature do
         %Feature{id: _aid} = feature,
         %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    features = load_member_features(plan, feature)
+    features = load_plan_features(plan, feature)
 
     case features do
       nil ->
@@ -145,13 +145,13 @@ defmodule Membership.Feature do
   Function accepts either `Membership.Feature` or `Membership.Plan` grants.
   Function is directly opposite of `Membership.Member.grant/2`
 
-  To revoke particular feature from a given member
+  To revoke particular feature from a given plan
 
-      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
+      iex> Membership.Feature.revoke(%Membership.Plan{id: 1}, %Membership.Feature{id: 1})
 
-  To revoke particular plan from a given member
+  To revoke particular plan from a given feature
 
-      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
+      iex> Membership.Feature.revoke(%Membership.Feature{id: 1}, %Membership.Plan{id: 1})
 
   """
   @spec revoke(Plan.t(), Feature.t() | Plan.t()) :: Member.t()
@@ -202,7 +202,7 @@ defmodule Membership.Feature do
         %Feature{id: _id} = feature,
         %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    feature_features = load_member_features(plan, feature)
+    feature_features = load_plan_features(plan, feature)
 
     case feature_features do
       nil ->
@@ -244,7 +244,16 @@ defmodule Membership.Feature do
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_member_features() do
-    features = []
+  def load_plan_features(plan, %{
+        __struct__: _feature_name,
+        id: feature_id,
+        identifier: identifier
+      }) do
+    PlanFeatures
+    |> where(
+      [e],
+      e.plan_id == ^plan.id and e.feature_id == ^feature_id
+    )
+    |> Repo.one()
   end
 end
