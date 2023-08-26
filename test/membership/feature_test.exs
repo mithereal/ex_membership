@@ -3,7 +3,7 @@ defmodule Membership.FeatureTest do
   alias Membership.Feature
 
   setup do
-    Membership.load_membership_plans()
+    Feature.load_plan_features()
     :ok
   end
 
@@ -46,39 +46,39 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan, identifier: "gold", name: "Gold Plan")
       feature = insert(:feature, identifier: "admin_feature")
 
-      Plan.grant(Feature, feature)
+      Feature.grant(feature, plan)
 
-      feature = Repo.get(Feature, Feature.id())
+      feature = Repo.get(Feature, feature.id())
 
       assert 1 == length(plan.features())
       assert feature.identifier == Enum.at(plan.features(), 0)
     end
 
     test "grant unique abilities to Feature" do
-      Feature = insert(:Feature, identifier: "admin", name: "Global Administrator")
-      ability = insert(:ability, identifier: "delete_accounts")
+      plan = insert(:plan, identifier: "gold", name: "Gold Plan")
+      feature = insert(:feature, identifier: "admin_feature")
 
-      Feature.grant(Feature, ability)
-      Feature.grant(Feature, ability)
+      Feature.grant(feature, plan)
+      Feature.grant(feature, plan)
 
-      Feature = Repo.get(Feature, Feature.id())
+      feature = Repo.get(Feature, feature.id())
 
-      assert 1 == length(Feature.abilities())
-      assert ability.identifier == Enum.at(Feature.abilities(), 0)
+      assert 1 == length(feature.abilities())
+      assert feature.identifier == Enum.at(plan.features(), 0)
     end
 
     test "grants multiple abilities to Feature" do
-      Feature = insert(:Feature, identifier: "admin", name: "Global Administrator")
-      ability_delete = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      plan = insert(:plan, identifier: "gold", name: "Gold Plan")
+      feature_1 = insert(:feature, identifier: "first_feature")
+      feature_2 = insert(:feature, identifier: "second_feature")
 
-      Feature = Feature.grant(Feature, ability_delete)
-      Feature.grant(Feature, ability_ban)
+      plan = Feature.grant(plan, feature_1)
+      Feature.grant(plan, feature_2)
 
-      Feature = Repo.get(Feature, Feature.id())
+      plan = Repo.get(Plan, feature.id())
 
-      assert 2 == length(Feature.abilities())
-      assert assert ["delete_accounts", "ban_accounts"] == Feature.abilities()
+      assert 2 == length(plan.features())
+      assert assert ["first_feature", "second_feature"] == plan.features()
     end
   end
 

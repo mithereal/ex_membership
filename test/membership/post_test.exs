@@ -5,7 +5,7 @@ defmodule PostTest do
     load_and_authorize_member(member)
 
     permissions do
-      has_role(:admin)
+      has_plan(:admin)
     end
 
     as_authorized do
@@ -16,8 +16,8 @@ defmodule PostTest do
   def update(member) do
     load_and_authorize_member(member)
 
-    permissions do
-      has_ability(:update_post)
+    membership_permissions do
+      has_feature(:update_post)
     end
 
     as_authorized do
@@ -28,8 +28,8 @@ defmodule PostTest do
   def entity_update(member) do
     load_and_authorize_member(member)
 
-    permissions do
-      has_ability(:delete_member, member)
+    membership_permissions do
+      has_feature(:delete_member, member)
     end
 
     as_authorized do
@@ -40,8 +40,8 @@ defmodule PostTest do
   def no_macro(member) do
     load_and_authorize_member(member)
 
-    permissions do
-      has_ability(:update_post)
+    membership_permissions do
+      has_feature(:update_post)
     end
 
     case is_authorized?() do
@@ -99,7 +99,7 @@ defmodule Membership.MembershipTest do
   use Membership.EctoCase
 
   setup do
-    Membership.reset_session()
+    Membership.load_membership_plans()
     :ok
   end
 
@@ -118,59 +118,59 @@ defmodule Membership.MembershipTest do
 
     test "rejects invalid role" do
       member = insert(:member)
-      role = insert(:role, identifier: "editor")
+      plan = insert(:plan, identifier: "gold")
 
-      Membership.Member.grant(member, role)
+      Membership.Member.grant(member, plan)
 
       assert {:error, "Member is not granted to perform this action"} == Post.delete(member)
     end
 
-    test "allows role" do
+    test "allows plan" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin")
+      plan = insert(:plan, identifier: "admin")
 
-      member = Membership.Member.grant(member, role)
+      member = Membership.Member.grant(member, plan)
       assert {:ok, "Authorized"} == Post.delete(member)
     end
 
-    test "rejects no abilities" do
+    test "rejects no features" do
       member = insert(:member)
 
       assert {:error, "Member is not granted to perform this action"} == Post.update(member)
     end
 
-    test "rejects invalid ability" do
+    test "rejects invalid features" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_post")
+      feature = insert(:feature, identifier: "view_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
 
       assert {:error, "Member is not granted to perform this action"} == Post.update(member)
     end
 
-    test "allows ability" do
+    test "allows feature" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
 
       assert {:ok, "Authorized"} == Post.update(member)
     end
 
     test "allows ability on struct" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_member")
+      feature = insert(:feature, identifier: "delete_member")
 
-      member = Membership.Member.grant(member, ability, member)
+      member = Membership.Member.grant(member, feature, member)
 
       assert {:ok, "Authorized"} == Post.entity_update(member)
     end
 
     test "rejects ability on struct" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      ability = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability, member)
+      member = Membership.Member.grant(member, feature, member)
 
       assert {:error, "Member is not granted to perform this action"} ==
                Post.entity_update(member)
@@ -178,21 +178,21 @@ defmodule Membership.MembershipTest do
 
     test "rejects inherited ability from role" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin", name: "Administator")
+      plan = insert(:plan, identifier: "admin", name: "Administator")
       ability = insert(:ability, identifier: "view_post")
 
-      role = Membership.Role.grant(role, ability)
-      member = Membership.Member.grant(member, role)
+      feature = Membership.Feature.grant(plan, ability)
+      member = Membership.Member.grant(member, feature)
 
       assert {:error, "Member is not granted to perform this action"} == Post.update(member)
     end
 
     test "allows inherited ability from role" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin", name: "Administator")
-      ability = insert(:ability, identifier: "update_post")
+      plan = insert(:plan, identifier: "admin", name: "Administator")
+      feature = insert(:feature, identifier: "update_post")
 
-      role = Membership.Role.grant(role, ability)
+      role = Membership.Role.grant(plan, feature)
       member = Membership.Member.grant(member, role)
 
       assert {:ok, "Authorized"} == Post.update(member)
@@ -200,15 +200,15 @@ defmodule Membership.MembershipTest do
 
     test "allows inherited ability from multiple roles" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin", name: "Administator")
-      role_editor = insert(:role, identifier: "editor", name: "Administator")
-      ability = insert(:ability, identifier: "delete_post")
-      ability_update = insert(:ability, identifier: "update_post")
+      plan = insert(:plan, identifier: "admin", name: "Administator")
+      plan_1 = insert(:plan, identifier: "editor", name: "Administator")
+      feature = insert(:feature, identifier: "delete_post")
+      feature_update = insert(:feature, identifier: "update_post")
 
-      role = Membership.Role.grant(role, ability)
-      role_editor = Membership.Role.grant(role_editor, ability_update)
-      member = Membership.Member.grant(member, role)
-      member = Membership.Member.grant(member, role_editor)
+      role = Membership.Role.grant(plan, feature)
+      role_editor = Membership.Role.grant(plan_1, feature_update)
+      member = Membership.Member.grant(member, plan)
+      member = Membership.Member.grant(member, plan_1)
 
       assert {:ok, "Authorized"} == Post.update(member)
     end
@@ -223,18 +223,18 @@ defmodule Membership.MembershipTest do
 
     test "allows ability without macro block" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
 
       assert {:ok, "Authorized"} == Post.no_macro(member)
     end
 
     test "allows ability without any required permissions" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
 
       assert {:ok, "Authorized"} == Post.no_permissions(member)
     end
@@ -249,10 +249,10 @@ defmodule Membership.MembershipTest do
   describe "Membership.load_and_store_member/1" do
     test "allows ability to not preloaded member from database" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
       not_loaded_member = %{member_id: member.id}
-      Membership.Member.grant(member, ability)
+      Membership.Member.grant(member, feature)
 
       assert {:ok, "Authorized"} == Post.update(not_loaded_member)
     end
@@ -261,9 +261,9 @@ defmodule Membership.MembershipTest do
   describe "Membership.store_member/1" do
     test "allows ability to member loaded on different struct" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
       user = %{member: member}
 
       assert {:ok, "Authorized"} == Post.update(user)
@@ -290,38 +290,38 @@ defmodule Membership.MembershipTest do
     end
   end
 
-  describe "Membership.has_ability?/2" do
-    test "grants ability passed as an argument" do
+  describe "Membership.has_feature?/2" do
+    test "grants feature passed as an argument" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, ability)
+      member = Membership.Member.grant(member, feature)
 
-      assert Membership.has_ability?(member, :update_post)
+      assert Membership.has_feature?(member, :update_post)
 
-      refute Membership.has_ability?(member, :delete_post)
+      refute Membership.has_feature?(member, :delete_post)
     end
   end
 
-  describe "Membership.has_role?/2" do
+  describe "Membership.has_plan?/2" do
     test "grants role passed as an argument" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin", name: "Administrator")
+      plan = insert(:plan, identifier: "admin", name: "Administrator")
 
-      member = Membership.Member.grant(member, role)
+      member = Membership.Member.grant(member, plan)
 
-      assert Membership.has_role?(member, :admin)
+      assert Membership.has_plan?(member, :admin)
 
-      refute Membership.has_role?(member, :editor)
+      refute Membership.has_plan?(member, :editor)
     end
   end
 
   describe "Membership.perform_authorization!/3" do
     test "performs authorization" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin", name: "Administrator")
+      plan = insert(:plan, identifier: "admin", name: "Administrator")
 
-      member = Membership.Member.grant(member, role)
+      member = Membership.Member.grant(member, plan)
 
       assert Membership.perform_authorization!(member)
       assert Membership.perform_authorization!(member, [])
