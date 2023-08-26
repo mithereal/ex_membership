@@ -245,8 +245,6 @@ defmodule Membership.Feature do
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
   def load_member_features() do
-    ## todo
     features = []
-    {:ok, features}
   end
 end
