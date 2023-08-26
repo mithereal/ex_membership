@@ -22,129 +22,129 @@ defmodule Membership.MemberTest do
       end
     end
 
-    test "grant ability to member" do
+    test "grant feature to member" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(member, ability)
+      Member.grant(member, feature)
 
       member = Repo.get(Member, member.id)
 
-      assert 1 == length(member.abilities)
-      assert "delete_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
-    test "grant ability to inherited member" do
+    test "grant feature to inherited member" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(%{member: member}, ability)
+      Member.grant(%{member: member}, feature)
 
       member = Repo.get(Member, member.id)
 
-      assert 1 == length(member.abilities)
-      assert "delete_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
-    test "grant ability to inherited member from id" do
+    test "grant feature to inherited member from id" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(%{member_id: member.id}, ability)
+      Member.grant(%{member_id: member.id}, feature)
 
       member = Repo.get(Member, member.id)
 
-      assert 1 == length(member.abilities)
-      assert "delete_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
-    test "grant only unique abilities to member" do
+    test "grant only unique features to member" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(member, ability)
-      Member.grant(member, ability)
+      Member.grant(member, feature)
+      Member.grant(member, feature)
 
       member = Repo.get(Member, member.id)
 
-      assert 1 == length(member.abilities)
-      assert "delete_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
-    test "grant different abilities to member" do
+    test "grant different features to member" do
       member = insert(:member)
-      ability_delete = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      feature_delete = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, ability_delete)
-      Member.grant(member, ability_ban)
+      Member.grant(member, feature_delete)
+      Member.grant(member, feature_ban)
 
       member = Repo.get(Member, member.id)
-      assert 2 == length(member.abilities)
-      assert [ability_delete.identifier] ++ [ability_ban.identifier] == member.abilities
+      assert 2 == length(member.features)
+      assert [feature_delete.identifier] ++ [feature_ban.identifier] == member.features
     end
 
-    test "grant role to member" do
+    test "grant plan to member" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin")
+      plan = insert(:plan, identifier: "admin")
 
-      Member.grant(member, role)
+      Member.grant(member, plan)
 
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
 
-      assert 1 == length(member.roles)
-      assert role == Enum.at(member.roles, 0)
+      assert 1 == length(member.plans)
+      assert plan == Enum.at(member.plans, 0)
     end
 
-    test "grant role to inherited member" do
+    test "grant plan to inherited member" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin")
+      plan = insert(:plan, identifier: "admin")
 
-      Member.grant(%{member: member}, role)
+      Member.grant(%{member: member}, plan)
 
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
 
-      assert 1 == length(member.roles)
-      assert role == Enum.at(member.roles, 0)
+      assert 1 == length(member.plans)
+      assert plan == Enum.at(member.plans, 0)
     end
 
-    test "grant role to inherited member from id" do
+    test "grant plan to inherited member from id" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin")
+      plan = insert(:plan, identifier: "admin")
 
-      Member.grant(%{member_id: member.id}, role)
+      Member.grant(%{member_id: member.id}, plan)
 
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
 
-      assert 1 == length(member.roles)
-      assert role == Enum.at(member.roles, 0)
+      assert 1 == length(member.plans)
+      assert plan == Enum.at(member.plans, 0)
     end
 
-    test "grant only unique roles to member" do
+    test "grant only unique plans to member" do
       member = insert(:member)
-      role = insert(:role, identifier: "admin")
+      plan = insert(:plan, identifier: "admin")
 
-      Member.grant(member, role)
-      Member.grant(member, role)
+      Member.grant(member, plan)
+      Member.grant(member, plan)
 
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
 
-      assert 1 == length(member.roles)
-      assert role == Enum.at(member.roles, 0)
+      assert 1 == length(member.plans)
+      assert plan == Enum.at(member.plans, 0)
     end
 
-    test "grant different roles to member" do
+    test "grant different plans to member" do
       member = insert(:member)
-      role_admin = insert(:role, identifier: "admin")
-      role_editor = insert(:role, identifier: "editor")
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
 
-      Member.grant(member, role_admin)
-      Member.grant(member, role_editor)
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
 
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
 
-      assert 2 == length(member.roles)
-      assert [role_admin] ++ [role_editor] == member.roles
+      assert 2 == length(member.plans)
+      assert [plan_admin] ++ [plan_editor] == member.plans
     end
   end
 
@@ -155,100 +155,100 @@ defmodule Membership.MemberTest do
       end
     end
 
-    test "revokes correct ability from member" do
+    test "revokes correct feature from member" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, ability)
-      Member.grant(member, ability_ban)
+      Member.grant(member, feature)
+      Member.grant(member, feature_ban)
       member = Repo.get(Member, member.id)
-      assert 2 == length(member.abilities)
+      assert 2 == length(member.features)
 
-      Member.revoke(member, ability)
+      Member.revoke(member, feature)
       member = Repo.get(Member, member.id)
-      assert 1 == length(member.abilities)
-      assert "ban_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "ban_accounts" == Enum.at(member.features, 0)
     end
 
-    test "revokes correct ability from inherited member" do
+    test "revokes correct feature from inherited member" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, ability)
-      Member.grant(member, ability_ban)
+      Member.grant(member, feature)
+      Member.grant(member, feature_ban)
       member = Repo.get(Member, member.id)
-      assert 2 == length(member.abilities)
+      assert 2 == length(member.features)
 
-      Member.revoke(%{member: member}, ability)
+      Member.revoke(%{member: member}, feature)
       member = Repo.get(Member, member.id)
-      assert 1 == length(member.abilities)
-      assert "ban_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "ban_accounts" == Enum.at(member.features, 0)
     end
 
-    test "revokes correct ability from inherited member from id" do
+    test "revokes correct feature from inherited member from id" do
       member = insert(:member)
-      ability = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      feature = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, ability)
-      Member.grant(member, ability_ban)
+      Member.grant(member, feature)
+      Member.grant(member, feature_ban)
       member = Repo.get(Member, member.id)
-      assert 2 == length(member.abilities)
+      assert 2 == length(member.features)
 
-      Member.revoke(%{member_id: member.id}, ability)
+      Member.revoke(%{member_id: member.id}, feature)
       member = Repo.get(Member, member.id)
-      assert 1 == length(member.abilities)
-      assert "ban_accounts" == Enum.at(member.abilities, 0)
+      assert 1 == length(member.features)
+      assert "ban_accounts" == Enum.at(member.features, 0)
     end
 
-    test "revokes correct role from member" do
+    test "revokes correct plan from member" do
       member = insert(:member)
-      role_admin = insert(:role, identifier: "admin")
-      role_editor = insert(:role, identifier: "editor")
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
 
-      Member.grant(member, role_admin)
-      Member.grant(member, role_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 2 == length(member.roles)
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
 
-      Member.revoke(member, role_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 1 == length(member.roles)
-      assert role_editor == Enum.at(member.roles, 0)
+      Member.revoke(member, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
     end
 
-    test "revokes correct role from inherited member" do
+    test "revokes correct plan from inherited member" do
       member = insert(:member)
-      role_admin = insert(:role, identifier: "admin")
-      role_editor = insert(:role, identifier: "editor")
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
 
-      Member.grant(member, role_admin)
-      Member.grant(member, role_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 2 == length(member.roles)
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
 
-      Member.revoke(%{member: member}, role_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 1 == length(member.roles)
-      assert role_editor == Enum.at(member.roles, 0)
+      Member.revoke(%{member: member}, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
     end
 
-    test "revokes correct role from inherited member from id" do
+    test "revokes correct plan from inherited member from id" do
       member = insert(:member)
-      role_admin = insert(:role, identifier: "admin")
-      role_editor = insert(:role, identifier: "editor")
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
 
-      Member.grant(member, role_admin)
-      Member.grant(member, role_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 2 == length(member.roles)
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
 
-      Member.revoke(%{member_id: member.id}, role_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:roles])
-      assert 1 == length(member.roles)
-      assert role_editor == Enum.at(member.roles, 0)
+      Member.revoke(%{member_id: member.id}, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
     end
   end
 
@@ -259,49 +259,49 @@ defmodule Membership.MemberTest do
       end
     end
 
-    test "revokes ability from member on struct" do
-      struct = insert(:role)
+    test "revokes feature from member on struct" do
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, ability, struct)
+      Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
 
-      member = Member.revoke(member, ability, struct)
-      refute Membership.has_ability?(member, :view_role, struct)
+      member = Member.revoke(member, feature, struct)
+      refute Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "revokes ability from inherited member on struct" do
-      struct = insert(:role)
+    test "revokes feature from inherited member on struct" do
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, ability, struct)
+      Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
 
-      member = Member.revoke(%{member: member}, ability, struct)
-      refute Membership.has_ability?(member, :view_role, struct)
+      member = Member.revoke(%{member: member}, feature, struct)
+      refute Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "revokes ability from inherited member from id on struct" do
-      struct = insert(:role)
+    test "revokes feature from inherited member from id on struct" do
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, ability, struct)
+      Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
 
-      member = Member.revoke(%{member_id: member.id}, ability, struct)
-      refute Membership.has_ability?(member, :view_role, struct)
+      member = Member.revoke(%{member_id: member.id}, feature, struct)
+      refute Membership.has_feature?(member, :view_plan, struct)
     end
   end
 
@@ -312,111 +312,111 @@ defmodule Membership.MemberTest do
       end
     end
 
-    test "grant ability to member on struct" do
+    test "grant feature to member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, ability, struct)
+      Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "grant ability to inherited member on struct" do
+    test "grant feature to inherited member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(%{member: member}, ability, struct)
+      Member.grant(%{member: member}, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "grant ability to inherited member from id on struct" do
+    test "grant feature to inherited member from id on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(%{member_id: member.id}, ability, struct)
+      Member.grant(%{member_id: member.id}, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "revokes ability to member on struct" do
+    test "revokes feature to member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, ability, struct)
+      Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
 
-      Member.revoke(member, ability, struct)
+      Member.revoke(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 0 == length(member.entities)
-      refute Membership.has_ability?(member, :view_role, struct)
+      refute Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "revokes no ability to member on struct" do
+    test "revokes no feature to member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
+      feature = insert(:feature, identifier: "view_plan")
 
-      Member.revoke(member, ability, struct)
+      Member.revoke(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 0 == length(member.entities)
-      refute Membership.has_ability?(member, :view_role, struct)
+      refute Membership.has_feature?(member, :view_plan, struct)
     end
 
-    test "grants multiple abilities to member on struct" do
+    test "grants multiple features to member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
-      ability_delete = insert(:ability, identifier: "delete_role")
+      feature = insert(:feature, identifier: "view_plan")
+      feature_delete = insert(:feature, identifier: "delete_plan")
 
-      member = Member.grant(member, ability, struct)
-      member = Member.grant(member, ability_delete, struct)
+      member = Member.grant(member, feature, struct)
+      member = Member.grant(member, feature_delete, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
-      assert Membership.has_ability?(member, :delete_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
+      assert Membership.has_feature?(member, :delete_plan, struct)
     end
 
-    test "revokes multiple abilities to member on struct" do
+    test "revokes multiple features to member on struct" do
       # Can be any struct
-      struct = insert(:role)
+      struct = insert(:plan)
       member = insert(:member)
-      ability = insert(:ability, identifier: "view_role")
-      ability_delete = insert(:ability, identifier: "delete_role")
+      feature = insert(:feature, identifier: "view_plan")
+      feature_delete = insert(:feature, identifier: "delete_plan")
 
-      member = Member.grant(member, ability, struct)
-      member = Member.grant(member, ability_delete, struct)
+      member = Member.grant(member, feature, struct)
+      member = Member.grant(member, feature_delete, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
       assert 1 == length(member.entities)
-      assert Membership.has_ability?(member, :view_role, struct)
-      assert Membership.has_ability?(member, :delete_role, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
+      assert Membership.has_feature?(member, :delete_plan, struct)
 
-      Member.revoke(member, ability_delete, struct)
-      refute Membership.has_ability?(member, :delete_role, struct)
-      assert Membership.has_ability?(member, :view_role, struct)
+      Member.revoke(member, feature_delete, struct)
+      refute Membership.has_feature?(member, :delete_plan, struct)
+      assert Membership.has_feature?(member, :view_plan, struct)
     end
   end
 end
