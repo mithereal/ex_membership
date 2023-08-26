@@ -81,7 +81,6 @@ defmodule Membership.Member.Server do
     {:noreply, state}
   end
 
-  @impl true
   def handle_call(_msg, state) do
     {:reply, state, state}
   end

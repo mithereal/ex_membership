@@ -7,7 +7,7 @@ defmodule Membership.Memberships.Supervisor do
   """
 
   alias __MODULE__, as: SUPERVISOR
-  alias Member.Server, as: SERVER
+  alias Membership.Member.Server, as: SERVER
 
   @name :memberships_supervisor
   @registry_name :active_memberships

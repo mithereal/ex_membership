@@ -22,7 +22,7 @@ defmodule Membership.PlanFeatures do
   def create(
         %Membership.PlanFeatures{id: id},
         %{__struct__: _plan_name, id: assoc_id},
-        features \\ []
+        _features \\ []
       ) do
     changeset(%Membership.PlanFeatures{
       feature_id: id,

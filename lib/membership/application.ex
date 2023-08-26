@@ -7,7 +7,7 @@ defmodule Membership.Application do
   @impl true
   def start(_type, args \\ []) do
     children = [
-      {Repo, []},
+      {Repo, args},
       ## store ref to ets
       {Registry, keys: :unique, name: :active_memberships},
       ## start/stop members for ref cleanup when killed

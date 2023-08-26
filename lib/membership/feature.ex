@@ -4,8 +4,12 @@ defmodule Membership.Feature do
   """
   use Membership.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   alias Membership.Feature
+  alias Membership.PlanFeatures
+  alias Membership.Plan
+  alias Membership.Repo
 
   @typedoc "A Feature struct"
   @type t :: %Feature{}
@@ -178,7 +182,7 @@ defmodule Membership.Feature do
       end)
 
     changeset =
-      changeset(member)
+      changeset(plan)
       |> put_change(:features, features)
 
     changeset |> Repo.update!()
@@ -228,7 +232,7 @@ defmodule Membership.Feature do
 
   def revoke(
         %{plan_id: id},
-        %Feature{id: _id} = plan,
+        %Feature{id: _id} = _plan,
         %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
     revoke(%Plan{id: id}, feature, feature)
@@ -247,7 +251,7 @@ defmodule Membership.Feature do
   def load_plan_features(plan, %{
         __struct__: _feature_name,
         id: feature_id,
-        identifier: identifier
+        identifier: _identifier
       }) do
     PlanFeatures
     |> where(
@@ -255,5 +259,11 @@ defmodule Membership.Feature do
       e.plan_id == ^plan.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
+  end
+
+  defp merge_uniq_grants(grants) do
+    Enum.uniq_by(grants, fn grant ->
+      grant.identifier
+    end)
   end
 end
