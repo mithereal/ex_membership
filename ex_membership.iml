@@ -92,5 +92,6 @@
     <orderEntry type="library" name="myxql" level="project" />
     <orderEntry type="library" name="tds" level="project" />
     <orderEntry type="library" name="table" level="project" />
+    <orderEntry type="library" name="faker" level="project" />
   </component>
 </module>

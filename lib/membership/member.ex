@@ -251,7 +251,7 @@ defmodule Membership.Member do
   def load_member_features(member, %{
         __struct__: _feature_name,
         id: feature_id,
-        identifier: identifier
+        identifier: _identifier
       }) do
     MemberFeatures
     |> where(

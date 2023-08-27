@@ -3,7 +3,7 @@ defmodule Membership.FeatureTest do
   alias Membership.Feature
 
   setup do
-    Feature.load_plan_features()
+    Membership.load_membership_plans()
     :ok
   end
 
@@ -29,7 +29,7 @@ defmodule Membership.FeatureTest do
           name: "Global administrator"
         })
 
-      built_changeset = Feature.build("admin", [], "Global administrator")
+      built_changeset = Feature.build("admin", "Global administrator")
 
       assert built_changeset == classic_changeset
     end
@@ -55,9 +55,8 @@ defmodule Membership.FeatureTest do
     end
 
     test "grant unique abilities to Feature" do
-      plan = insert(:plan, identifier: "gold", name: "Gold Plan")
+      plan = insert(:plan, identifier: "silver", name: "silver Plan")
       feature = insert(:feature, identifier: "admin_feature")
-
       Feature.grant(feature, plan)
       Feature.grant(feature, plan)
 
@@ -68,7 +67,7 @@ defmodule Membership.FeatureTest do
     end
 
     test "grants multiple abilities to Feature" do
-      plan = insert(:plan, identifier: "gold", name: "Gold Plan")
+      plan = insert(:plan, identifier: "bronze", name: "bronze Plan")
       feature_1 = insert(:feature, identifier: "first_feature")
       feature_2 = insert(:feature, identifier: "second_feature")
 
@@ -90,18 +89,18 @@ defmodule Membership.FeatureTest do
     end
 
     test "revokes correct ability from Feature" do
-      Feature = insert(:Feature, identifier: "admin", name: "Global Administrator")
-      ability = insert(:ability, identifier: "delete_accounts")
-      ability_ban = insert(:ability, identifier: "ban_accounts")
+      feature = insert(:feature)
+      plan = insert(:plan)
+      ban_feature = insert(:feature, identifier: "ban_accounts")
 
-      Feature = Feature.grant(Feature, ability)
-      Feature = Feature.grant(Feature, ability_ban)
+      feature_1 = Feature.grant(feature, plan)
+      feature_2 = Feature.grant(plan, feature)
 
-      assert 2 == length(Feature.abilities())
+      assert 2 == length(plan.features())
 
-      Feature = Feature.revoke(Feature, ability)
+      Feature = Feature.revoke(plan, ban_feature)
 
-      assert "ban_accounts" == Enum.at(Feature.abilities(), 0)
+      assert "ban_accounts" == Enum.at(plan.features(), 0)
     end
   end
 end

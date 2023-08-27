@@ -9,14 +9,19 @@ defmodule Membership.Factory do
   end
 
   def plan_factory do
+    plan = Faker.Color.En.name()
+
     %Plan{
-      identifier: sequence(:plan, ["Free", "Bronze", "Silver", "Gold"])
+      identifier: sequence(:plan, [plan]),
+      name: sequence(:plan_name, &"Generated plan-#{&1}")
     }
   end
 
   def feature_factory do
+    feature = Faker.Company.bullshit_suffix()
+
     %Feature{
-      identifier: sequence(:feature, ["feature_id"]),
+      identifier: sequence(:feature, [feature]),
       name: sequence(:feature_name, &"Generated feature-#{&1}")
     }
   end
