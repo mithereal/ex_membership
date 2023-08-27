@@ -133,7 +133,7 @@ defmodule Membership do
 
   defmacro as_member(member, func_name, do: block) do
     quote do
-      with :ok <- member_authorization!(member, func_name) do
+      with :ok <- member_authorization!(unquote(member), unquote(func_name)) do
         unquote(block)
       end
     end
@@ -217,14 +217,14 @@ defmodule Membership do
   defmacro calculated_member(current_member, func_name)
            when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Member.Server.show(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
 
       rules = %{calculated_as_member: unquote(func_name)(current_member)}
 
       registry =
         Membership.Registry.add(
           __MODULE__,
-          func_name,
+          unquote(func_name),
           rules
         )
     end
@@ -232,14 +232,14 @@ defmodule Membership do
 
   defmacro calculated_member(current_member, callback, func_name) when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Member.Server.show(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = apply(unquote(callback), [current_member])
 
       rules = %{calculated_as_member: result}
 
       Membership.Registry.add(
         __MODULE__,
-        func_name,
+        unquote(func_name),
         rules
       )
     end
@@ -247,13 +247,13 @@ defmodule Membership do
 
   defmacro calculated_member(current_member, func_name, bindings) when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Member.Server.show(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = unquote(func_name)(current_member, unquote(bindings))
       rules = %{calculated_as_member: result}
 
       Membership.Registry.add(
         __MODULE__,
-        func_name,
+        unquote(func_name),
         rules
       )
     end
@@ -262,13 +262,13 @@ defmodule Membership do
   defmacro calculated_member(current_member, callback, bindings, func_name)
            when is_atom(func_name) do
     quote do
-      {:ok, current_member} = Membership.Member.Server.show(current_member)
+      {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = apply(unquote(callback), [current_member, unquote(bindings)])
       rules = %{calculated_as_member: result}
 
       Membership.Registry.add(
         __MODULE__,
-        func_name,
+        unquote(func_name),
         rules
       )
     end
@@ -385,7 +385,7 @@ defmodule Membership do
   @doc false
   def create_membership() do
     quote do
-      import Membership, only: [store_member!: 1, load_and_store_member!: 1]
+      import Membership, only: [load_and_store_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
         do: load_and_store_member!(member)

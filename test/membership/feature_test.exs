@@ -75,7 +75,7 @@ defmodule Membership.FeatureTest do
       plan = Feature.grant(plan, feature_1)
       Feature.grant(plan, feature_2)
 
-      plan = Repo.get(Plan, feature.id())
+      plan = Repo.get(Plan, feature_1.id())
 
       assert 2 == length(plan.features())
       assert assert ["first_feature", "second_feature"] == plan.features()

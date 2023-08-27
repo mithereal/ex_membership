@@ -63,10 +63,11 @@ defmodule PostTest do
   end
 
   def calculated(member, email_confirmed) do
-    load_and_authorize_member(member)
+    {:ok, member} = load_and_authorize_member(member)
 
     member_permissions do
       calculated_member(
+        member,
         fn _member ->
           email_confirmed
         end,
@@ -81,10 +82,10 @@ defmodule PostTest do
   end
 
   def calculated_macro(member) do
-    load_and_authorize_member(member)
+    {:ok, member} = load_and_authorize_member(member)
 
     member_permissions do
-      calculated_member(:confirmed_email, :calculated_macro)
+      calculated_member(member, :confirmed_email)
     end
 
     case member_authorized?() do
@@ -171,7 +172,7 @@ defmodule Membership.MembershipTest do
 
     test "rejects ability on struct" do
       member = insert(:member)
-      ability = insert(:feature, identifier: "update_post")
+      feature = insert(:feature, identifier: "update_post")
 
       member = Membership.Member.grant(member, feature, member)
 

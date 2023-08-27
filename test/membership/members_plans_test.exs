@@ -12,7 +12,7 @@ defmodule Membership.MemberPlansTest do
 
       member = member |> Repo.preload([:plans])
 
-      assert 1 == length(member.Plans)
+      assert 1 == length(member.plans)
     end
 
     test "creates entity relation for member without features" do
@@ -23,7 +23,7 @@ defmodule Membership.MemberPlansTest do
 
       member = member |> Repo.preload([:plans])
 
-      assert 1 == length(member.Plans)
+      assert 1 == length(member.plans)
     end
   end
 end
