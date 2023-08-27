@@ -4,37 +4,36 @@ defmodule PostTest do
   def delete(member) do
     {_, member} = load_and_authorize_member(member)
 
-    as_member(member, :delete) do
+    member_permissions do
       has_plan(:admin, :delete)
     end
 
-    member_authorized do
+    as_member(member, :delete) do
       {:ok, "Authorized"}
     end
   end
 
   def update(member) do
-    load_and_authorize_member(member)
+    {_, member} = load_and_authorize_member(member)
 
     member_permissions do
       has_feature(:update_post, :update)
     end
 
-    member_authorized do
+    as_member(member, :update) do
       {:ok, "Authorized"}
     end
   end
 
   def entity_update(member) do
-    load_and_authorize_member(member)
+    {_, member} = load_and_authorize_member(member)
 
     member_permissions do
       has_feature(:delete_member, :entity_update)
     end
 
-    member_authorized do
-      {:ok, "Authorized"}
-    end
+    as_member(^member, :entity_update)
+    {:ok, "Authorized"}
   end
 
   def no_macro(member) do
@@ -44,7 +43,7 @@ defmodule PostTest do
       has_feature(:update_post)
     end
 
-    case is_authorized?() do
+    case member_authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -56,7 +55,7 @@ defmodule PostTest do
     member_permissions do
     end
 
-    case is_authorized?() do
+    case member_authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -74,7 +73,7 @@ defmodule PostTest do
       )
     end
 
-    case is_authorized?() do
+    case member_authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -87,7 +86,7 @@ defmodule PostTest do
       calculated_member(:confirmed_email, :calculated_macro)
     end
 
-    case is_authorized?() do
+    case member_authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
