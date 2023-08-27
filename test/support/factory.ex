@@ -5,7 +5,9 @@ defmodule Membership.Factory do
   alias Membership.Plan
 
   def member_factory do
-    %Member{}
+    %Member{
+      id: sequence("id")
+    }
   end
 
   def plan_factory do

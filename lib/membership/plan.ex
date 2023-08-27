@@ -18,15 +18,16 @@ defmodule Membership.Plan do
 
   def changeset(%Plan{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:identifier, :name])
+    |> cast(params, [:identifier, :name, :features])
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Plan already exists")
   end
 
-  def build(identifier, name) do
+  def build(identifier, name, features \\ []) do
     changeset(%Plan{}, %{
       identifier: identifier,
-      name: name
+      name: name,
+      features: features
     })
   end
 

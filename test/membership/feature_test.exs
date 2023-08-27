@@ -89,8 +89,8 @@ defmodule Membership.FeatureTest do
     end
 
     test "revokes correct ability from Feature" do
-      feature = insert(:feature)
-      plan = insert(:plan)
+      feature = insert(:feature, id: 1)
+      plan = insert(:plan, id: 1)
       ban_feature = insert(:feature, identifier: "ban_accounts")
 
       feature_1 = Feature.grant(feature, plan)
@@ -98,7 +98,7 @@ defmodule Membership.FeatureTest do
 
       assert 2 == length(plan.features())
 
-      Feature = Feature.revoke(plan, ban_feature)
+      plan = Feature.revoke(plan, ban_feature)
 
       assert "ban_accounts" == Enum.at(plan.features(), 0)
     end
