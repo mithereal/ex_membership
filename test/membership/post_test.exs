@@ -2,13 +2,13 @@ defmodule PostTest do
   use Membership
 
   def delete(member) do
-    load_and_authorize_member(member)
+    {_, member} = load_and_authorize_member(member)
 
-    permissions do
-      has_plan(:admin)
+    as_member(member, :delete) do
+      has_plan(:admin, :delete)
     end
 
-    as_authorized do
+    member_authorized do
       {:ok, "Authorized"}
     end
   end
@@ -16,11 +16,11 @@ defmodule PostTest do
   def update(member) do
     load_and_authorize_member(member)
 
-    membership_permissions do
-      has_feature(:update_post)
+    member_permissions do
+      has_feature(:update_post, :update)
     end
 
-    as_authorized do
+    member_authorized do
       {:ok, "Authorized"}
     end
   end
@@ -28,11 +28,11 @@ defmodule PostTest do
   def entity_update(member) do
     load_and_authorize_member(member)
 
-    membership_permissions do
-      has_feature(:delete_member, member)
+    member_permissions do
+      has_feature(:delete_member, :entity_update)
     end
 
-    as_authorized do
+    member_authorized do
       {:ok, "Authorized"}
     end
   end
@@ -40,7 +40,7 @@ defmodule PostTest do
   def no_macro(member) do
     load_and_authorize_member(member)
 
-    membership_permissions do
+    member_permissions do
       has_feature(:update_post)
     end
 
@@ -53,7 +53,7 @@ defmodule PostTest do
   def no_permissions(member) do
     load_and_authorize_member(member)
 
-    permissions do
+    member_permissions do
     end
 
     case is_authorized?() do
@@ -65,10 +65,13 @@ defmodule PostTest do
   def calculated(member, email_confirmed) do
     load_and_authorize_member(member)
 
-    permissions do
-      calculated(fn _member ->
-        email_confirmed
-      end)
+    member_permissions do
+      calculated_member(
+        fn _member ->
+          email_confirmed
+        end,
+        :calculated
+      )
     end
 
     case is_authorized?() do
@@ -80,8 +83,8 @@ defmodule PostTest do
   def calculated_macro(member) do
     load_and_authorize_member(member)
 
-    permissions do
-      calculated(:confirmed_email)
+    member_permissions do
+      calculated_member(:confirmed_email, :calculated_macro)
     end
 
     case is_authorized?() do

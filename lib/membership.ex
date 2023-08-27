@@ -53,8 +53,8 @@ defmodule Membership do
 
         def test_authorization do
           member_permissions do
-            has_feature(:admin_feature)
-            has_plan(:gold)
+            has_feature(:admin_feature, :test_authorization)
+            has_plan(:gold, :test_authorization)
           end
         end
       end
