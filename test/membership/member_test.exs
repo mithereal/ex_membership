@@ -3,7 +3,7 @@ defmodule Membership.MemberTest do
   alias Membership.Member
 
   setup do
-    Membership.reset_session()
+    Membership.load_membership_plans()
     :ok
   end
 
