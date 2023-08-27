@@ -7,8 +7,8 @@ defmodule Membership.Repo.Migrations.CreateMembershipFeaturesTable do
     create table(:membership_member_features, primary_key: false) do
       add(:id, key_type, primary_key: true)
 
-      add(:member_id, references(Membership.Member.table()))
-      add(:feature_id, references(Membership.Feature.table()))
+      add(:member_id, references(Membership.Member.table(), type: key_type))
+      add(:feature_id, references(Membership.Feature.table(), type: key_type))
     end
   end
 end

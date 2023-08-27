@@ -85,7 +85,7 @@ defmodule PostTest do
     {:ok, member} = load_and_authorize_member(member)
 
     member_permissions do
-      calculated_member(member, :confirmed_email)
+      calculated_member(member, :confirmed_email, :calculated_macro)
     end
 
     case member_authorized?() do
@@ -196,7 +196,7 @@ defmodule Membership.MembershipTest do
       plan = insert(:plan, identifier: "admin", name: "Administator")
       feature = insert(:feature, identifier: "update_post")
 
-      role = Membership.Role.grant(plan, feature)
+      role = Membership.Feature.grant(plan, feature)
       member = Membership.Member.grant(member, role)
 
       assert {:ok, "Authorized"} == Post.update(member)
@@ -209,8 +209,8 @@ defmodule Membership.MembershipTest do
       feature = insert(:feature, identifier: "delete_post")
       feature_update = insert(:feature, identifier: "update_post")
 
-      role = Membership.Role.grant(plan, feature)
-      role_editor = Membership.Role.grant(plan_1, feature_update)
+      role = Membership.Feature.grant(plan, feature)
+      role_editor = Membership.Feature.grant(plan_1, feature_update)
       member = Membership.Member.grant(member, plan)
       member = Membership.Member.grant(member, plan_1)
 

@@ -14,6 +14,7 @@ defmodule Membership.Schema do
       _ ->
         quote do
           use Ecto.Schema
+          @primary_key {:id, :id, autogenerate: true}
         end
     end
   end
