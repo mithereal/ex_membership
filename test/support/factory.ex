@@ -6,7 +6,7 @@ defmodule Membership.Factory do
 
   def member_factory do
     %Member{
-      id: sequence("id")
+      id: sequence(:id, &"#{&1}")
     }
   end
 
@@ -14,6 +14,7 @@ defmodule Membership.Factory do
     plan = Faker.Color.En.name()
 
     %Plan{
+      id: sequence(:id, &"#{&1}"),
       identifier: sequence(:plan, [plan]),
       name: sequence(:plan_name, &"Generated plan-#{&1}")
     }
@@ -23,6 +24,7 @@ defmodule Membership.Factory do
     feature = Faker.Company.bullshit_suffix()
 
     %Feature{
+      id: sequence(:id, &"#{&1}"),
       identifier: sequence(:feature, [feature]),
       name: sequence(:feature_name, &"Generated feature-#{&1}")
     }
