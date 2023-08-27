@@ -17,6 +17,9 @@ defmodule Membership.Feature do
   schema "membership_features" do
     field(:identifier, :string)
     field(:name, :string)
+
+    has_many(:plan_list_items, Membership.PlanFeatures)
+    has_many(:plans, through: [:plan_list_items, :plan])
   end
 
   def changeset(%Feature{} = struct, params \\ %{}) do

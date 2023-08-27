@@ -25,8 +25,11 @@ defmodule Membership.Member do
   schema "membership_members" do
     field(:features, {:array, :string}, default: [])
 
-    many_to_many(:plans, Plan, join_through: Membership.MemberPlans)
-    many_to_many(:extra_features, Feature, join_through: Membership.MemberFeatures)
+    has_many(:plan_list_items, Membership.MemberPlans)
+    has_many(:plans, through: [:plan_list_items, :plan])
+
+    has_many(:extra_features_items, Membership.MemberFeatures)
+    has_many(:extra_features, through: [:extra_features_items, :extra_features])
 
     timestamps()
   end
