@@ -32,7 +32,7 @@ defmodule PostTest do
       has_feature(:delete_member, :entity_update)
     end
 
-    as_member(^member, :entity_update)
+    as_member(member, :entity_update)
     {:ok, "Authorized"}
   end
 
@@ -40,7 +40,7 @@ defmodule PostTest do
     load_and_authorize_member(member)
 
     member_permissions do
-      has_feature(:update_post)
+      has_feature(:update_post, :no_macro)
     end
 
     case member_authorized?() do
