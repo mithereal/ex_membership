@@ -32,8 +32,9 @@ defmodule PostTest do
       has_feature(:delete_member, :entity_update)
     end
 
-    as_member(member, :entity_update)
-    {:ok, "Authorized"}
+    as_member(member, :entity_update) do
+      {:ok, "Authorized"}
+    end
   end
 
   def no_macro(member) do
