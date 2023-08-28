@@ -14,13 +14,12 @@ defmodule Membership.Plan do
     field(:identifier, :string)
     field(:name, :string)
 
-    has_many(:feature_list_items, Membership.PlanFeatures)
-    has_many(:features, through: [:feature_list_items, :feature])
+    many_to_many(:features, Membership.Feature, join_through: Membership.PlanFeatures)
   end
 
   def changeset(%Plan{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:identifier, :name, :features])
+    |> cast(params, [:identifier, :name])
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Plan already exists")
   end

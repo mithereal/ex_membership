@@ -18,8 +18,7 @@ defmodule Membership.Feature do
     field(:identifier, :string)
     field(:name, :string)
 
-    has_many(:plan_list_items, Membership.PlanFeatures)
-    has_many(:plans, through: [:plan_list_items, :plan])
+    many_to_many(:plans, Membership.Plan, join_through: Membership.PlanFeatures)
   end
 
   def changeset(%Feature{} = struct, params \\ %{}) do
@@ -82,7 +81,7 @@ defmodule Membership.Feature do
 
   #### todo
   def grant(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id)
+    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
     features = Enum.uniq(plan.features ++ [feature.identifier])
 
     changeset =

@@ -8,7 +8,6 @@ defmodule Membership.Repo.Migrations.CreatePlansTable do
       add(:id, key_type, primary_key: true)
       add(:identifier, :string)
       add(:name, :string, size: 255)
-      add(:features, {:array, :string}, default: [])
     end
 
     create(unique_index(:membership_plans, [:identifier]))
