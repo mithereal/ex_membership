@@ -18,7 +18,10 @@ defmodule Membership.Feature do
     field(:identifier, :string)
     field(:name, :string)
 
-    many_to_many(:plans, Membership.Plan, join_through: Membership.PlanFeatures)
+    many_to_many(:plans, Membership.Plan,
+      join_through: Membership.PlanFeatures,
+      on_replace: :delete
+    )
   end
 
   def changeset(%Feature{} = struct, params \\ %{}) do
@@ -59,15 +62,20 @@ defmodule Membership.Feature do
   @spec grant(Feature.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Feature{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload Feature plans
-    member = Feature |> Repo.get!(id) |> Repo.preload([:plans])
+    feature = Feature |> Repo.get!(id) |> Repo.preload(:plans)
 
-    plans = merge_uniq_grants(member.plans ++ [plan])
+    plans = merge_uniq_grants(feature.plans ++ [plan])
+    IO.inspect(feature, label: "feature")
+    IO.inspect(plan, label: "plan")
 
     changeset =
-      changeset(member)
+      changeset(feature)
       |> put_assoc(:plans, plans)
 
-    changeset |> Repo.update!()
+    ### why are we returning id
+    IO.inspect(changeset, label: "changeset")
+    # changeset |> Repo.update()
+    []
   end
 
   def grant(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
@@ -161,7 +169,7 @@ defmodule Membership.Feature do
 
   """
   @spec revoke(Plan.t(), Feature.t() | Plan.t()) :: Member.t()
-  def revoke(%Plan{id: id} = _, %Plan{id: _id} = plan) do
+  def revoke(%Feature{id: id} = _, %Plan{id: _id} = plan) do
     from(pa in PlanFeatures)
     |> where([pr], pr.feature_id == ^id and pr.plan_id == ^plan.id)
     |> Repo.delete_all()

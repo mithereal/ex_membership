@@ -14,7 +14,10 @@ defmodule Membership.Plan do
     field(:identifier, :string)
     field(:name, :string)
 
-    many_to_many(:features, Membership.Feature, join_through: Membership.PlanFeatures)
+    many_to_many(:features, Membership.Feature,
+      join_through: Membership.PlanFeatures,
+      on_replace: :delete
+    )
   end
 
   def changeset(%Plan{} = struct, params \\ %{}) do
