@@ -41,6 +41,8 @@ defmodule Membership.Member do
   def changeset(%Member{} = struct, params \\ %{}) do
     struct
     |> cast(params, [])
+    |> cast_assoc(:plans, required: false)
+    |> cast_assoc(:extra_features, required: false)
   end
 
   @doc """

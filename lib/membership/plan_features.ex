@@ -1,13 +1,14 @@
 defmodule Membership.PlanFeatures do
   @moduledoc false
 
-  use Membership.Schema
+  use Ecto.Schema
 
   import Ecto.Changeset
 
   alias Membership.Feature
   alias Membership.Plan
 
+  @primary_key false
   schema "membership_plan_features" do
     belongs_to(:feature, Feature)
     belongs_to(:plan, Plan)
@@ -20,7 +21,7 @@ defmodule Membership.PlanFeatures do
   end
 
   def create(
-        %Membership.PlanFeatures{id: id},
+        %Membership.Feature{id: id},
         %{__struct__: _plan_name, id: assoc_id},
         _features \\ []
       ) do

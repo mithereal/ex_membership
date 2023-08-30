@@ -23,6 +23,7 @@ defmodule Membership.Plan do
   def changeset(%Plan{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
+    |> cast_assoc(:features, required: false)
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Plan already exists")
   end

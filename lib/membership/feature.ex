@@ -27,6 +27,7 @@ defmodule Membership.Feature do
   def changeset(%Feature{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
+    |> cast_assoc(:plans, required: false)
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Feature already exists")
   end
@@ -41,7 +42,7 @@ defmodule Membership.Feature do
   def table, do: :membership_features
 
   @doc """
-  Grant given grant type to a member.
+  Grant given grant type to a feature.
 
   ## Examples
 
@@ -65,15 +66,11 @@ defmodule Membership.Feature do
     feature = Feature |> Repo.get!(id) |> Repo.preload(:plans)
 
     plans = merge_uniq_grants(feature.plans ++ [plan])
-    IO.inspect(feature, label: "feature")
-    IO.inspect(plan, label: "plan")
 
     changeset =
       changeset(feature)
       |> put_assoc(:plans, plans)
 
-    ### why are we returning id
-    IO.inspect(changeset, label: "changeset")
     changeset |> Repo.update()
   end
 
@@ -86,10 +83,10 @@ defmodule Membership.Feature do
     grant(feature, plan)
   end
 
-  #### todo
   def grant(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
     plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
     features = Enum.uniq(plan.features ++ [feature.identifier])
+    IO.inspect(features)
 
     changeset =
       Plan.changeset(plan)

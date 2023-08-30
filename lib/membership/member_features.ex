@@ -3,9 +3,10 @@ defmodule Membership.MemberFeatures do
   MemberFeatures is the association linking the member to the feature you can also set specific features for the membership
   """
 
-  use Membership.Schema
+  use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key false
   schema "membership_member_features" do
     belongs_to(:member, Membership.Member)
     belongs_to(:feature, Membership.Feature)

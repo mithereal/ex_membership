@@ -46,40 +46,28 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan, identifier: "gold", name: "Gold Plan")
       feature = insert(:feature, identifier: "admin_feature")
 
-      grant = Feature.grant(feature, plan)
-      IO.inspect(grant, label: "grant")
+      {_, feature} = Feature.grant(feature, plan)
       feature = Repo.get(Feature, feature.id()) |> Repo.preload(:plans)
-      IO.inspect(feature, label: "fetched feature")
+      plan = List.first(feature.plans)
+      plan = Repo.get(Membership.Plan, plan.id()) |> Repo.preload(:features)
+
       assert 1 == length(plan.features())
-      assert feature.identifier == Enum.at(plan.features(), 0)
+      assert feature.identifier == Enum.at(plan.features(), 0).identifier
     end
 
-    #
-    #    test "grant unique abilities to Feature" do
-    #      plan = insert(:plan, identifier: "silver", name: "silver Plan")
-    #      feature = insert(:feature, identifier: "admin_feature")
-    #      Feature.grant(feature, plan)
-    #      Feature.grant(feature, plan)
-    #
-    #      feature = Repo.get(Feature, feature.id())
-    #      IO.inspect(feature)
-    #      assert 1 == length(feature.abilities())
-    #      assert feature.identifier == Enum.at(plan.features(), 0)
-    #    end
-    #
-    #    test "grants multiple abilities to Feature" do
-    #      plan = insert(:plan, identifier: "bronze", name: "bronze Plan")
-    #      feature_1 = insert(:feature, identifier: "first_feature")
-    #      feature_2 = insert(:feature, identifier: "second_feature")
-    #
-    #      plan = Feature.grant(plan, feature_1)
-    #      Feature.grant(plan, feature_2)
-    #
-    #      plan = Repo.get(Plan, feature_1.id())
-    #
-    #      assert 2 == length(plan.features())
-    #      assert assert ["first_feature", "second_feature"] == plan.features()
-    #    end
+    test "grants multiple abilities to Feature" do
+      plan = insert(:plan, identifier: "bronze", name: "bronze Plan")
+      feature_1 = insert(:feature, identifier: "first_feature")
+      feature_2 = insert(:feature, identifier: "second_feature")
+
+      plan = Feature.grant(plan, feature_1)
+      Feature.grant(plan, feature_2)
+
+      plan = Repo.get(Plan, feature_1.id())
+
+      assert 2 == length(plan.features())
+      assert assert ["first_feature", "second_feature"] == plan.features()
+    end
   end
 
   #

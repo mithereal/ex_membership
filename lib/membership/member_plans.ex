@@ -3,9 +3,10 @@ defmodule Membership.MemberPlans do
   MemberPlans is the association linking the member to the plan you can also set specific features for the membership
   """
 
-  use Membership.Schema
+  use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key false
   schema "membership_member_plans" do
     belongs_to(:member, Membership.Member)
     belongs_to(:plan, Membership.Plan)
