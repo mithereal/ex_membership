@@ -21,7 +21,8 @@ defmodule Membership.PlanTest do
       classic_changeset =
         Plan.changeset(%Plan{}, %{
           identifier: "delete_accounts",
-          name: "Can delete accounts"
+          name: "Can delete accounts",
+          features: []
         })
 
       built_changeset = Plan.build("delete_accounts", "Can delete accounts")

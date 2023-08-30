@@ -278,7 +278,7 @@ defmodule Membership.MemberTest do
       struct = insert(:plan)
       member = insert(:member)
       feature = insert(:feature, identifier: "view_plan")
-
+      ## todo:: fox,e
       Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
