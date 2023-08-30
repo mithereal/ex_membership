@@ -49,9 +49,9 @@ defmodule Membership.Feature do
   Function is merging existing grants with the new ones, so calling grant with same
   grants will not duplicate entries in table.
 
-  To grant particular feature to a given member
+  To grant particular feature to a given plan
 
-      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
+      iex> Membership.Feature.grant(%Membership.Plan{id: 1}, %Membership.Feature{id: 1})
 
   To grant particular feature to a given plan
 
@@ -74,8 +74,7 @@ defmodule Membership.Feature do
 
     ### why are we returning id
     IO.inspect(changeset, label: "changeset")
-    # changeset |> Repo.update()
-    []
+    changeset |> Repo.update()
   end
 
   def grant(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
