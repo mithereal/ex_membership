@@ -20,8 +20,7 @@ defmodule Membership.MemberFeatures do
 
   def create(
         %Membership.Member{id: id},
-        %{__struct__: _feature_name, id: feature_id},
-        _features \\ []
+        %{__struct__: _feature_name, id: feature_id}
       ) do
     changeset(%Membership.MemberFeatures{
       member_id: id,

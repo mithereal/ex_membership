@@ -260,18 +260,18 @@ defmodule Membership.MemberTest do
     end
 
     test "revokes feature from member on struct" do
-      struct = insert(:plan)
+      plan = insert(:plan)
       member = insert(:member)
       feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, feature, struct)
-      member = Repo.get(Member, member.id) |> Repo.preload([:entities])
+      Member.grant(member, feature, plan)
+      member = Repo.get(Member, member.id) |> Repo.preload([:features])
 
-      assert 1 == length(member.entities)
-      assert Membership.has_feature?(member, :view_plan, struct)
+      assert 1 == length(member.features)
+      assert Membership.has_feature?(member, :view_plan, plan)
 
-      member = Member.revoke(member, feature, struct)
-      refute Membership.has_feature?(member, :view_plan, struct)
+      member = Member.revoke(member, feature, plan)
+      refute Membership.has_feature?(member, :view_plan, plan)
     end
 
     test "revokes feature from inherited member on struct" do

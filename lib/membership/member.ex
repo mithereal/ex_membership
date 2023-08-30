@@ -113,20 +113,48 @@ defmodule Membership.Member do
   def grant(
         %Member{id: _pid} = member,
         %Feature{id: _aid} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
+        %Feature{id: _aid} = extra_feature
       ) do
     features = load_member_features(member, feature)
 
     case features do
       nil ->
-        MemberFeatures.create(member, feature, [feature.identifier])
+        features = Enum.uniq(member.features ++ [feature])
 
-      feature ->
-        features = Enum.uniq(feature.features ++ [feature.identifier])
+        MemberFeatures.create(member, extra_feature.identifier)
 
         MemberFeatures.changeset(feature)
         |> put_change(:features, features)
         |> Repo.update!()
+
+      feature ->
+        MemberFeatures.create(member, extra_feature.identifier)
+        feature
+    end
+
+    member
+  end
+
+  def grant(
+        %Member{id: _pid} = member,
+        %Feature{id: _aid} = feature,
+        %Plan{id: _aid} = plan
+      ) do
+    features = load_member_features(member, feature)
+
+    case features do
+      nil ->
+        features = Enum.uniq(member.features ++ [feature])
+
+        MemberFeatures.changeset(feature)
+        |> put_change(:features, features)
+        |> Repo.update!()
+
+        Plan.create(member, plan)
+
+      feature ->
+        Plan.create(member, plan)
+        feature
     end
 
     member
