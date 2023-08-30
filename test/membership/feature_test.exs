@@ -1,6 +1,7 @@
 defmodule Membership.FeatureTest do
   use Membership.EctoCase
   alias Membership.Feature
+  alias Membership.Plan
 
   setup do
     Membership.load_membership_plans()
@@ -59,38 +60,44 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan, identifier: "bronze", name: "bronze Plan")
       feature_1 = insert(:feature, identifier: "first_feature")
       feature_2 = insert(:feature, identifier: "second_feature")
-
-      plan = Feature.grant(plan, feature_1)
+      Feature.grant(plan, feature_1)
       Feature.grant(plan, feature_2)
 
-      plan = Repo.get(Plan, feature_1.id())
+      plan = Repo.get(Plan, plan.id()) |> Repo.preload(:features)
+
+      identifiers =
+        Enum.map(plan.features(), fn x ->
+          x.identifier
+        end)
 
       assert 2 == length(plan.features())
-      assert assert ["first_feature", "second_feature"] == plan.features()
+      assert assert ["first_feature", "second_feature"] == identifiers
     end
   end
 
   #
-  #  describe "Membership.Feature.revoke/2" do
-  #    test "rejects invalid grant" do
-  #      assert_raise ArgumentError, fn ->
-  #        Feature.revoke(nil, nil)
-  #      end
-  #    end
-  #
-  #    test "revokes correct ability from Feature" do
-  #      feature = insert(:feature, id: 1)
-  #      plan = insert(:plan, id: 1)
-  #      ban_feature = insert(:feature, identifier: "ban_accounts")
-  #
-  #      _feature_1 = Feature.grant(feature, plan)
-  #      _feature_2 = Feature.grant(plan, feature)
-  #
-  #      assert 2 == length(plan.features())
-  #
-  #      plan = Feature.revoke(plan, ban_feature)
-  #
-  #      assert "ban_accounts" == Enum.at(plan.features(), 0)
-  #    end
-  #  end
+  describe "Membership.Feature.revoke/2" do
+    test "rejects invalid grant" do
+      assert_raise ArgumentError, fn ->
+        Feature.revoke(nil, nil)
+      end
+    end
+
+    test "revokes correct ability from Feature" do
+      feature = insert(:feature, id: 1)
+      plan = insert(:plan, id: 1)
+      ban_feature = insert(:feature, identifier: "ban_accounts")
+
+      feature_1 = Feature.grant(feature, plan)
+      feature_2 = Feature.grant(plan, ban_feature)
+
+      plan = Repo.get(Plan, plan.id()) |> Repo.preload(:features)
+
+      assert 2 == length(plan.features())
+
+      plan = Feature.revoke(plan, ban_feature)
+
+      refute Enum.member?(plan.features(), "ban_accounts")
+    end
+  end
 end

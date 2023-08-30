@@ -85,8 +85,7 @@ defmodule Membership.Feature do
 
   def grant(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
     plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
-    features = Enum.uniq(plan.features ++ [feature.identifier])
-    IO.inspect(features)
+    features = Enum.uniq(plan.features ++ [feature])
 
     changeset =
       Plan.changeset(plan)
@@ -119,7 +118,7 @@ defmodule Membership.Feature do
         PlanFeatures.create(plan, feature, [feature.identifier])
 
       feature ->
-        features = Enum.uniq(feature.features ++ [feature.identifier])
+        features = Enum.uniq(feature.features ++ [feature])
 
         PlanFeatures.changeset(feature)
         |> put_change(:features, features)
@@ -180,7 +179,7 @@ defmodule Membership.Feature do
   end
 
   def revoke(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id)
+    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
 
     features =
       Enum.filter(plan.features, fn grant ->
@@ -188,7 +187,7 @@ defmodule Membership.Feature do
       end)
 
     changeset =
-      changeset(plan)
+      Plan.changeset(plan)
       |> put_change(:features, features)
 
     changeset |> Repo.update!()
