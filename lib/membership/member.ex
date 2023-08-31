@@ -64,20 +64,6 @@ defmodule Membership.Member do
 
   """
 
-  @doc """
-  Sync features column with the member features and member plans pivot tables.
-  we do this for caching reasons, ie holding the feature and extra feature identifiers summed
-  into a list and stored in features column of the member, we  query this to see if member has
-  ex feature vs repo lookup by plan and checking if plan has said feature
-  """
-  @spec sync_features(Member.t()) :: Member.t()
-  defp sync_features(%Member{id: id} = _member) do
-    member =
-      Member |> Repo.get!(id) |> Repo.preload(plans: :features) |> Repo.preload([:extra_features])
-
-    IO.inspect(member)
-  end
-
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload member plans
@@ -310,6 +296,20 @@ defmodule Membership.Member do
       e.member_id == ^member.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
+  end
+
+  @doc """
+  Sync features column with the member features and member plans pivot tables.
+  we do this for caching reasons, ie holding the feature and extra feature identifiers summed
+  into a list and stored in features column of the member, we  query this to see if member has
+  ex feature vs repo lookup by plan and checking if plan has said feature
+  """
+  @spec sync_features(Member.t()) :: Member.t()
+  defp sync_features(%Member{id: id} = _member) do
+    member =
+      Member |> Repo.get!(id) |> Repo.preload(plans: :features) |> Repo.preload([:extra_features])
+
+    IO.inspect(member)
   end
 
   def table, do: :membership_members
