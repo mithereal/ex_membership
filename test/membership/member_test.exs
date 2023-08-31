@@ -278,7 +278,7 @@ defmodule Membership.MemberTest do
       struct = insert(:plan)
       member = insert(:member)
       feature = insert(:feature, identifier: "view_plan")
-      ## todo:: fox,e
+      ## todo:: fixme
       Member.grant(member, feature, struct)
       member = Repo.get(Member, member.id) |> Repo.preload([:entities])
 
@@ -345,9 +345,9 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "view_plan")
 
       Member.grant(%{member_id: member.id}, feature, struct)
-      member = Repo.get(Member, member.id) |> Repo.preload([:entities])
+      member = Repo.get(Member, member.id) |> Repo.preload([:features])
 
-      assert 1 == length(member.entities)
+      assert 1 == length(member.features)
       assert Membership.has_feature?(member, :view_plan, struct)
     end
 
