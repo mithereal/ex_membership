@@ -24,6 +24,7 @@ defmodule Membership.Member do
 
   schema "membership_members" do
     field(:features, {:array, :string}, default: [])
+    field(:identifier, :string, default: nil)
 
     many_to_many(:plans, Membership.Plan,
       join_through: Membership.PlanFeatures,
