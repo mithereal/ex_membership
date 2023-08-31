@@ -9,7 +9,7 @@ defmodule Membership.Member.Server do
   require Logger
   @registry_name :active_memberships
 
-  defstruct identifier: nil, ref: nil
+  defstruct identifier: nil, features: []
 
   def child_spec(data) do
     %{
@@ -21,18 +21,7 @@ defmodule Membership.Member.Server do
 
   @impl true
   def init(init_arg) do
-    ref =
-      :ets.new(:membership_members, [
-        :set,
-        :named_table,
-        :public,
-        read_concurrency: true,
-        write_concurrency: false
-      ])
-
-    :ets.insert(ref, {:default, init_arg})
-
-    {:ok, %{identifier: init_arg.identifier, ref: ref}}
+    {:ok, %{identifier: init_arg.identifier, features: init_arg.features}}
   end
 
   def start_link(data) do

@@ -300,12 +300,12 @@ defmodule Membership.Member do
 
   @doc """
   Sync features column with the member features and member plans pivot tables.
-  we do this for caching reasons, ie holding the feature and extra feature identifiers summed
+  we do this for caching reasons, ie holding the plan[feature] and extra feature identifiers summed
   into a list and stored in features column of the member, we  query this to see if member has
   ex feature vs repo lookup by plan and checking if plan has said feature
   """
   @spec sync_features(Member.t()) :: Member.t()
-  defp sync_features(%Member{id: id} = _member) do
+  def sync_features(%Member{id: id} = _member) do
     member =
       Member |> Repo.get!(id) |> Repo.preload(plans: :features) |> Repo.preload([:extra_features])
 
