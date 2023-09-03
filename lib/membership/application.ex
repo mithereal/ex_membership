@@ -10,6 +10,7 @@ defmodule Membership.Application do
       {Repo, args},
       ## store ref to ets
       {Registry, keys: :unique, name: :active_memberships},
+      {Registry, keys: :unique, name: :membership_plans},
       ## start/stop members for ref cleanup when killed
       {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor}
     ]
