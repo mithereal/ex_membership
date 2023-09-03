@@ -10,6 +10,7 @@ defmodule Membership.MemberFeatures do
   schema "membership_member_features" do
     belongs_to(:member, Membership.Member)
     belongs_to(:feature, Membership.Feature)
+    field(:permission, :string, default: "deny")
   end
 
   def changeset(%Membership.MemberFeatures{} = struct, params \\ %{}) do
