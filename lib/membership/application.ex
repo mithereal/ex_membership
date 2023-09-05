@@ -29,7 +29,7 @@ defmodule Membership.Application do
     Repo.all(Membership.Plan)
     |> Repo.preload([:features])
     |> Enum.each(fn x ->
-      :ets.insert(:membership_plans, {x.identifier, x})
+      :ets.insert(:membership_plans, {x.identifier, x.features})
     end)
   end
 end
