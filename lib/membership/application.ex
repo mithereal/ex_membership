@@ -21,13 +21,15 @@ defmodule Membership.Application do
 
   def load_plans(params) do
     :ets.new(:membership_plans, [:named_table, :set, :public, read_concurrency: true])
+    reload_plans()
+    params
+  end
 
+  def reload_plans() do
     Repo.all(Membership.Plan)
     |> Repo.preload([:features])
     |> Enum.each(fn x ->
       :ets.insert(:membership_plans, {x.identifier, x})
     end)
-
-    params
   end
 end
