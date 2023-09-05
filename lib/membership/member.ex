@@ -23,11 +23,12 @@ defmodule Membership.Member do
   @type t :: %Member{}
 
   schema "membership_members" do
+    field(:plans, {:array, :string}, default: [])
     field(:features, {:array, :string}, default: [])
     field(:identifier, :string, default: nil)
 
-    many_to_many(:plans, Membership.Plan,
-      join_through: Membership.PlanFeatures,
+    many_to_many(:plan_memberships, Membership.Plan,
+      join_through: Membership.MemberPlans,
       on_replace: :delete
     )
 
@@ -72,11 +73,7 @@ defmodule Membership.Member do
 
     plans = merge_uniq_grants(member.plans ++ [plan])
 
-    changeset =
-      changeset(member)
-      |> put_assoc(:plans, plans)
-
-    changeset |> Repo.update!()
+    changeset(member, %{plans: plans}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -89,14 +86,10 @@ defmodule Membership.Member do
   end
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> Repo.get!(id) |> Repo.preload([:features])
     features = Enum.uniq(member.features ++ [feature.identifier])
 
-    changeset =
-      changeset(member)
-      |> put_change(:features, features)
-
-    changeset |> Repo.update!()
+    changeset(member, %{features: features}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
@@ -151,14 +144,13 @@ defmodule Membership.Member do
         |> put_change(:features, features)
         |> Repo.update!()
 
-        Plan.create(member, plan)
+        Plan.build(member, plan, features)
+        |> Repo.insert_or_update!()
 
       feature ->
-        Plan.create(member, plan)
-        feature
+        Plan.build(member, plan, features)
+        |> Repo.insert_or_update!()
     end
-
-    member
   end
 
   def grant(
@@ -279,9 +271,9 @@ defmodule Membership.Member do
   def revoke(
         %{member: %Member{id: _pid} = member},
         %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
+        %{__struct__: _feature_name, id: _feature_id} = data
       ) do
-    revoke(member, feature, feature)
+    revoke(member, feature, data)
   end
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
@@ -308,9 +300,24 @@ defmodule Membership.Member do
   @spec sync_features(Member.t()) :: Member.t()
   def sync_features(%Member{id: id} = _member) do
     member =
-      Member |> Repo.get!(id) |> Repo.preload(plans: :features) |> Repo.preload([:extra_features])
+      Member
+      |> Repo.get!(id)
+      |> Repo.preload(plans: :plan)
+      |> Repo.preload(extra_features: :feature)
 
-    IO.inspect(member)
+    plan_features =
+      Enum.map(member.plans, fn x ->
+        x.features
+      end)
+
+    extra_features =
+      Enum.map(member.extra_features, fn x ->
+        x.identifier
+      end)
+
+    features = Enum.uniq(member.features ++ plan_features ++ extra_features)
+
+    changeset(member, %{features: features}) |> Repo.update!(features)
   end
 
   def table, do: :membership_members

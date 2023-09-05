@@ -1,6 +1,6 @@
 defmodule Membership.Repo.Migrations.CreateMembershipFeaturesTable do
   use Ecto.Migration
-  ### todo:: remove
+
   def change do
     key_type = Membership.Config.key_type(:migration)
 
