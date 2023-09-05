@@ -7,7 +7,7 @@ defmodule Membership.PlanFeatures do
 
   alias Membership.Feature
   alias Membership.Plan
-
+  @foreign_key_type :binary_id
   @primary_key false
   schema "membership_plan_features" do
     belongs_to(:feature, Feature)

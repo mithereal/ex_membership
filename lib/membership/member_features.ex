@@ -5,6 +5,7 @@ defmodule Membership.MemberFeatures do
 
   use Ecto.Schema
   import Ecto.Changeset
+  @foreign_key_type :binary_id
 
   @primary_key false
   schema "membership_member_features" do
