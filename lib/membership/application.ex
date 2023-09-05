@@ -6,11 +6,20 @@ defmodule Membership.Application do
 
   @impl true
   def start(_type, args \\ []) do
-    children = [
-      {Repo, args},
-      {Registry, keys: :unique, name: :active_memberships},
-      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor}
-    ]
+    storage_type = Membership.Config.storage_type()
+
+    children =
+      case storage_type do
+        :horde ->
+          Membership.Application.Horde.start()
+
+        _ ->
+          [
+            {Repo, args},
+            {Registry, keys: :unique, name: :active_memberships},
+            {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor}
+          ]
+      end
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]
     Supervisor.start_link(children, opts) |> load_plans()
