@@ -283,10 +283,10 @@ defmodule Membership.MemberTest do
       member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
 
       assert 1 == length(member.features)
-      assert Membership.has_feature?(member, :view_plan, struct)
+      assert Membership.has_feature?(member, :view_plan, plan)
 
-      member = Member.revoke(%{member: member}, feature, struct)
-      refute Membership.has_feature?(member, :view_plan, struct)
+      member = Member.revoke(%{member: member}, feature, plan)
+      refute Membership.has_feature?(member, :view_plan, plan)
     end
 
     test "revokes feature from inherited member from id on struct" do
