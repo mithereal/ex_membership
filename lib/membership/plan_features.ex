@@ -1,7 +1,7 @@
 defmodule Membership.PlanFeatures do
   @moduledoc false
 
-  use Membership.Schema[type: :binary_fk]
+  use Membership.Schema, type: :binary_fk
 
   alias Membership.Feature
   alias Membership.Plan

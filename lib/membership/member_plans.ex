@@ -3,7 +3,7 @@ defmodule Membership.MemberPlans do
   MemberPlans is the association linking the member to the plan you can also set specific features for the membership
   """
 
-  use Membership.Schema[type: :binary_fk]
+  use Membership.Schema, type: :binary_fk
 
   alias Membership.Member
   alias Membership.Plan
