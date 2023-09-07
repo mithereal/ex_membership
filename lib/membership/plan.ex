@@ -3,9 +3,10 @@ defmodule Membership.Plan do
   Plan is main representation of a single plan
   """
   use Membership.Schema
-  import Ecto.Changeset
 
+  alias Membership.Feature
   alias Membership.Plan
+  alias Membership.PlanFeatures
 
   @typedoc "A plan struct"
   @type t :: %Plan{}
@@ -14,8 +15,8 @@ defmodule Membership.Plan do
     field(:identifier, :string)
     field(:name, :string)
 
-    many_to_many(:features, Membership.Feature,
-      join_through: Membership.PlanFeatures,
+    many_to_many(:features, Feature,
+      join_through: PlanFeatures,
       on_replace: :delete
     )
   end
@@ -23,7 +24,7 @@ defmodule Membership.Plan do
   def changeset(%Plan{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
-    |> cast_assoc(:features, required: false)
+    |> put_assoc(:features, required: false)
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Plan already exists")
   end
@@ -37,4 +38,21 @@ defmodule Membership.Plan do
   end
 
   def table, do: :membership_plans
+
+  def create(identifier, name, features \\ []) do
+    features =
+      Enum.map(features, fn f ->
+        Feature.create(f.identifier, f.name)
+      end)
+
+    IO.inspect(features)
+
+    {status, changeset} =
+      changeset(%Plan{}, %{
+        identifier: identifier,
+        name: name,
+        features: features
+      })
+      |> Repo.insert_or_update()
+  end
 end

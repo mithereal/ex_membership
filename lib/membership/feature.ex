@@ -3,13 +3,11 @@ defmodule Membership.Feature do
   Feature is main representation of a single feature flag assigned to a plan
   """
   use Membership.Schema
-  import Ecto.Changeset
   import Ecto.Query
 
   alias Membership.Feature
   alias Membership.PlanFeatures
   alias Membership.Plan
-  alias Membership.Repo
 
   @typedoc "A Feature struct"
   @type t :: %Feature{}
@@ -18,8 +16,8 @@ defmodule Membership.Feature do
     field(:identifier, :string)
     field(:name, :string)
 
-    many_to_many(:plans, Membership.Plan,
-      join_through: Membership.PlanFeatures,
+    many_to_many(:plans, Plan,
+      join_through: PlanFeatures,
       on_replace: :delete
     )
   end
@@ -37,6 +35,19 @@ defmodule Membership.Feature do
       identifier: identifier,
       name: name
     })
+  end
+
+  def create(identifier, name) do
+    record = Repo.get_by(Feature, identifier: identifier)
+
+    case is_nil(record) do
+      true ->
+        {_, record} = Repo.insert(%Feature{identifier: identifier, name: name})
+        record
+
+      false ->
+        record
+    end
   end
 
   def table, do: :membership_features

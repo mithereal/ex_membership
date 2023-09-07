@@ -7,15 +7,13 @@ defmodule Membership.Member do
   Member is a main actor for determining features
   """
   use Membership.Schema
-  import Ecto.Changeset
+
   import Ecto.Query
 
   alias Membership.Plan
   alias Membership.Feature
   alias Membership.MemberPlans
   alias Membership.MemberFeatures
-
-  alias Membership.Repo
 
   alias Membership.Member
 
@@ -27,13 +25,13 @@ defmodule Membership.Member do
     field(:features, {:array, :string}, default: [])
     field(:identifier, :string, default: nil)
 
-    many_to_many(:plan_memberships, Membership.Plan,
-      join_through: Membership.MemberPlans,
+    many_to_many(:plan_memberships, Plan,
+      join_through: MemberPlans,
       on_replace: :delete
     )
 
-    many_to_many(:extra_features, Membership.Feature,
-      join_through: Membership.MemberFeatures,
+    many_to_many(:extra_features, Feature,
+      join_through: MemberFeatures,
       on_replace: :delete
     )
 
