@@ -1,11 +1,7 @@
 defmodule Membership.Schema do
   @moduledoc false
   defmacro __using__(options) do
-    type =
-      case Enum.member?(options, :type) do
-        false -> Membership.Config.key_type()
-        true -> options[:type]
-      end
+    type = options[:type] || Membership.Config.key_type()
 
     case type do
       :binary_id ->
