@@ -24,7 +24,7 @@ defmodule Membership.Role do
   def changeset(%Role{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
-    |> cast_assoc(:plans, required: false)
+    |> cast_assoc(:features, required: false)
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Role already exists")
   end
@@ -56,62 +56,62 @@ defmodule Membership.Role do
 
   ## Examples
 
-  Function accepts either `Membership.Role` or `Membership.Plan` grants.
+  Function accepts either `Membership.Role` or `Membership.Feature` grants.
   Function is merging existing grants with the new ones, so calling grant with same
   grants will not duplicate entries in table.
 
-  To grant particular feature to a given plan
+  To grant particular feature to a given role
 
-      iex> Membership.Role.grant(%Membership.Plan{id: 1}, %Membership.Role{id: 1})
+      iex> Membership.Role.grant(%Membership.Feature{id: 1}, %Membership.Role{id: 1})
 
-  To grant particular feature to a given plan
+  To grant particular feature to a given role
 
-      iex> Membership.Role.grant(%Membership.Role{id: 1}, %Membership.Plan{id: 1})
+      iex> Membership.Role.grant(%Membership.Role{id: 1}, %Membership.Feature{id: 1})
 
   """
 
-  @spec grant(Role.t(), Role.t() | Plan.t()) :: Member.t()
-  def grant(%Role{id: id} = _member, %Plan{id: _id} = plan) do
-    # Preload Role plans
-    feature = Role |> Repo.get!(id) |> Repo.preload(:plans)
+  @spec grant(Role.t(), Role.t() | Feature.t()) :: Member.t()
+  def grant(%Role{id: id} = _member, %Feature{id: _id} = feature) do
+    # Preload Role features
+    role = Role |> Repo.get!(id) |> Repo.preload(:features)
 
-    plans = merge_uniq_grants(feature.plans ++ [plan])
+    features = merge_uniq_grants(role.features ++ [feature])
 
     changeset =
       changeset(feature)
-      |> put_assoc(:plans, plans)
+      |> put_assoc(:features, features)
 
     changeset |> Repo.update()
   end
 
-  def grant(%{feature: %Role{id: _pid} = feature}, %Plan{id: _id} = plan) do
-    grant(feature, plan)
+  def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
+    grant(role, feature)
   end
 
-  def grant(%{feature_id: id}, %Plan{id: _id} = plan) do
-    feature = Role |> Repo.get!(id)
-    grant(feature, plan)
+  def grant(%{role_id: id}, %Feature{id: _id} = feature) do
+    role = Role |> Repo.get!(id)
+    grant(role, feature)
   end
 
-  def grant(%Plan{id: id} = _member, %Role{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
-    features = Enum.uniq(plan.features ++ [feature])
+  def grant(%Feature{id: id} = feature, %Role{id: _id} = role) do
+    role = Role |> Repo.get!(id) |> Repo.preload(:features)
+    features = Enum.uniq(role.features ++ [feature])
 
     changeset =
-      Plan.changeset(plan)
+      Role.changeset(Role)
       |> put_change(:features, features)
 
     changeset |> Repo.update!()
   end
 
-  def grant(%{plan: %Plan{id: id}}, %Role{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id)
-    grant(plan, feature)
+  def grant(%{feature: %Feature{id: id}}, %Role{id: _id} = role) do
+    feature = Feature |> Repo.get!(id)
+    grant(role, feature)
   end
 
-  def grant(%{plan_id: id}, %Role{id: _id} = feature) do
-    plan = Member |> Repo.get!(id)
-    grant(plan, feature)
+  def grant(%{feature_id: id}, %Role{id: _id} = role) do
+    role = Role |> Repo.get!(id)
+    grant(role, feature)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -128,59 +128,59 @@ defmodule Membership.Role do
 
   To revoke particular feature from a given plan
 
-      iex> Membership.Role.revoke(%Membership.Plan{id: 1}, %Membership.Role{id: 1})
+      iex> Membership.Role.revoke(%Membership.Feature{id: 1}, %Membership.Role{id: 1})
 
   To revoke particular plan from a given feature
 
-      iex> Membership.Role.revoke(%Membership.Role{id: 1}, %Membership.Plan{id: 1})
+      iex> Membership.Role.revoke(%Membership.Role{id: 1}, %Membership.Feature{id: 1})
 
   """
   @spec revoke(Plan.t(), Role.t() | Plan.t()) :: Member.t()
-  def revoke(%Role{id: id} = _, %Plan{id: _id} = plan) do
+  def revoke(%Role{id: id} = _, %Feature{id: _id} = feature) do
     from(pa in PlanRoles)
-    |> where([pr], pr.feature_id == ^id and pr.plan_id == ^plan.id)
+    |> where([pr], pr.role_id == ^id and pr.feature_id == ^feature.id)
     |> Repo.delete_all()
   end
 
-  def revoke(%{feature: %Role{id: _pid} = feature}, %Plan{id: _id} = plan) do
+  def revoke(%{feature: %Role{id: _pid} = feature}, %Feature{id: _id} = plan) do
     revoke(feature, plan)
   end
 
-  def revoke(%{feature_id: id}, %Plan{id: _id} = plan) do
+  def revoke(%{feature_id: id}, %Feature{id: _id} = plan) do
     revoke(%Role{id: id}, plan)
   end
 
-  def revoke(%Plan{id: id} = _member, %Role{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
+  def revoke(%Feature{id: id} = _member, %Role{id: _id} = feature) do
+    role = Role |> Repo.get!(id) |> Repo.preload(:features)
 
     features =
-      Enum.filter(plan.features, fn grant ->
+      Enum.filter(role.features, fn grant ->
         grant != feature.identifier
       end)
 
     changeset =
-      Plan.changeset(plan)
+      Plan.changeset(role)
       |> put_change(:features, features)
 
     changeset |> Repo.update!()
   end
 
   def revoke(
-        %{plan: %Plan{id: _pid} = plan},
-        %Role{id: _id} = feature
+        %{feature: %Feature{id: _pid} = feature},
+        %Role{id: _id} = role
       ) do
-    revoke(plan, feature)
+    revoke(role, feature)
   end
 
-  def revoke(%{plan_id: id}, %Role{id: _id} = feature) do
-    revoke(%Plan{id: id}, feature)
+  def revoke(%{feature_id: id}, %Role{id: _id} = role) do
+    revoke(%Feature{id: id}, role)
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_plan_feature(plan, %{
+  def load_role_feature(role, %{
         __struct__: _feature_name,
         id: feature_id,
         identifier: _identifier
@@ -188,7 +188,7 @@ defmodule Membership.Role do
     PlanRoles
     |> where(
       [e],
-      e.plan_id == ^plan.id and e.feature_id == ^feature_id
+      e.role_id == ^role.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
   end

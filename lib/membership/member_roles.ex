@@ -16,7 +16,7 @@ defmodule Membership.MemberRoles do
 
   def changeset(%MemberRoles{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :role_id,)
+    |> cast(params, [:member_id, :role_id])
     |> validate_required([:member_id, :role_id])
   end
 
@@ -26,7 +26,7 @@ defmodule Membership.MemberRoles do
       ) do
     changeset(%MemberRoles{
       member_id: id,
-        role_id: role_id
+      role_id: role_id
     })
     |> Repo.insert!()
   end
