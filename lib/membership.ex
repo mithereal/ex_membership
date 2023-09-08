@@ -349,28 +349,15 @@ defmodule Membership do
            length(rules.extra_rules) == 0 do
         :ok
       else
-        # 1st layer of authorization (optimize db load)
-        first_layer =
+        reply =
           authorize!(
             [
               authorize_features(current_member.features, rules.required_features)
             ] ++ rules.calculated_as_member ++ rules.extra_rules
           )
 
-        if first_layer == :ok do
-          first_layer
-        else
-          # 2nd layer with DB preloading of features
-          %{features: current_features} = load_member_features(current_member)
-
-          second_layer =
-            authorize!([
-              authorize_features(current_features, required_features),
-              authorize_inherited_features(current_features, required_features)
-            ])
-
-          if second_layer == :ok do
-            second_layer
+        if reply == :ok do
+          reply
           else
             {:error, "Member is not granted to perform this action"}
           end
