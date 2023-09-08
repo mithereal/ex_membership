@@ -84,11 +84,9 @@ defmodule Membership.Member do
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id) |> Repo.preload([:extra_features])
-    features = Enum.uniq(member.features ++ [feature.identifier])
-
-    ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
-
-    changeset(member, %{extra_features: features}) |> Repo.update!()
+    extra_features = Enum.uniq(member.extra_features ++ [feature])
+    ### todo make sure this returns correctly
+    changeset(member, %{extra_features: extra_features}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
