@@ -102,7 +102,6 @@ defmodule Membership do
         |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
         |> Enum.each(fn {x, _} ->
           default = %{
-            required_plans: [],
             required_features: [],
             calculated_as_member: [],
             extra_rules: []
@@ -337,8 +336,15 @@ defmodule Membership do
     else
       rules = fetch_rules_from_ets(func_name)
 
+      plan_features =
+        List.flatten(
+          Enum.map(required_plans, fn p ->
+            p.features
+          end)
+        )
+
       # If no as_member were required then we can assume member is granted
-      if length(rules.required_plans) + length(rules.required_features) +
+      if length(plan_features) + length(rules.required_features) +
            length(rules.calculated_as_member) +
            length(rules.extra_rules) == 0 do
         :ok
@@ -347,7 +353,7 @@ defmodule Membership do
         first_layer =
           authorize!(
             [
-              authorize_plans(current_member.plans, rules.required_plans)
+              authorize_features(current_member.features, rules.required_features)
             ] ++ rules.calculated_as_member ++ rules.extra_rules
           )
 
@@ -360,7 +366,7 @@ defmodule Membership do
           second_layer =
             authorize!([
               authorize_features(current_features, required_features),
-              authorize_inherited_plans(current_features, required_plans)
+              authorize_inherited_features(current_features, required_features)
             ])
 
           if second_layer == :ok do
@@ -420,30 +426,20 @@ defmodule Membership do
   @doc false
   @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
   def load_member_features(member) do
-    member |> Membership.Repo.preload([:features])
+    member
   end
 
   @doc false
-  def authorize_plans(active_plans \\ [], required_plans \\ []) do
-    authorized =
-      Enum.filter(required_plans, fn plan ->
-        Enum.member?(active_plans, plan)
-      end)
-
-    length(authorized) > 0
-  end
-
-  @doc false
-  def authorize_inherited_plans(active_features \\ [], required_plans \\ []) do
-    active_plans =
+  def authorize_inherited_features(active_features \\ [], required_features \\ []) do
+    active_features =
       active_features
-      |> Enum.map(& &1.plans)
+      |> Enum.map(& &1.features)
       |> List.flatten()
       |> Enum.uniq()
 
     authorized =
-      Enum.filter(required_plans, fn plan ->
-        Enum.member?(active_plans, plan)
+      Enum.filter(required_features, fn feature ->
+        Enum.member?(active_features, feature)
       end)
 
     length(authorized) > 0
@@ -456,6 +452,16 @@ defmodule Membership do
       |> Enum.map(& &1.identifier)
       |> Enum.uniq()
 
+    authorized =
+      Enum.filter(required_features, fn feature ->
+        Enum.member?(active_features, feature)
+      end)
+
+    length(authorized) > 0
+  end
+
+  @doc false
+  def authorized_features(active_features \\ [], required_features \\ []) do
     authorized =
       Enum.filter(required_features, fn feature ->
         Enum.member?(active_features, feature)
