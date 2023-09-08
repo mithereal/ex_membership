@@ -64,9 +64,7 @@ defmodule Membership.Member do
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    # Preload member plans
     member = Member |> Repo.get!(id) |> Repo.preload(plan_memberships: :plan)
-
     plans = merge_uniq_grants(member.plan_memberships ++ [plan])
 
     changeset(member, %{plan_memberships: plans}) |> Repo.update!()

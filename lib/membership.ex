@@ -358,9 +358,8 @@ defmodule Membership do
 
         if reply == :ok do
           reply
-          else
-            {:error, "Member is not granted to perform this action"}
-          end
+        else
+          {:error, "Member is not granted to perform this action"}
         end
       end
     end
@@ -480,7 +479,7 @@ defmodule Membership do
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
-    ##todo:: lookup the plan and add the features to required_features
+    ## todo:: lookup the plan and add the features to required_features
     Membership.Registry.add(__MODULE__, func_name, %{required_plan: plan})
     {:ok, plan}
   end
