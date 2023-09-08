@@ -298,7 +298,7 @@ defmodule Membership do
   """
   @spec has_plan?(Membership.Member.t(), atom(), String.t()) :: boolean()
   def has_plan?(%Membership.Member{} = member, func_name, plan_name) do
-    member_authorization!(member, func_name, [Atom.to_string(plan_name)], []) == :ok
+    member_authorization!(member, func_name, [], [Atom.to_string(plan_name)]) == :ok
   end
 
   #  def has_plan?(
@@ -319,15 +319,15 @@ defmodule Membership do
   Perform feature check on passed member and feature
   """
   def has_feature?(%Membership.Member{} = member, func_name, feature_name) do
-    member_authorization!(member, func_name, nil, [Atom.to_string(feature_name)], nil) == :ok
+    member_authorization!(member, func_name, [Atom.to_string(feature_name)]) == :ok
   end
 
   @doc false
   def member_authorization!(
         current_member \\ nil,
         func_name \\ nil,
-        required_plans \\ [],
         required_features \\ [],
+        required_plans \\ [],
         _extra_rules \\ []
       ) do
     # If no member is given we can assume that as_member are not granted
