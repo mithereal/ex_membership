@@ -236,7 +236,7 @@ defmodule Membership.Member do
 
     role_features =
       Enum.map(member.roles, fn x ->
-        x.identifier
+        x.features
       end)
 
     features = Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
