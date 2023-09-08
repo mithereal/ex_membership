@@ -63,12 +63,12 @@ defmodule Membership.Member do
       iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
 
   """
-  ### todo look at thei
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload member plans
     member = Member |> Repo.get!(id) |> Repo.preload(plan_memberships: :plan)
 
+    ### todo make sure this returns correctly
     plans = merge_uniq_grants(member.plan_memberships ++ [plan])
 
     changeset(member, %{plan_memberships: plans}) |> Repo.update!()
@@ -103,73 +103,6 @@ defmodule Membership.Member do
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
-
-  ### todo: is this unnessessary
-  def grant(
-        %Member{id: _pid} = member,
-        %Feature{id: _aid} = feature,
-        %Feature{id: _aid} = extra_feature
-      ) do
-    member_feature = load_member_feature(member, feature)
-
-    case member_feature do
-      nil ->
-        features = Enum.uniq(member.features ++ [feature])
-
-        MemberFeatures.create(member, extra_feature)
-
-        MemberFeatures.changeset(feature)
-        |> put_change(:features, features)
-        |> Repo.update!()
-
-      feature ->
-        MemberFeatures.create(member, extra_feature)
-        feature
-    end
-
-    member
-  end
-
-  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
-  def grant(
-        %Member{id: _pid} = member,
-        %Feature{id: _aid} = feature,
-        %Plan{id: _aid} = plan
-      ) do
-    member_feature = load_member_feature(member, feature)
-
-    case member_feature do
-      nil ->
-        features = Enum.uniq(member.features ++ [member_feature])
-
-        MemberFeatures.changeset(feature)
-        |> put_change(:features, features)
-        |> Repo.update!()
-
-        Plan.build(member, plan, features)
-        |> Repo.insert_or_update!()
-
-      feature ->
-        Plan.build(member, plan, member_feature)
-        |> Repo.insert_or_update!()
-    end
-  end
-
-  def grant(
-        %{member_id: id},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    grant(%Member{id: id}, feature, feature)
-  end
-
-  def grant(
-        %{member: %Member{id: _pid} = member},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    grant(member, feature, feature)
-  end
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
@@ -216,7 +149,6 @@ defmodule Membership.Member do
     revoke(%Member{id: id}, feature)
   end
 
-  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
   def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id) |> Repo.preload(:features)
 
@@ -233,52 +165,6 @@ defmodule Membership.Member do
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
-
-  def revoke(
-        %{member_id: id},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    revoke(%Member{id: id}, feature, feature)
-  end
-
-  def revoke(
-        %{member: %Member{id: _pid} = member},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = data
-      ) do
-    revoke(member, feature, data)
-  end
-
-  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
-  def revoke(
-        %Member{id: _pid} = member,
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    feature_features = load_member_feature(member, feature)
-
-    case feature_features do
-      nil ->
-        member
-
-      feature ->
-        features =
-          Enum.filter(feature.features, fn grant ->
-            grant != feature.identifier
-          end)
-
-        if length(features) == 0 do
-          feature |> Repo.delete!()
-        else
-          MemberFeatures.changeset(feature)
-          |> put_change(:features, features)
-          |> Repo.update!()
-        end
-
-        member
-    end
-  end
 
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
