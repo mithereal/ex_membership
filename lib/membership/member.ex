@@ -221,6 +221,7 @@ defmodule Membership.Member do
       Member
       |> Repo.get!(id)
       |> Repo.preload(plans: :plan)
+      |> Repo.preload(roles: :role)
       |> Repo.preload(extra_features: :feature)
 
     plan_features =
@@ -233,7 +234,12 @@ defmodule Membership.Member do
         x.identifier
       end)
 
-    features = Enum.uniq(member.features ++ plan_features ++ extra_features)
+    role_features =
+      Enum.map(member.roles, fn x ->
+        x.identifier
+      end)
+
+    features = Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
 
     changeset(member, %{features: features}) |> Repo.update!(features)
   end
