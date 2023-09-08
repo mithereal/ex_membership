@@ -479,8 +479,8 @@ defmodule Membership do
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
-    ## todo:: lookup the plan and add the features to required_features
-    Membership.Registry.add(__MODULE__, func_name, %{required_plan: plan})
+    {plan, features} = :ets.lookup(:membership_plans, plan)
+    Membership.Registry.add(__MODULE__, func_name, features)
     {:ok, plan}
   end
 
@@ -513,7 +513,7 @@ defmodule Membership do
   """
   @spec has_feature(atom(), atom()) :: {:ok, atom()}
   def has_feature(feature, func_name) do
-    Membership.Registry.add(__MODULE__, func_name, [feature])
+    Membership.Registry.add(__MODULE__, func_name, feature)
     {:ok, feature}
   end
 
