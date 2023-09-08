@@ -50,8 +50,10 @@ defmodule Sample.Post
 
 - [x] `Member` -> `[Feature]` permission schema
 - [x] `Plan` -> `[Feature]` permission schema
+- [] `Role` -> `[Feature]` permission schema
 - [x] `Member` -> `[Plan]` -> `[Feature]` permission schema
-- [x] `Member` -> `Object` -> `[Feature]` permission schema
+- [] `Member` -> `[Role]` -> `[Feature]` permission schema
+- [] `Member` -> `Object` -> `[Feature]` permission schema
 - [x] Computed permission in runtime
 - [x] Easily readable DSL
 - [ ] [ueberauth](https://github.com/ueberauth/ueberauth) integration
