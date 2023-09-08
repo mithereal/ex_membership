@@ -12,8 +12,10 @@ defmodule Membership.Member do
 
   alias Membership.Plan
   alias Membership.Feature
+  alias Membership.Role
   alias Membership.MemberPlans
   alias Membership.MemberFeatures
+  alias Membership.MemberRoles
 
   alias Membership.Member
 
@@ -184,6 +186,19 @@ defmodule Membership.Member do
     |> where(
       [e],
       e.member_id == ^member.id and e.plan_id == ^plan_id
+    )
+    |> Repo.one()
+  end
+
+  def load_member_role(member, %{
+        __struct__: _role_name,
+        id: role_id,
+        identifier: _identifier
+      }) do
+    MemberRoles
+    |> where(
+      [e],
+      e.member_id == ^member.id and e.role_id == ^role_id
     )
     |> Repo.one()
   end
