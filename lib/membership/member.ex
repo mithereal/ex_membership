@@ -63,15 +63,15 @@ defmodule Membership.Member do
       iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
 
   """
-
+  ### todo look at thei
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload member plans
-    member = Member |> Repo.get!(id) |> Repo.preload([:plan_memberships])
+    member = Member |> Repo.get!(id) |> Repo.preload(plan_memberships: :plan)
 
-    plans = merge_uniq_grants(member.plans ++ [plan])
+    plans = merge_uniq_grants(member.plan_memberships ++ [plan])
 
-    changeset(member, %{plans: plans}) |> Repo.update!()
+    changeset(member, %{plan_memberships: plans}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -84,10 +84,12 @@ defmodule Membership.Member do
   end
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id) |> Repo.preload([:features])
+    member = Member |> Repo.get!(id) |> Repo.preload([:extra_features])
     features = Enum.uniq(member.features ++ [feature.identifier])
 
-    changeset(member, %{features: features}) |> Repo.update!()
+    ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
+
+    changeset(member, %{extra_features: features}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
@@ -102,6 +104,7 @@ defmodule Membership.Member do
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
+  ### todo: is this unnessessary
   def grant(
         %Member{id: _pid} = member,
         %Feature{id: _aid} = feature,
@@ -127,6 +130,7 @@ defmodule Membership.Member do
     member
   end
 
+  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
   def grant(
         %Member{id: _pid} = member,
         %Feature{id: _aid} = feature,
@@ -212,6 +216,7 @@ defmodule Membership.Member do
     revoke(%Member{id: id}, feature)
   end
 
+  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
   def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id) |> Repo.preload(:features)
 
@@ -245,6 +250,7 @@ defmodule Membership.Member do
     revoke(member, feature, data)
   end
 
+  ### todo: create a feature pivot table instead of modifyint features directly, we do that in sync
   def revoke(
         %Member{id: _pid} = member,
         %Feature{id: _id} = feature,
@@ -289,6 +295,19 @@ defmodule Membership.Member do
     |> Repo.one()
   end
 
+  def load_member_plan(member, %{
+        __struct__: _plan_name,
+        id: plan_id,
+        identifier: _identifier
+      }) do
+    MemberPlans
+    |> where(
+      [e],
+      e.member_id == ^member.id and e.plan_id == ^plan_id
+    )
+    |> Repo.one()
+  end
+
   @doc """
   Sync features column with the member features and member plans pivot tables.
   we do this for caching reasons, ie holding the plan[feature] and extra feature identifiers summed
@@ -300,11 +319,11 @@ defmodule Membership.Member do
     member =
       Member
       |> Repo.get!(id)
-      |> Repo.preload(plans: :plan)
+      |> Repo.preload(plan_memberships: :plan)
       |> Repo.preload(extra_features: :feature)
 
     plan_features =
-      Enum.map(member.plans, fn x ->
+      Enum.map(member.plan_memberships, fn x ->
         x.features
       end)
 
