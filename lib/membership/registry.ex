@@ -50,4 +50,12 @@ defmodule Membership.Registry do
   def lookup(name) when is_atom(name) do
     :ets.lookup(__MODULE__, name)
   end
+
+  def normalize_struct_name(name) do
+    name
+    |> Atom.to_string()
+    |> String.replace(".", "_")
+    |> String.downcase()
+    |> String.to_atom()
+  end
 end
