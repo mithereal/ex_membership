@@ -21,7 +21,6 @@ defmodule Membership.Member do
   @type t :: %Member{}
 
   schema "membership_members" do
-    field(:plans, {:array, :string}, default: [])
     field(:features, {:array, :string}, default: [])
     field(:identifier, :string, default: nil)
 

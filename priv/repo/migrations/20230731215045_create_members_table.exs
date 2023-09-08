@@ -8,7 +8,6 @@ defmodule Membership.Repo.Migrations.CreateMembersTable do
       add(:id, key_type, primary_key: true)
       add(:identifier, :string)
       add(:features, {:array, :string}, default: [])
-      add(:plans, {:array, :string}, default: [])
 
       timestamps()
     end

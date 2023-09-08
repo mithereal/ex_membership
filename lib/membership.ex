@@ -26,7 +26,7 @@ defmodule Membership do
 
 
   ## Available as_member
-
+  ##todo:: rewrite has_plan to compare features on member vs plan vs plan name in plans array
     * `Membership.has_plan/1` - Requires single plan to be present on member
     * `Membership.has_feature/1` - Requires single feature to be present on member
 
