@@ -227,19 +227,29 @@ defmodule Membership.Member do
     plan_features =
       Enum.map(member.plans, fn x ->
         x.features
+        |> Enum.map(fn f ->
+          f.identifier
+        end)
       end)
 
     extra_features =
       Enum.map(member.extra_features, fn x ->
         x.identifier
+        |> Enum.map(fn f ->
+          f.identifier
+        end)
       end)
 
     role_features =
       Enum.map(member.roles, fn x ->
         x.features
+        |> Enum.map(fn f ->
+          f.identifier
+        end)
       end)
 
-    features = Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
+    features =
+      Enum.uniq(List.flatten(member.features ++ plan_features ++ role_features ++ extra_features))
 
     changeset(member, %{features: features}) |> Repo.update!(features)
   end
