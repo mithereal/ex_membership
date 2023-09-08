@@ -67,7 +67,7 @@ defmodule Membership.Member do
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     # Preload member plans
-    member = Member |> Repo.get!(id) |> Repo.preload([:plans])
+    member = Member |> Repo.get!(id) |> Repo.preload([:plan_memberships])
 
     plans = merge_uniq_grants(member.plans ++ [plan])
 
@@ -107,20 +107,20 @@ defmodule Membership.Member do
         %Feature{id: _aid} = feature,
         %Feature{id: _aid} = extra_feature
       ) do
-    features = load_member_features(member, feature)
+    member_feature = load_member_feature(member, feature)
 
-    case features do
+    case member_feature do
       nil ->
         features = Enum.uniq(member.features ++ [feature])
 
-        MemberFeatures.create(member, extra_feature.identifier)
+        MemberFeatures.create(member, extra_feature)
 
         MemberFeatures.changeset(feature)
         |> put_change(:features, features)
         |> Repo.update!()
 
       feature ->
-        MemberFeatures.create(member, extra_feature.identifier)
+        MemberFeatures.create(member, extra_feature)
         feature
     end
 
@@ -132,11 +132,11 @@ defmodule Membership.Member do
         %Feature{id: _aid} = feature,
         %Plan{id: _aid} = plan
       ) do
-    features = load_member_features(member, feature)
+    member_feature = load_member_feature(member, feature)
 
-    case features do
+    case member_feature do
       nil ->
-        features = Enum.uniq(member.features ++ [feature])
+        features = Enum.uniq(member.features ++ [member_feature])
 
         MemberFeatures.changeset(feature)
         |> put_change(:features, features)
@@ -146,7 +146,7 @@ defmodule Membership.Member do
         |> Repo.insert_or_update!()
 
       feature ->
-        Plan.build(member, plan, features)
+        Plan.build(member, plan, member_feature)
         |> Repo.insert_or_update!()
     end
   end
@@ -201,8 +201,19 @@ defmodule Membership.Member do
     revoke(%Member{id: id}, plan)
   end
 
+  def revoke(
+        %{member: %Member{id: _pid} = member},
+        %Feature{id: _id} = feature
+      ) do
+    revoke(member, feature)
+  end
+
+  def revoke(%{member_id: id}, %Feature{id: _id} = feature) do
+    revoke(%Member{id: id}, feature)
+  end
+
   def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
+    member = Member |> Repo.get!(id) |> Repo.preload(:features)
 
     features =
       Enum.filter(member.features, fn grant ->
@@ -216,25 +227,30 @@ defmodule Membership.Member do
     changeset |> Repo.update!()
   end
 
+  def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
+
+  def revoke(
+        %{member_id: id},
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = feature
+      ) do
+    revoke(%Member{id: id}, feature, feature)
+  end
+
   def revoke(
         %{member: %Member{id: _pid} = member},
-        %Feature{id: _id} = feature
+        %Feature{id: _id} = feature,
+        %{__struct__: _feature_name, id: _feature_id} = data
       ) do
-    revoke(member, feature)
+    revoke(member, feature, data)
   end
-
-  def revoke(%{member_id: id}, %Feature{id: _id} = feature) do
-    revoke(%Member{id: id}, feature)
-  end
-
-  def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
   def revoke(
         %Member{id: _pid} = member,
         %Feature{id: _id} = feature,
         %{__struct__: _feature_name, id: _feature_id} = feature
       ) do
-    feature_features = load_member_features(member, feature)
+    feature_features = load_member_feature(member, feature)
 
     case feature_features do
       nil ->
@@ -258,25 +274,9 @@ defmodule Membership.Member do
     end
   end
 
-  def revoke(
-        %{member_id: id},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    revoke(%Member{id: id}, feature, feature)
-  end
-
-  def revoke(
-        %{member: %Member{id: _pid} = member},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = data
-      ) do
-    revoke(member, feature, data)
-  end
-
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_member_features(member, %{
+  def load_member_feature(member, %{
         __struct__: _feature_name,
         id: feature_id,
         identifier: _identifier
