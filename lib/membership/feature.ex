@@ -117,44 +117,6 @@ defmodule Membership.Feature do
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
-  def grant(
-        %Plan{id: _pid} = plan,
-        %Feature{id: _aid} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    features = load_plan_features(plan, feature)
-
-    case features do
-      nil ->
-        PlanFeatures.create(plan, feature, [feature.identifier])
-
-      feature ->
-        features = Enum.uniq(feature.features ++ [feature])
-
-        PlanFeatures.changeset(feature)
-        |> put_change(:features, features)
-        |> Repo.update!()
-    end
-
-    plan
-  end
-
-  def grant(
-        %{plan_id: id},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    grant(%Plan{id: id}, feature, feature)
-  end
-
-  def grant(
-        %{member: %Plan{id: _pid} = plan},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    grant(plan, feature, feature)
-  end
-
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
   @doc """
@@ -217,54 +179,9 @@ defmodule Membership.Feature do
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def revoke(
-        %Plan{id: _pid} = plan,
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    feature_features = load_plan_features(plan, feature)
-
-    case feature_features do
-      nil ->
-        plan
-
-      feature ->
-        features =
-          Enum.filter(feature.features, fn grant ->
-            grant != feature.identifier
-          end)
-
-        if length(features) == 0 do
-          feature |> Repo.delete!()
-        else
-          PlanFeatures.changeset(feature)
-          |> put_change(:features, features)
-          |> Repo.update!()
-        end
-
-        plan
-    end
-  end
-
-  def revoke(
-        %{plan_id: id},
-        %Feature{id: _id} = _plan,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    revoke(%Plan{id: id}, feature, feature)
-  end
-
-  def revoke(
-        %{plan: %Plan{id: _pid} = plan},
-        %Feature{id: _id} = feature,
-        %{__struct__: _feature_name, id: _feature_id} = feature
-      ) do
-    revoke(plan, feature, feature)
-  end
-
   def revoke(_, _, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
 
-  def load_plan_features(plan, %{
+  def load_plan_feature(plan, %{
         __struct__: _feature_name,
         id: feature_id,
         identifier: _identifier
