@@ -26,13 +26,18 @@ defmodule Membership.Member do
     field(:features, {:array, :string}, default: [])
     field(:identifier, :string, default: nil)
 
-    many_to_many(:plan_memberships, Plan,
+    many_to_many(:plans, Plan,
       join_through: MemberPlans,
       on_replace: :delete
     )
 
     many_to_many(:extra_features, Feature,
       join_through: MemberFeatures,
+      on_replace: :delete
+    )
+
+    many_to_many(:roles, Role,
+      join_through: MemberRoles,
       on_replace: :delete
     )
 
@@ -43,6 +48,7 @@ defmodule Membership.Member do
     struct
     |> cast(params, [])
     |> cast_assoc(:plans, required: false)
+    |> cast_assoc(:roles, required: false)
     |> cast_assoc(:extra_features, required: false)
   end
 
@@ -66,10 +72,10 @@ defmodule Membership.Member do
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    member = Member |> Repo.get!(id) |> Repo.preload(plan_memberships: :plan)
-    plans = merge_uniq_grants(member.plan_memberships ++ [plan])
+    member = Member |> Repo.get!(id) |> Repo.preload(plans: :plan)
+    plans = merge_uniq_grants(member.plans ++ [plan])
 
-    changeset(member, %{plan_memberships: plans}) |> Repo.update!()
+    changeset(member, %{plans: plans}) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -214,11 +220,11 @@ defmodule Membership.Member do
     member =
       Member
       |> Repo.get!(id)
-      |> Repo.preload(plan_memberships: :plan)
+      |> Repo.preload(plans: :plan)
       |> Repo.preload(extra_features: :feature)
 
     plan_features =
-      Enum.map(member.plan_memberships, fn x ->
+      Enum.map(member.plans, fn x ->
         x.features
       end)
 
