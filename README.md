@@ -1,14 +1,14 @@
-# 🛡 Membership 🛡 
+# 🛡 Membership 🛡
 
 [![Coverage Status](https://img.shields.io/coveralls/github/mithereal/ex_membership.svg?style=flat-square)](https://coveralls.io/github/mithereal/ex_membership)
 [![Build Status](https://img.shields.io/travis/mithereal/ex_membership.svg?style=flat-square)](https://travis-ci.org/mithereal/ex_membership)
 [![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 
-Membership is toolkit for granular feature management for members. It allows you to define granular features such as:
-this is basically terminator but with methods and dsl for membership plans and features
-also we can now coexist with terminator and have our own custom dsl/ets etc.
-- `Member -> Plan`
-- `Member -> [Plan, Plan, ...]`
+Membership is toolkit for granular feature management for members. It allows you to define granular features such
+as: [:can_edit, :can_delete] on a per module basis
+each module has an ets backed registry with {function, permission} tuple.
+this allows us to have plans with multiple features which members can subscribe to
+we then can hold each user in a registry and compare features on a function level.
 
 Here is a small example:
 
@@ -83,7 +83,9 @@ iex> mix membership.setup
 
 ### Usage with ecto
 
-Membership is originally designed to be used with Ecto. Usually you will want to have your own table for `Accounts`/`Users` living in your application. To do so you can link member with `belongs_to` association within your schema.
+Membership is originally designed to be used with Ecto. Usually you will want to have your own table
+for `Accounts`/`Users` living in your application. To do so you can link member with `belongs_to` association within
+your schema.
 
 ```elixir
 # In your migrations add member_id field
@@ -104,7 +106,8 @@ end
 
 ```
 
-This will allow you link any internal entity with 1-1 association to members. Please note that you need to create member on each user creation (e.g with `Membership.Member.changeset/2`) and call `put_assoc` inside your changeset
+This will allow you link any internal entity with 1-1 association to members. Please note that you need to create member
+on each user creation (e.g with `Membership.Member.changeset/2`) and call `put_assoc` inside your changeset
 
 ```elixir
 # In schema defintion
@@ -157,11 +160,15 @@ defmodule Sample.Post
 
 ```
 
-Membership tries to infer the member, so it is easy to pass any struct (could be for example `User` in your application) which has set up `belongs_to` association for member. If the member was already preloaded from database Membership will take it as loaded member. If you didn't do preload and just loaded `User` -> `Repo.get(User, 1)` Membership will fetch the member on each authorization try.
+Membership tries to infer the member, so it is easy to pass any struct (could be for example `User` in your application)
+which has set up `belongs_to` association for member. If the member was already preloaded from database Membership will
+take it as loaded member. If you didn't do preload and just loaded `User` -> `Repo.get(User, 1)` Membership will fetch
+the member on each authorization try.
 
 ### Calculated permissions
 
-Often you will come to case when `static` permissions are not enough. For example allow only users who confirmed their email address.
+Often you will come to case when `static` permissions are not enough. For example allow only users who confirmed their
+email address.
 
 ```elixir
 defmodule Sample.Post do
@@ -224,7 +231,8 @@ defmodule Sample.Post do
 end
 ```
 
-To perform exclusive features such as `when User is owner of post AND is in editor plan` we can do so as in following example
+To perform exclusive features such as `when User is owner of post AND is in editor plan` we can do so as in following
+example
 
 ```elixir
 defmodule Sample.Post do
@@ -281,7 +289,11 @@ end
 
 ### Member related features
 
-Membership allows you to grant features on any particular struct. Struct needs to have signature of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete` feature on particular `Post` for our member:
+## todo: add feature
+
+Membership allows you to grant features on any particular struct. Struct needs to have signature
+of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete`
+feature on particular `Post` for our member:
 
 ```elixir
 iex> {:ok, member} = %Membership.Member{} |> Membership.Repo.insert()
@@ -312,7 +324,8 @@ end
 
 ### Granting features
 
-Let's assume we want to create new `Plan` - _gold_ which is able to delete accounts inside our system. We want to have special `Member` who is given this _plan_ but also he is able to have `Feature` for banning users.
+Let's assume we want to create new `Plan` - _gold_ which is able to delete accounts inside our system. We want to have
+special `Member` who is given this _plan_ but also he is able to have `Feature` for banning users.
 
 1. Create member
 
@@ -352,14 +365,16 @@ iex> Membership.Member.grant(member, feature_ban)
 ```
 
 ```elixir
-iex> member |> Membership.Repo.preload([:plans, :features])
+iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
-  features: [
+features: ["ban_accounts"],
+identifier: "asfdcxfdsr42424eq2",
+  extra_features: [
     %Membership.Feature{
       identifier: "ban_accounts"
     }
-  ]
-  plans: [
+  ],
+  plan_memberships: [
     %Membership.Plan{
       identifier: "gold"
       features: ["delete_accounts"]
@@ -374,20 +389,24 @@ Same as we can grant any features to models we can also revoke them.
 
 ```elixir
 iex> Membership.Member.revoke(member, plan)
-iex> member |> Membership.Repo.preload([:plans, :features])
+iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
-  features: [
+features: [],
+identifier: "asfdcxfdsr42424eq2",
+  extra_features: [
     %Membership.Feature{
       identifier: "ban_accounts"
     }
   ]
-  plans: []
+  plan_memberships: []
 }
 iex> Membership.Member.revoke(member, feature_ban)
-iex> member |> Membership.Repo.preload([:plans, :features])
+iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
-  features: []
-  plans: []
+features: [],
+identifier: "asfdcxfdsr42424eq2",
+  extra_features: []
+  plan_memberships: []
 }
 ```
 
