@@ -447,21 +447,6 @@ defmodule Membership do
 
   @doc false
   def authorize_features(active_features \\ [], required_features \\ []) do
-    active_features =
-      active_features
-      |> Enum.map(& &1.identifier)
-      |> Enum.uniq()
-
-    authorized =
-      Enum.filter(required_features, fn feature ->
-        Enum.member?(active_features, feature)
-      end)
-
-    length(authorized) > 0
-  end
-
-  @doc false
-  def authorized_features(active_features \\ [], required_features \\ []) do
     authorized =
       Enum.filter(required_features, fn feature ->
         Enum.member?(active_features, feature)
