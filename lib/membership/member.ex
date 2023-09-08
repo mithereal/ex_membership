@@ -67,7 +67,6 @@ defmodule Membership.Member do
     # Preload member plans
     member = Member |> Repo.get!(id) |> Repo.preload(plan_memberships: :plan)
 
-    ### todo make sure this returns correctly
     plans = merge_uniq_grants(member.plan_memberships ++ [plan])
 
     changeset(member, %{plan_memberships: plans}) |> Repo.update!()
@@ -84,8 +83,8 @@ defmodule Membership.Member do
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id) |> Repo.preload([:extra_features])
-    extra_features = Enum.uniq(member.extra_features ++ [feature])
-    ### todo make sure this returns correctly
+    extra_features = merge_uniq_grants(member.extra_features ++ [feature])
+
     changeset(member, %{extra_features: extra_features}) |> Repo.update!()
   end
 
