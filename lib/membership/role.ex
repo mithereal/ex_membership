@@ -6,6 +6,7 @@ defmodule Membership.Role do
   import Ecto.Query
 
   alias Membership.Role
+  alias Membership.Feature
   alias Membership.RoleFeatures
 
   @typedoc "A Role struct"
@@ -110,7 +111,7 @@ defmodule Membership.Role do
   end
 
   def grant(%{feature_id: id}, %Role{id: _id} = role) do
-    role = Role |> Repo.get!(id)
+    feature = Feature |> Repo.get!(id)
     grant(role, feature)
   end
 
