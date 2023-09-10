@@ -13,7 +13,7 @@ defmodule Membership.Application do
     ]
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]
-    Supervisor.start_link(children, opts) |> load_plans()
+    Supervisor.start_link(children, opts) |> load_plans() |> load_roles()
   end
 
   @version Mix.Project.config()[:version]
