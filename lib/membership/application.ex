@@ -25,12 +25,27 @@ defmodule Membership.Application do
     params
   end
 
+  def load_roles(params) do
+    :ets.new(:membership_roles, [:named_table, :set, :public, read_concurrency: true])
+    reload_roles()
+    params
+  end
+
   def reload_plans() do
     Repo.all(Membership.Plan)
     |> Repo.preload([:features])
     |> Enum.each(fn x ->
       features = Enum.map(x.features, fn x -> x.identifier end)
       :ets.insert(:membership_plans, {x.identifier, features})
+    end)
+  end
+
+  def reload_roles() do
+    Repo.all(Membership.Role)
+    |> Repo.preload([:features])
+    |> Enum.each(fn x ->
+      features = Enum.map(x.features, fn x -> x.identifier end)
+      :ets.insert(:membership_roles, {x.identifier, features})
     end)
   end
 end
