@@ -11,7 +11,6 @@ defmodule Membership.Config do
 
   def repo, do: List.first(Application.fetch_env!(:ex_membership, :ecto_repos))
   def repos, do: Application.fetch_env!(:ex_membership, :ecto_repos)
-  def storage_type, do: Application.get_env(:ex_membership, :storage_type, :ets)
 
   @spec config() :: Keyword.t() | none()
   def config() do
