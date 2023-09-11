@@ -21,6 +21,14 @@ defmodule Membership.Plan do
     )
   end
 
+  def build_changeset(%Plan{} = struct, params \\ %{}) do
+    struct
+    |> cast(params, [:identifier, :name])
+    |> cast_assoc(:features, required: false)
+    |> validate_required([:identifier, :name])
+    |> unique_constraint(:identifier, message: "Plan already exists")
+  end
+
   def changeset(%Plan{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
@@ -30,11 +38,12 @@ defmodule Membership.Plan do
   end
 
   def build(identifier, name, features \\ []) do
-    changeset(%Plan{}, %{
+    build_changeset(%Plan{}, %{
       identifier: identifier,
       name: name,
       features: features
     })
+    |> Ecto.Changeset.apply_changes()
   end
 
   def table, do: :membership_plans
@@ -45,6 +54,8 @@ defmodule Membership.Plan do
         Feature.create(f.identifier, f.name)
       end)
 
+    IO.inspect(features)
+
     {status, changeset} =
       changeset(%Plan{}, %{
         identifier: identifier,
@@ -52,5 +63,9 @@ defmodule Membership.Plan do
         features: features
       })
       |> Repo.insert_or_update()
+  end
+
+  def create(plan = %Plan{}) do
+    create(plan.identifier, plan.name, plan.features)
   end
 end

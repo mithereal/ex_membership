@@ -28,7 +28,7 @@ defmodule Membership.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :observer, :wx, :runtime_tools],
+      extra_applications: [:logger, :observer, :wx, :runtime_tools, :debugger],
       mod: {Membership.Application, []}
     ]
   end
@@ -52,7 +52,7 @@ defmodule Membership.MixProject do
   end
 
   defp description() do
-    "Elixir ACL library for managing user features and roles with support of ecto and compatibility with absinthe"
+    "Elixir ACL library for managing user features, plans and roles with support of ecto and compatibility with absinthe"
   end
 
   defp package() do

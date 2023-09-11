@@ -29,4 +29,7 @@ defmodule Membership.Factory do
       name: sequence(:feature_name, &"Generated feature-#{&1}")
     }
   end
+
+  def binary_id() do
+  end
 end

@@ -8,7 +8,7 @@ defmodule Membership.MemberPlansTest do
       struct = insert(:plan)
       features = ["test_feature"]
 
-      #   MemberPlans.create(member, struct, features)
+      MemberPlans.create(member, struct, features)
 
       member = member |> Repo.preload([:plans])
 
