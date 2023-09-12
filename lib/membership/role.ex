@@ -143,15 +143,15 @@ defmodule Membership.Role do
     |> Repo.delete_all()
   end
 
-  def revoke(%{feature: %Role{id: _pid} = feature}, %Feature{id: _id} = plan) do
-    revoke(feature, plan)
+  def revoke(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
+    revoke(role, feature)
   end
 
-  def revoke(%{feature_id: id}, %Feature{id: _id} = plan) do
-    revoke(%Role{id: id}, plan)
+  def revoke(%{feature_id: id}, %Feature{id: _id} = feature) do
+    revoke(%Role{id: id}, feature)
   end
 
-  def revoke(%Feature{id: _id} = _member, %Role{id: id} = role) do
+  def revoke(%Feature{id: _id} = feature, %Role{id: id} = role) do
     role = Role |> Repo.get!(id) |> Repo.preload(:features)
 
     features =

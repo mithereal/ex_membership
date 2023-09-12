@@ -56,13 +56,12 @@ defmodule Membership.Plan do
 
     IO.inspect(features)
 
-    {status, changeset} =
-      changeset(%Plan{}, %{
-        identifier: identifier,
-        name: name,
-        features: features
-      })
-      |> Repo.insert_or_update()
+    changeset(%Plan{}, %{
+      identifier: identifier,
+      name: name,
+      features: features
+    })
+    |> Repo.insert_or_update()
   end
 
   def create(plan = %Plan{}) do
