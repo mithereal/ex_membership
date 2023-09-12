@@ -326,7 +326,7 @@ defmodule Membership do
   def member_authorization!(
         current_member \\ nil,
         func_name \\ nil,
-        required_features \\ [],
+        _required_features \\ [],
         required_plans \\ [],
         _extra_rules \\ []
       ) do

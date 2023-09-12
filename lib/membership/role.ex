@@ -94,7 +94,7 @@ defmodule Membership.Role do
     grant(role, feature)
   end
 
-  def grant(%Feature{id: id} = feature, %Role{id: _id} = role) do
+  def grant(%Feature{id: _id} = feature, %Role{id: id} = _role) do
     role = Role |> Repo.get!(id) |> Repo.preload(:features)
     features = Enum.uniq(role.features ++ [feature])
 
@@ -124,7 +124,7 @@ defmodule Membership.Role do
 
   ## Examples
 
-  Function accepts either `Membership.Role` or `Membership.Plan` grants.
+  Function accepts either `Membership.Role` or `Membership.Feature` grants.
   Function is directly opposite of `Membership.Member.grant/2`
 
   To revoke particular feature from a given plan
@@ -136,9 +136,9 @@ defmodule Membership.Role do
       iex> Membership.Role.revoke(%Membership.Role{id: 1}, %Membership.Feature{id: 1})
 
   """
-  @spec revoke(Plan.t(), Role.t() | Plan.t()) :: Member.t()
+  @spec revoke(Role.t(), Role.t() | Feature.t()) :: Member.t()
   def revoke(%Role{id: id} = _, %Feature{id: _id} = feature) do
-    from(pa in PlanRoles)
+    from(pa in RoleFeatures)
     |> where([pr], pr.role_id == ^id and pr.feature_id == ^feature.id)
     |> Repo.delete_all()
   end
@@ -151,7 +151,7 @@ defmodule Membership.Role do
     revoke(%Role{id: id}, plan)
   end
 
-  def revoke(%Feature{id: id} = _member, %Role{id: _id} = feature) do
+  def revoke(%Feature{id: _id} = _member, %Role{id: id} = role) do
     role = Role |> Repo.get!(id) |> Repo.preload(:features)
 
     features =
@@ -160,7 +160,7 @@ defmodule Membership.Role do
       end)
 
     changeset =
-      Plan.changeset(role)
+      Role.changeset(role)
       |> put_change(:features, features)
 
     changeset |> Repo.update!()
@@ -186,7 +186,7 @@ defmodule Membership.Role do
         id: feature_id,
         identifier: _identifier
       }) do
-    PlanRoles
+    FeatureRoles
     |> where(
       [e],
       e.role_id == ^role.id and e.feature_id == ^feature_id

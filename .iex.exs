@@ -6,6 +6,8 @@ alias Membership.MemberFeatures
 alias Membership.Member
 alias Membership.Repo
 
+require Logger
+
 alias :debugger, as: D
 
 local_time = fn ->
@@ -68,6 +70,10 @@ IEx.configure(
 
 case Code.ensure_compiled(:debugger) do
   {:error, :nofile} ->
+    Logger.error(
+      ":debugger not found, ensure :debugger exists under extra_applications in mix.exs"
+    )
+
     {:error, "debugger not loaded"}
 
   _ ->
