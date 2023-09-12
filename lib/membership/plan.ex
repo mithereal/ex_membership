@@ -54,8 +54,6 @@ defmodule Membership.Plan do
         Feature.create(f.identifier, f.name)
       end)
 
-    IO.inspect(features)
-
     changeset(%Plan{}, %{
       identifier: identifier,
       name: name,

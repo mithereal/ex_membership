@@ -98,9 +98,11 @@ defmodule Membership.Feature do
     plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
     features = Enum.uniq(plan.features ++ [feature])
 
+    plan = %{plan | features: features}
+    IO.inspect(plan)
+    ## todo fix
     changeset =
       Plan.changeset(plan)
-      |> put_change(:features, features)
 
     changeset |> Repo.update!()
   end

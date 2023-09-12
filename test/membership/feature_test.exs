@@ -60,6 +60,7 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan, identifier: "bronze", name: "bronze Plan")
       feature_1 = insert(:feature, identifier: "first_feature")
       feature_2 = insert(:feature, identifier: "second_feature")
+
       Feature.grant(plan, feature_1)
       Feature.grant(plan, feature_2)
 
@@ -75,7 +76,6 @@ defmodule Membership.FeatureTest do
     end
   end
 
-  #
   describe "Membership.Feature.revoke/2" do
     test "rejects invalid grant" do
       assert_raise ArgumentError, fn ->
@@ -84,8 +84,8 @@ defmodule Membership.FeatureTest do
     end
 
     test "revokes correct ability from Feature" do
-      feature = insert(:feature, id: 1)
-      plan = insert(:plan, id: 1)
+      feature = insert(:feature)
+      plan = insert(:plan)
       ban_feature = insert(:feature, identifier: "ban_accounts")
 
       feature_1 = Feature.grant(feature, plan)

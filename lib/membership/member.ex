@@ -44,7 +44,9 @@ defmodule Membership.Member do
     timestamps()
   end
 
-  def changeset(%Member{} = struct, params \\ %{}) do
+  def changeset(%Member{} = struct, params \\ %Member{}) do
+    IO.inspect(params, label: "niggers")
+
     struct
     |> cast(params, [])
     |> cast_assoc(:plans, required: false)
@@ -72,10 +74,10 @@ defmodule Membership.Member do
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    member = Member |> Repo.get!(id) |> Repo.preload(plans: :plan)
+    member = Member |> Repo.get!(id) |> Repo.preload(:plans)
     plans = merge_uniq_grants(member.plans ++ [plan])
-
-    changeset(member, %{plans: plans}) |> Repo.update!()
+    changeset(member, %{plans: plans})
+    # Repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do

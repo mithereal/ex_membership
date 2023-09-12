@@ -15,6 +15,17 @@ defmodule Membership.Schema do
           alias Membership.Repo
         end
 
+      :uuid ->
+        quote do
+          use Ecto.Schema
+          @primary_key {:id, :binary_id, autogenerate: true}
+          @foreign_key_type :binary_id
+
+          import Ecto.Changeset
+
+          alias Membership.Repo
+        end
+
       :binary_fk ->
         quote do
           use Ecto.Schema
