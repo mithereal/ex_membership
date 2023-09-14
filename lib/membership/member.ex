@@ -71,14 +71,12 @@ defmodule Membership.Member do
 
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
-  def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    member = Member |> Repo.get!(id) |> Repo.preload(:plans)
-    plans = merge_uniq_grants(member.plans ++ [plan])
-    IO.inspect(plans, label: "plans")
+  def grant(%Member{id: id} = _member, %Plan{id: plan_id} = plan) do
+    member = Member |> Repo.get!(id)
+    plan = Member |> Repo.get!(plan_id)
 
-    changeset(member)
-    |> put_assoc(:plans, plans)
-    |> Repo.update!()
+    %MemberPlans{member_id: member.id, plan_id: plan.id}
+    |> Repo.insert!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -91,11 +89,30 @@ defmodule Membership.Member do
     |> grant(plan)
   end
 
-  def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id) |> Repo.preload([:extra_features])
-    extra_features = merge_uniq_grants(member.extra_features ++ [feature])
+  def grant(%Member{id: id} = _member, %Role{id: role_id} = role) do
+    member = Member |> Repo.get!(id)
+    role = Role |> Repo.get!(role_id)
 
-    changeset(member) |> put_change(:extra_features, extra_features) |> Repo.update!()
+    %MemberRoles{member_id: member.id, role_id: role.id}
+    |> Repo.insert!()
+  end
+
+  def grant(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
+    grant(member, role)
+  end
+
+  def grant(%{member_id: id}, %Role{id: _id} = role) do
+    Member
+    |> Repo.get!(id)
+    |> grant(role)
+  end
+
+  def grant(%Member{id: id} = _member, %Feature{id: feature_id} = feature) do
+    member = Member |> Repo.get!(id)
+    feature = Member |> Repo.get!(feature_id)
+
+    %MemberFeatures{member_id: member.id, feature_id: feature.id}
+    |> Repo.insert!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
@@ -144,6 +161,20 @@ defmodule Membership.Member do
 
   def revoke(%{member_id: id}, %Plan{id: _id} = plan) do
     revoke(%Member{id: id}, plan)
+  end
+
+  def revoke(%Member{id: id} = _member, %Role{id: _id} = role) do
+    from(pa in MemberRoles)
+    |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
+    |> Repo.delete_all()
+  end
+
+  def revoke(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
+    revoke(member, role)
+  end
+
+  def revoke(%{member_id: id}, %Role{id: _id} = role) do
+    revoke(%Member{id: id}, role)
   end
 
   def revoke(
