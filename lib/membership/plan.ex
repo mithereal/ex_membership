@@ -11,6 +11,9 @@ defmodule Membership.Plan do
   @typedoc "A plan struct"
   @type t :: %Plan{}
 
+  @params ~w(identifier name)a
+  @required_fields ~w(identifier name)a
+
   schema "membership_plans" do
     field(:identifier, :string)
     field(:name, :string)
@@ -21,7 +24,12 @@ defmodule Membership.Plan do
     )
   end
 
-  def build_changeset(%Plan{} = struct, params \\ %{}) do
+  def changeset(%Plan{} = struct, params = %Plan{}) do
+    params = %{id: params.id, identifier: params.identifier, name: params.name}
+    changeset(struct, params)
+  end
+
+  def changeset(%Plan{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :name])
     |> cast_assoc(:features, required: false)
@@ -29,16 +37,8 @@ defmodule Membership.Plan do
     |> unique_constraint(:identifier, message: "Plan already exists")
   end
 
-  def changeset(%Plan{} = struct, params \\ %{}) do
-    struct
-    |> cast(params, [:identifier, :name])
-    |> put_assoc(:features, required: false)
-    |> validate_required([:identifier, :name])
-    |> unique_constraint(:identifier, message: "Plan already exists")
-  end
-
   def build(identifier, name, features \\ []) do
-    build_changeset(%Plan{}, %{
+    changeset(%Plan{}, %{
       identifier: identifier,
       name: name,
       features: features

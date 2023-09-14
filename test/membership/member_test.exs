@@ -138,7 +138,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       plan_admin = insert(:plan, identifier: "admin")
       plan_editor = insert(:plan, identifier: "editor")
-      IO.inspect(plan_admin)
+      IO.inspect(plan_admin, label: "plan_admin")
       Member.grant(member, plan_admin)
       Member.grant(member, plan_editor)
 

@@ -44,11 +44,9 @@ defmodule Membership.Member do
     timestamps()
   end
 
-  def changeset(%Member{} = struct, params \\ %Member{}) do
-    IO.inspect(params, label: "niggers")
-
+  def changeset(%Member{} = struct, params \\ %{}) do
     struct
-    |> cast(params, [])
+    |> cast(params, [:identifier, :features])
     |> cast_assoc(:plans, required: false)
     |> cast_assoc(:roles, required: false)
     |> cast_assoc(:extra_features, required: false)
@@ -76,8 +74,11 @@ defmodule Membership.Member do
   def grant(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     member = Member |> Repo.get!(id) |> Repo.preload(:plans)
     plans = merge_uniq_grants(member.plans ++ [plan])
-    changeset(member, %{plans: plans})
-    # Repo.update!()
+    IO.inspect(plans, label: "plans")
+
+    changeset(member)
+    |> put_assoc(:plans, plans)
+    |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -85,25 +86,28 @@ defmodule Membership.Member do
   end
 
   def grant(%{member_id: id}, %Plan{id: _id} = plan) do
-    member = Member |> Repo.get!(id)
-    grant(member, plan)
+    Member
+    |> Repo.get!(id)
+    |> grant(plan)
   end
 
   def grant(%Member{id: id} = _member, %Feature{id: _id} = feature) do
     member = Member |> Repo.get!(id) |> Repo.preload([:extra_features])
     extra_features = merge_uniq_grants(member.extra_features ++ [feature])
 
-    changeset(member, %{extra_features: extra_features}) |> Repo.update!()
+    changeset(member) |> put_change(:extra_features, extra_features) |> Repo.update!()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
-    grant(member, feature)
+    Member
+    |> Repo.get!(id)
+    |> grant(feature)
   end
 
   def grant(%{member_id: id}, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id)
-    grant(member, feature)
+    Member
+    |> Repo.get!(id)
+    |> grant(feature)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -164,8 +168,7 @@ defmodule Membership.Member do
     changeset =
       changeset(member)
       |> put_change(:features, features)
-
-    changeset |> Repo.update!()
+      |> Repo.update!()
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
