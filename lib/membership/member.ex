@@ -256,7 +256,9 @@ defmodule Membership.Member do
     features =
       Enum.uniq(List.flatten(member.features ++ plan_features ++ role_features ++ extra_features))
 
-    changeset(member, %{features: features}) |> Repo.update!(features)
+    changeset(member)
+    |> put_change(:features, features)
+    |> Repo.update!(features)
   end
 
   def table, do: :membership_members

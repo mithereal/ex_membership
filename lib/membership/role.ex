@@ -78,11 +78,9 @@ defmodule Membership.Role do
 
     features = merge_uniq_grants(role.features ++ [feature])
 
-    changeset =
-      changeset(feature)
-      |> put_assoc(:features, features)
-
-    changeset |> Repo.update()
+    changeset(feature)
+    |> put_assoc(:features, features)
+    |> Repo.update()
   end
 
   def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -90,19 +88,18 @@ defmodule Membership.Role do
   end
 
   def grant(%{role_id: id}, %Feature{id: _id} = feature) do
-    role = Role |> Repo.get!(id)
-    grant(role, feature)
+    Role
+    |> Repo.get!(id)
+    |> grant(feature)
   end
 
   def grant(%Feature{id: _id} = feature, %Role{id: id} = _role) do
     role = Role |> Repo.get!(id) |> Repo.preload(:features)
     features = Enum.uniq(role.features ++ [feature])
 
-    changeset =
-      Role.changeset(Role)
-      |> put_change(:features, features)
-
-    changeset |> Repo.update!()
+    changeset(Role)
+    |> put_change(:features, features)
+    |> Repo.update!()
   end
 
   def grant(%{feature: %Feature{id: id}}, %Role{id: _id} = role) do
