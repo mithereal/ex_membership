@@ -47,7 +47,8 @@ defmodule Membership.MixProject do
       {:excoveralls, "~> 0.10", only: :test},
       {:mock, "~> 0.3.0", only: :test},
       {:inch_ex, only: :docs},
-      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
+      {:mix_audit, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
