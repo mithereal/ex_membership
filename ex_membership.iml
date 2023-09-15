@@ -95,5 +95,8 @@
     <orderEntry type="library" name="tds" level="project" />
     <orderEntry type="library" name="table" level="project" />
     <orderEntry type="library" name="faker" level="project" />
+    <orderEntry type="library" name="mix_audit" level="project" />
+    <orderEntry type="library" name="yaml_elixir" level="project" />
+    <orderEntry type="library" name="credo_naming" level="project" />
   </component>
 </module>
