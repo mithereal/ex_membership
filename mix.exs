@@ -72,7 +72,8 @@ defmodule Membership.MixProject do
       groups_for_modules: [
         Models: [
           Membership.Member,
-          Membership.Plan
+          Membership.Plan,
+          Membership.Role
         ]
       ]
     ]
