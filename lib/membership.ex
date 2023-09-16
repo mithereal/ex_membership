@@ -81,8 +81,9 @@ defmodule Membership do
   Check if membership ets exists for the module
   """
   def ets_exists() do
-    normalize_struct_name(__MODULE__)
-    |> case :ets.whereis() do
+    module = normalize_struct_name(__MODULE__)
+
+    case :ets.whereis(module) do
       :undefined -> false
       _ -> true
     end

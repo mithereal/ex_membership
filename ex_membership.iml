@@ -53,6 +53,9 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/unicode_util_compat" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/faker" />
       <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/faker" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/jason" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mix_audit" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/yaml_elixir" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

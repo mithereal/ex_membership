@@ -3,6 +3,7 @@ defmodule Membership.Plan do
   Plan is main representation of a single plan
   """
   use Membership.Schema
+  import Ecto.Query
 
   alias Membership.Feature
   alias Membership.Plan
