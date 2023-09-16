@@ -197,10 +197,4 @@ defmodule Membership.Plan do
     )
     |> Repo.one()
   end
-
-  defp merge_uniq_grants(grants) do
-    Enum.uniq_by(grants, fn grant ->
-      grant.identifier
-    end)
-  end
 end

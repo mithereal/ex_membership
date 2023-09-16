@@ -294,12 +294,6 @@ defmodule Membership.Member do
 
   def table, do: :membership_members
 
-  defp merge_uniq_grants(grants) do
-    Enum.uniq_by(grants, fn grant ->
-      grant.identifier
-    end)
-  end
-
   def normalize_struct_name(name) do
     name
     |> Atom.to_string()
