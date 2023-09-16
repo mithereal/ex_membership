@@ -78,7 +78,7 @@ defmodule Membership.Member do
     revoke(member, plan)
 
     %MemberPlans{member_id: member.id, plan_id: plan.id}
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -97,7 +97,7 @@ defmodule Membership.Member do
     revoke(member, role)
 
     %MemberRoles{member_id: member.id, role_id: role.id}
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
@@ -114,7 +114,7 @@ defmodule Membership.Member do
     feature = Member |> Repo.get!(feature_id)
 
     %MemberFeatures{member_id: member.id, feature_id: feature.id}
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do

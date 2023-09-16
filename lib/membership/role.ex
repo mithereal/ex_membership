@@ -80,7 +80,7 @@ defmodule Membership.Role do
     revoke(feature, role)
 
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -100,7 +100,7 @@ defmodule Membership.Role do
     revoke(feature, role)
 
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def grant(%{feature: feature}, %Role{id: _id} = role) do
