@@ -4,8 +4,9 @@ defmodule Membership.Registry do
   use GenServer
 
   def start_link(args) do
-    normalize_struct_name(__MODULE__)
-    |> {:ok, pid} = GenServer.start_link(%{table: nil})
+    {:ok, pid} =
+      normalize_struct_name(__MODULE__)
+      |> GenServer.start_link(%{table: nil})
 
     GenServer.call(pid, {:init_table, args.identifier})
     {:ok, pid}
