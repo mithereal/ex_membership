@@ -72,17 +72,15 @@ defmodule Membership.Feature do
   """
 
   @spec grant(Feature.t(), Feature.t() | Plan.t()) :: Member.t()
-  def grant(%Feature{id: id} = _member, %Plan{id: _id} = plan) do
+  def grant(%Feature{id: id} = _eature, %Plan{id: plan_id} = _plan) do
     # Preload Feature plans
-    feature = Feature |> Repo.get!(id) |> Repo.preload(:plans)
+    feature = Feature |> Repo.get!(id)
+    plan = Plan |> Repo.get!(plan_id)
 
-    plans = merge_uniq_grants(feature.plans ++ [plan])
+    revoke(feature, plan)
 
-    changeset =
-      changeset(feature)
-      |> put_assoc(:plans, plans)
-
-    changeset |> Repo.update()
+    %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
+    |> Repo.insert!()
   end
 
   def grant(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
@@ -94,27 +92,25 @@ defmodule Membership.Feature do
     grant(feature, plan)
   end
 
-  def grant(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
-    features = Enum.uniq(plan.features ++ [feature])
+  def grant(%Plan{id: plan_id} = _member, %Feature{id: id} = feature) do
+    # Preload Feature plans
+    feature = Feature |> Repo.get!(id)
+    plan = Plan |> Repo.get!(plan_id)
 
-    plan = %{plan | features: features}
-    IO.inspect(plan)
-    ## todo fix
-    changeset =
-      Plan.changeset(plan)
+    revoke(feature, plan)
 
-    changeset |> Repo.update!()
+    %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
+    |> Repo.insert!()
   end
 
   def grant(%{plan: %Plan{id: id}}, %Feature{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id)
-    grant(plan, feature)
+    %Plan{id: id}
+    |> grant(feature)
   end
 
   def grant(%{plan_id: id}, %Feature{id: _id} = feature) do
-    plan = Member |> Repo.get!(id)
-    grant(plan, feature)
+    %Plan{id: id}
+    |> grant(feature)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -153,19 +149,10 @@ defmodule Membership.Feature do
     revoke(%Feature{id: id}, plan)
   end
 
-  def revoke(%Plan{id: id} = _member, %Feature{id: _id} = feature) do
-    plan = Plan |> Repo.get!(id) |> Repo.preload(:features)
-
-    features =
-      Enum.filter(plan.features, fn grant ->
-        grant != feature.identifier
-      end)
-
-    changeset =
-      Plan.changeset(plan)
-      |> put_change(:features, features)
-
-    changeset |> Repo.update!()
+  def revoke(%Plan{id: _id} = plan, %Feature{id: feature_id} = _feature) do
+    from(pa in PlanFeatures)
+    |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^plan.id)
+    |> Repo.delete_all()
   end
 
   def revoke(

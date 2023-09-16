@@ -72,15 +72,15 @@ defmodule Membership.Role do
   """
 
   @spec grant(Role.t(), Role.t() | Feature.t()) :: Member.t()
-  def grant(%Role{id: id} = _member, %Feature{id: _id} = feature) do
+  def grant(%Role{id: id} = _role, %Feature{id: feature_id} = feature) do
     # Preload Role features
-    role = Role |> Repo.get!(id) |> Repo.preload(:features)
+    role = Role |> Repo.get!(id)
+    feature = Feature |> Repo.get!(feature_id)
 
-    features = merge_uniq_grants(role.features ++ [feature])
+    revoke(feature, role)
 
-    changeset(feature)
-    |> put_assoc(:features, features)
-    |> Repo.update()
+    %RoleFeatures{role_id: role.id, feature_id: feature.id}
+    |> Repo.insert!()
   end
 
   def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -93,23 +93,22 @@ defmodule Membership.Role do
     |> grant(feature)
   end
 
-  def grant(%Feature{id: _id} = feature, %Role{id: id} = _role) do
-    role = Role |> Repo.get!(id) |> Repo.preload(:features)
-    features = Enum.uniq(role.features ++ [feature])
+  def grant(%Feature{id: feature_id} = feature, %Role{id: id} = _role) do
+    role = Role |> Repo.get!(id)
+    feature = Feature |> Repo.get!(feature_id)
 
-    changeset(Role)
-    |> put_change(:features, features)
-    |> Repo.update!()
+    revoke(feature, role)
+
+    %RoleFeatures{role_id: role.id, feature_id: feature.id}
+    |> Repo.insert!()
   end
 
-  def grant(%{feature: %Feature{id: id}}, %Role{id: _id} = role) do
-    feature = Feature |> Repo.get!(id)
+  def grant(%{feature: feature}, %Role{id: _id} = role) do
     grant(role, feature)
   end
 
   def grant(%{feature_id: id}, %Role{id: _id} = role) do
-    feature = Feature |> Repo.get!(id)
-    grant(role, feature)
+    grant(role, %Feature{id: id})
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -148,19 +147,10 @@ defmodule Membership.Role do
     revoke(%Role{id: id}, feature)
   end
 
-  def revoke(%Feature{id: _id} = feature, %Role{id: id} = role) do
-    role = Role |> Repo.get!(id) |> Repo.preload(:features)
-
-    features =
-      Enum.filter(role.features, fn grant ->
-        grant != feature.identifier
-      end)
-
-    changeset =
-      Role.changeset(role)
-      |> put_change(:features, features)
-
-    changeset |> Repo.update!()
+  def revoke(%Feature{id: id} = _, %Role{id: _id} = role) do
+    from(pa in RoleFeatures)
+    |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
+    |> Repo.delete_all()
   end
 
   def revoke(
