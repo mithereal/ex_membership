@@ -4,7 +4,9 @@ defmodule Membership.Registry do
   use GenServer
 
   def start_link(args) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, %{table: nil})
+    normalize_struct_name(__MODULE__)
+    |> {:ok, pid} = GenServer.start_link(%{table: nil})
+
     GenServer.call(pid, {:init_table, args.identifier})
     {:ok, pid}
   end
@@ -48,7 +50,8 @@ defmodule Membership.Registry do
   end
 
   def lookup(name) when is_atom(name) do
-    :ets.lookup(__MODULE__, name)
+    normalize_struct_name(__MODULE__)
+    |> :ets.lookup(name)
   end
 
   def normalize_struct_name(name) do

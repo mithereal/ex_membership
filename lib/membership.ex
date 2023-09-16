@@ -81,7 +81,8 @@ defmodule Membership do
   Check if membership ets exists for the module
   """
   def ets_exists() do
-    case :ets.whereis(__MODULE__) do
+    normalize_struct_name(__MODULE__)
+    |> case :ets.whereis() do
       :undefined -> false
       _ -> true
     end
@@ -107,7 +108,10 @@ defmodule Membership do
             extra_rules: []
           }
 
-          Membership.Registry.insert(__MODULE__, x, default)
+          registry =
+            normalize_struct_name(__MODULE__)
+
+          Membership.Registry.insert(registry, x, default)
         end)
     end
   end
@@ -221,8 +225,11 @@ defmodule Membership do
       rules = %{calculated_as_member: unquote(func_name)(current_member)}
 
       registry =
+        normalize_struct_name(__MODULE__)
+
+      registry =
         Membership.Registry.add(
-          __MODULE__,
+          registry,
           unquote(func_name),
           rules
         )
@@ -236,8 +243,11 @@ defmodule Membership do
 
       rules = %{calculated_as_member: result}
 
+      registry =
+        normalize_struct_name(__MODULE__)
+
       Membership.Registry.add(
-        __MODULE__,
+        registry,
         unquote(func_name),
         rules
       )
@@ -250,8 +260,11 @@ defmodule Membership do
       result = unquote(func_name)(current_member, unquote(bindings))
       rules = %{calculated_as_member: result}
 
+      registry =
+        normalize_struct_name(__MODULE__)
+
       Membership.Registry.add(
-        __MODULE__,
+        registry,
         unquote(func_name),
         rules
       )
@@ -265,8 +278,11 @@ defmodule Membership do
       result = apply(unquote(callback), [current_member, unquote(bindings)])
       rules = %{calculated_as_member: result}
 
+      registry =
+        normalize_struct_name(__MODULE__)
+
       Membership.Registry.add(
-        __MODULE__,
+        registry,
         unquote(func_name),
         rules
       )
@@ -366,11 +382,17 @@ defmodule Membership do
   end
 
   defp fetch_rules_from_ets(nil) do
-    {:error, "Unknown ETS Record for Registry __MODULE__"}
+    registry =
+      normalize_struct_name(__MODULE__)
+
+    {:error, "Unknown ETS Record for Registry registry"}
   end
 
   defp fetch_rules_from_ets(func_name) do
-    {:ok, value} = Membership.Registry.lookup(__MODULE__, func_name)
+    registry =
+      normalize_struct_name(__MODULE__)
+
+    {:ok, value} = Membership.Registry.lookup(registry, func_name)
     value
   end
 
@@ -480,7 +502,11 @@ defmodule Membership do
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
     {plan, features} = :ets.lookup(:membership_plans, plan)
-    Membership.Registry.add(__MODULE__, func_name, features)
+
+    registry =
+      normalize_struct_name(__MODULE__)
+
+    Membership.Registry.add(registry, func_name, features)
     {:ok, plan}
   end
 
@@ -513,8 +539,18 @@ defmodule Membership do
   """
   @spec has_feature(atom(), atom()) :: {:ok, atom()}
   def has_feature(feature, func_name) do
-    Membership.Registry.add(__MODULE__, func_name, feature)
+    registry =
+      normalize_struct_name(__MODULE__)
+
+    Membership.Registry.add(registry, func_name, feature)
     {:ok, feature}
+  end
+
+  def normalize_struct_name(name) do
+    name
+    |> Atom.to_string()
+    |> String.replace(".", "_")
+    |> String.downcase()
   end
 
   @doc """
