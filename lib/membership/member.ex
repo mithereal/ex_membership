@@ -109,12 +109,16 @@ defmodule Membership.Member do
     |> grant(role)
   end
 
-  def grant(%Member{id: id} = _member, %Feature{id: feature_id} = feature) do
+  def grant(%Member{id: id} = _member, %Feature{id: feature_id} = feature, permission) do
     member = Member |> Repo.get!(id)
-    feature = Member |> Repo.get!(feature_id)
+    feature = Feature |> Repo.get(feature_id)
 
-    %MemberFeatures{member_id: member.id, feature_id: feature.id}
-    |> Repo.insert()
+    d =
+      %MemberFeatures{member_id: member.id, feature_id: feature.id, permission: permission}
+      |> Repo.insert()
+
+    IO.inspect(d)
+    # sync_features(member)
   end
 
   def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
@@ -150,8 +154,7 @@ defmodule Membership.Member do
   """
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    from(pa in MemberPlans)
-    |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
+    %MemberPlans{member_id: id, plan_id: plan.id}
     |> Repo.delete_all()
   end
 
@@ -256,9 +259,9 @@ defmodule Membership.Member do
     member =
       Member
       |> Repo.get!(id)
-      |> Repo.preload(plans: :plan)
-      |> Repo.preload(roles: :role)
-      |> Repo.preload(extra_features: :feature)
+      |> Repo.preload(:plans)
+      |> Repo.preload(:roles)
+      |> Repo.preload(:extra_features)
 
     plan_features =
       Enum.map(member.plans, fn x ->

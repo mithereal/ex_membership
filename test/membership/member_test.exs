@@ -8,32 +8,34 @@ defmodule Membership.MemberTest do
   end
 
   #
-  #  describe "Membership.Member.changeset/2" do
-  #    test "changeset is valid" do
-  #      changeset = Member.changeset(%Member{}, %{})
-  #
-  #      assert changeset.valid?
-  #    end
-  #  end
+  describe "Membership.Member.changeset/2" do
+    test "changeset is valid" do
+      changeset = Member.changeset(%Member{}, %{})
+
+      assert changeset.valid?
+    end
+  end
+
   #
   describe "Membership.Member.grant/2" do
-    #    test "rejects invalid grant" do
-    #      assert_raise ArgumentError, fn ->
-    #        Member.grant(nil, nil)
-    #      end
-    #    end
+    test "rejects invalid grant" do
+      assert_raise ArgumentError, fn ->
+        Member.grant(nil, nil)
+      end
+    end
+
     #
-    #    test "grant feature to member" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
-    #
-    #      Member.grant(member, feature)
-    #
-    #      member = Repo.get(Member, member.id)
-    #
-    #      assert 1 == length(member.features)
-    #      assert "delete_accounts" == Enum.at(member.features, 0)
-    #    end
+    test "grant feature to member" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+      Member.grant(member, feature, "allow")
+
+      member = Repo.get(Member, member.id)
+
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
+    end
+
     #
     #    test "grant feature to inherited member" do
     #      member = insert(:member)
@@ -134,19 +136,19 @@ defmodule Membership.MemberTest do
     #      assert plan == Enum.at(member.plans, 0)
     #    end
 
-    test "grant different plans to member" do
-      member = insert(:member)
-      plan_admin = insert(:plan, identifier: "admin")
-      plan_editor = insert(:plan, identifier: "editor")
-      IO.inspect(plan_admin, label: "plan_admin")
-      Member.grant(member, plan_admin)
-      Member.grant(member, plan_editor)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-
-      assert 2 == length(member.plans)
-      assert [plan_admin] ++ [plan_editor] == member.plans
-    end
+    #    test "grant different plans to member" do
+    #      member = insert(:member)
+    #      plan_admin = insert(:plan, identifier: "admin")
+    #      plan_editor = insert(:plan, identifier: "editor")
+    #      IO.inspect(plan_admin, label: "plan_admin")
+    #      Member.grant(member, plan_admin)
+    #      Member.grant(member, plan_editor)
+    #
+    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+    #
+    #      assert 2 == length(member.plans)
+    #      assert [plan_admin] ++ [plan_editor] == member.plans
+    #    end
   end
 
   #
