@@ -30,7 +30,7 @@ defmodule Membership.Plan do
     changeset(struct, params)
   end
 
-  def changeset(%Plan{} = struct, params \\ %{}) do
+  def changeset(%Plan{} = struct, params) do
     struct
     |> cast(params, [:identifier, :name])
     |> cast_assoc(:features, required: false)

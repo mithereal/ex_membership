@@ -16,7 +16,7 @@ defmodule Membership.Role do
     field(:identifier, :string)
     field(:name, :string)
 
-    many_to_many(:features, Features,
+    many_to_many(:features, Feature,
       join_through: RoleFeatures,
       on_replace: :delete
     )

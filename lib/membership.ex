@@ -552,6 +552,7 @@ defmodule Membership do
     |> Atom.to_string()
     |> String.replace(".", "_")
     |> String.downcase()
+    |> String.to_atom()
   end
 
   @doc """
