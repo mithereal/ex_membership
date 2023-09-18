@@ -4,6 +4,7 @@ defmodule Membership.RegistyTest do
 
   setup do
     Registry.start_link(%{identifier: Registry.normalize_struct_name(Registry)})
+    :ok
   end
 
   describe "Membership.Registry.insert/2" do

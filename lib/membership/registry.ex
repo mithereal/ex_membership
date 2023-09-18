@@ -4,7 +4,6 @@ defmodule Membership.Registry do
   use GenServer
 
   def start_link(args) do
-    #      normalize_struct_name(__MODULE__)
     {:ok, pid} =
       __MODULE__
       |> GenServer.start_link(%{table: nil})
@@ -25,7 +24,6 @@ defmodule Membership.Registry do
   end
 
   def insert(identifier, name, value) do
-    identifier = normalize_struct_name(identifier)
     :ets.insert(identifier, {name, value})
   end
 
@@ -34,8 +32,6 @@ defmodule Membership.Registry do
   end
 
   def add(identifier, name, value) when is_binary(identifier) do
-    identifier = normalize_struct_name(identifier)
-
     current =
       case lookup(identifier, name) do
         {:ok, nil} -> %{}
@@ -60,8 +56,6 @@ defmodule Membership.Registry do
   end
 
   def lookup(identifier, name) when is_binary(identifier) do
-    identifier = normalize_struct_name(identifier)
-
     case :ets.lookup(identifier, name) do
       [{^name, value}] -> {:ok, value}
       [] -> {:ok, nil}
@@ -80,7 +74,7 @@ defmodule Membership.Registry do
   end
 
   def lookup(name) when is_atom(name) do
-    normalize_struct_name(__MODULE__)
+    __MODULE__
     |> :ets.lookup(name)
   end
 
@@ -89,5 +83,6 @@ defmodule Membership.Registry do
     |> Atom.to_string()
     |> String.replace(".", "_")
     |> String.downcase()
+    |> String.to_atom()
   end
 end
