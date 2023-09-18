@@ -4,8 +4,9 @@ defmodule Membership.Registry do
   use GenServer
 
   def start_link(args) do
+    #      normalize_struct_name(__MODULE__)
     {:ok, pid} =
-      normalize_struct_name(__MODULE__)
+      __MODULE__
       |> GenServer.start_link(%{table: nil})
 
     GenServer.call(pid, {:init_table, args.identifier})
@@ -88,6 +89,5 @@ defmodule Membership.Registry do
     |> Atom.to_string()
     |> String.replace(".", "_")
     |> String.downcase()
-    |> String.to_atom()
   end
 end
