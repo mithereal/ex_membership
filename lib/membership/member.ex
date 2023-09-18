@@ -152,10 +152,10 @@ defmodule Membership.Member do
 
   """
 
-  ## fixme write a query that doesnt return error
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    %MemberPlans{member_id: id, plan_id: plan.id}
+    from(pa in MemberPlans)
+    |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
     |> Repo.delete_all()
   end
 
@@ -167,7 +167,6 @@ defmodule Membership.Member do
     revoke(%Member{id: id}, plan)
   end
 
-  ## fixme write a query that doesnt return error
   def revoke(%Member{id: id} = _member, %Role{id: _id} = role) do
     from(pa in MemberRoles)
     |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
