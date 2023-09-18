@@ -71,16 +71,9 @@ defmodule Membership do
   The Function list to ignore when building the permissions registry's
   """
   def ignored_functions() do
-    base_functions =
-      Membership.module_info()
-      |> Keyword.fetch!(:exports)
-      |> Enum.map(fn {key, _data} -> key end)
-
-    base_functions ++
-      [
-        :info,
-        :version
-      ]
+    Membership.module_info()
+    |> Keyword.fetch!(:exports)
+    |> Enum.map(fn {key, _data} -> key end)
   end
 
   @doc """
