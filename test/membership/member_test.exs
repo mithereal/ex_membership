@@ -36,68 +36,70 @@ defmodule Membership.MemberTest do
       assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
+    test "grant feature to inherited member" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+
+      Member.grant(%{member: member}, feature, "allow")
+
+      member = Repo.get(Member, member.id)
+
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
+    end
+
+    test "grant feature to inherited member from id" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+
+      Member.grant(%{member_id: member.id}, feature, "allow")
+
+      member = Repo.get(Member, member.id)
+
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
+    end
+
+    test "grant only unique features to member" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+
+      Member.grant(member, feature, "allow")
+      Member.grant(member, feature, "allow")
+
+      member = Repo.get(Member, member.id)
+
+      assert 1 == length(member.features)
+      assert "delete_accounts" == Enum.at(member.features, 0)
+    end
+
     #
-    #    test "grant feature to inherited member" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
+    test "grant different features to member" do
+      member = insert(:member)
+      feature_delete = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
+
+      Member.grant(member, feature_delete, "allow")
+      Member.grant(member, feature_ban, "allow")
+
+      member = Repo.get(Member, member.id)
+      assert 2 == length(member.features)
+      assert [feature_delete.identifier] ++ [feature_ban.identifier] == member.features
+    end
+
     #
-    #      Member.grant(%{member: member}, feature)
-    #
-    #      member = Repo.get(Member, member.id)
-    #
-    #      assert 1 == length(member.features)
-    #      assert "delete_accounts" == Enum.at(member.features, 0)
-    #    end
-    #
-    #    test "grant feature to inherited member from id" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
-    #
-    #      Member.grant(%{member_id: member.id}, feature)
-    #
-    #      member = Repo.get(Member, member.id)
-    #
-    #      assert 1 == length(member.features)
-    #      assert "delete_accounts" == Enum.at(member.features, 0)
-    #    end
-    #
-    #    test "grant only unique features to member" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
-    #
-    #      Member.grant(member, feature)
-    #      Member.grant(member, feature)
-    #
-    #      member = Repo.get(Member, member.id)
-    #
-    #      assert 1 == length(member.features)
-    #      assert "delete_accounts" == Enum.at(member.features, 0)
-    #    end
-    #
-    #    test "grant different features to member" do
-    #      member = insert(:member)
-    #      feature_delete = insert(:feature, identifier: "delete_accounts")
-    #      feature_ban = insert(:feature, identifier: "ban_accounts")
-    #
-    #      Member.grant(member, feature_delete)
-    #      Member.grant(member, feature_ban)
-    #
-    #      member = Repo.get(Member, member.id)
-    #      assert 2 == length(member.features)
-    #      assert [feature_delete.identifier] ++ [feature_ban.identifier] == member.features
-    #    end
-    #
-    #    test "grant plan to member" do
-    #      member = insert(:member)
-    #      plan = insert(:plan, identifier: "admin")
-    #
-    #      Member.grant(member, plan)
-    #
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #
-    #      assert 1 == length(member.plans)
-    #      assert plan == Enum.at(member.plans, 0)
-    #    end
+    test "grant plan to member" do
+      member = insert(:member)
+      plan = insert(:plan, identifier: "admin")
+      IO.inspect(plan)
+      Member.grant(member, plan)
+
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+
+      assert 1 == length(member.plans)
+      assert plan == Enum.at(member.plans, 0)
+    end
+
     #
     #    test "grant plan to inherited member" do
     #      member = insert(:member)

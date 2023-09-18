@@ -73,7 +73,7 @@ defmodule Membership.Member do
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: plan_id} = plan) do
     member = Member |> Repo.get!(id)
-    plan = Member |> Repo.get!(plan_id)
+    plan = Plan |> Repo.get!(plan_id)
 
     revoke(member, plan)
 
@@ -117,18 +117,17 @@ defmodule Membership.Member do
       %MemberFeatures{member_id: member.id, feature_id: feature.id, permission: permission}
       |> Repo.insert()
 
-    IO.inspect(d)
-    # sync_features(member)
+    sync_features(member)
   end
 
-  def grant(%{member: %Member{id: id}}, %Feature{id: _id} = feature) do
-    %Member{id: id}
-    |> grant(feature)
+  def grant(%{member: member}, %Feature{id: _id} = feature, permission) do
+    member
+    |> grant(feature, permission)
   end
 
-  def grant(%{member_id: id}, %Feature{id: _id} = feature) do
+  def grant(%{member_id: id}, %Feature{id: _id} = feature, permission) do
     %Member{id: id}
-    |> grant(feature)
+    |> grant(feature, permission)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -152,6 +151,8 @@ defmodule Membership.Member do
       iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
 
   """
+
+  ## fixme write a query that doesnt return error
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
     %MemberPlans{member_id: id, plan_id: plan.id}
@@ -166,6 +167,7 @@ defmodule Membership.Member do
     revoke(%Member{id: id}, plan)
   end
 
+  ## fixme write a query that doesnt return error
   def revoke(%Member{id: id} = _member, %Role{id: _id} = role) do
     from(pa in MemberRoles)
     |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
@@ -274,9 +276,6 @@ defmodule Membership.Member do
     extra_features =
       Enum.map(member.extra_features, fn x ->
         x.identifier
-        |> Enum.map(fn f ->
-          f.identifier
-        end)
       end)
 
     role_features =
@@ -292,7 +291,7 @@ defmodule Membership.Member do
 
     changeset(member)
     |> put_change(:features, features)
-    |> Repo.update!(features)
+    |> Repo.update!()
   end
 
   def table, do: :membership_members
