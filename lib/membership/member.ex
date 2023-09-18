@@ -113,9 +113,8 @@ defmodule Membership.Member do
     member = Member |> Repo.get!(id)
     feature = Feature |> Repo.get(feature_id)
 
-    d =
-      %MemberFeatures{member_id: member.id, feature_id: feature.id, permission: permission}
-      |> Repo.insert()
+    %MemberFeatures{member_id: member.id, feature_id: feature.id, permission: permission}
+    |> Repo.insert()
 
     sync_features(member)
   end

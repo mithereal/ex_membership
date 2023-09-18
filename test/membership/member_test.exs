@@ -2,12 +2,6 @@ defmodule Membership.MemberTest do
   use Membership.EctoCase
   alias Membership.Member
 
-  setup do
-    Membership.load_membership_plans()
-    :ok
-  end
-
-  #
   describe "Membership.Member.changeset/2" do
     test "changeset is valid" do
       changeset = Member.changeset(%Member{}, %{})
@@ -16,7 +10,6 @@ defmodule Membership.MemberTest do
     end
   end
 
-  #
   describe "Membership.Member.grant/2" do
     test "rejects invalid grant" do
       assert_raise ArgumentError, fn ->
@@ -24,7 +17,6 @@ defmodule Membership.MemberTest do
       end
     end
 
-    #
     test "grant feature to member" do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
@@ -73,7 +65,6 @@ defmodule Membership.MemberTest do
       assert "delete_accounts" == Enum.at(member.features, 0)
     end
 
-    #
     test "grant different features to member" do
       member = insert(:member)
       feature_delete = insert(:feature, identifier: "delete_accounts")
@@ -87,11 +78,10 @@ defmodule Membership.MemberTest do
       assert [feature_delete.identifier] ++ [feature_ban.identifier] == member.features
     end
 
-    #
     test "grant plan to member" do
       member = insert(:member)
       plan = insert(:plan, identifier: "admin")
-      IO.inspect(plan)
+
       Member.grant(member, plan)
 
       member = Repo.get(Member, member.id) |> Repo.preload([:plans])
@@ -264,167 +254,26 @@ defmodule Membership.MemberTest do
       end
     end
 
-    #
-    #    test "revokes feature from member on struct" do
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #
-    #      member = Member.revoke(member, feature, plan)
-    #      refute Membership.has_feature?(member, :view_plan, plan)
-    #    end
+    test "revokes feature from member on struct" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "view_plan")
 
-    #    test "revokes feature from inherited member on struct" do
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #      ## todo:: fixme
-    #      Member.grant(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #
-    #      member = Member.revoke(%{member: member}, feature, plan)
-    #      refute Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #
-    #    test "revokes feature from inherited member from id on struct" do
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #
-    #      member = Member.revoke(%{member_id: member.id}, feature, plan)
-    #      refute Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #  end
-    #
-    #  describe "Membership.Member.grant/3" do
-    #    test "rejects invalid grant" do
-    #      assert_raise ArgumentError, fn ->
-    #        Member.revoke(nil, nil, nil)
-    #      end
-    #    end
+      Member.grant(member, feature, "allow")
+      member = Repo.get(Member, member.id)
 
-    #
-    #    test "grant feature to member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #
-    #    test "grant feature to inherited member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(%{member: member}, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #    end
+      assert 1 == length(member.features)
+      assert Membership.has_feature?(member, feature.identifier)
 
-    #
-    #    test "grant feature to inherited member from id on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(%{member_id: member.id}, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #
-    #    test "revokes feature to member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.grant(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #
-    #      Member.revoke(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 0 == length(member.features)
-    #      refute Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #
-    #    test "revokes no feature to member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #
-    #      Member.revoke(member, feature, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 0 == length(member.features)
-    #      refute Membership.has_feature?(member, :view_plan, plan)
-    #    end
-    #
-    #    test "grants multiple features to member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #      feature_delete = insert(:feature, identifier: "delete_plan")
-    #
-    #      member = Member.grant(member, feature, plan)
-    #      member = Member.grant(member, feature_delete, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #      assert Membership.has_feature?(member, :delete_plan, plan)
-    #    end
-    #
-    #    test "revokes multiple features to member on struct" do
-    #      # Can be any struct
-    #      plan = insert(:plan)
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "view_plan")
-    #      feature_delete = insert(:feature, identifier: "delete_plan")
-    #
-    #      member = Member.grant(member, feature, plan)
-    #      member = Member.grant(member, feature_delete, plan)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:extra_features])
-    #
-    #      assert 1 == length(member.features)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #      assert Membership.has_feature?(member, :delete_plan, plan)
-    #
-    #      Member.revoke(member, feature_delete, plan)
-    #      refute Membership.has_feature?(member, :delete_plan, plan)
-    #      assert Membership.has_feature?(member, :view_plan, plan)
-    #    end
+      member = Member.revoke(member, feature)
+      refute Membership.has_feature?(member, feature.identifier)
+    end
+  end
+
+  describe "Membership.Member.grant/3" do
+    test "rejects invalid grant" do
+      assert_raise ArgumentError, fn ->
+        Member.revoke(nil, nil, nil)
+      end
+    end
   end
 end

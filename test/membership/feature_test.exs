@@ -47,8 +47,9 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan, identifier: "gold", name: "Gold Plan")
       feature = insert(:feature, identifier: "admin_feature")
 
+      ## return feature with plans preload
       {_, feature} = Feature.grant(feature, plan)
-      feature = Repo.get(Feature, feature.id()) |> Repo.preload(:plans)
+      feature = Repo.get(Feature, feature.id) |> Repo.preload(:plans)
       plan = List.first(feature.plans)
       plan = Repo.get(Membership.Plan, plan.id()) |> Repo.preload(:features)
 
@@ -91,13 +92,14 @@ defmodule Membership.FeatureTest do
       feature_1 = Feature.grant(feature, plan)
       feature_2 = Feature.grant(plan, ban_feature)
 
-      plan = Repo.get(Plan, plan.id()) |> Repo.preload(:features)
+      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
 
-      assert 2 == length(plan.features())
+      assert 2 == length(plan.features)
 
-      plan = Feature.revoke(plan, ban_feature)
+      Feature.revoke(plan, ban_feature)
 
-      refute Enum.member?(plan.features(), "ban_accounts")
+      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
+      refute Enum.member?(plan.features, "ban_accounts")
     end
   end
 end

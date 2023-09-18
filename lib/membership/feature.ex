@@ -72,7 +72,7 @@ defmodule Membership.Feature do
   """
 
   @spec grant(Feature.t(), Feature.t() | Plan.t()) :: Member.t()
-  def grant(%Feature{id: id} = _eature, %Plan{id: plan_id} = _plan) do
+  def grant(%Feature{id: id} = _feature, %Plan{id: plan_id} = _plan) do
     # Preload Feature plans
     feature = Feature |> Repo.get!(id)
     plan = Plan |> Repo.get!(plan_id)
@@ -81,6 +81,8 @@ defmodule Membership.Feature do
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
+
+    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:plans)}
   end
 
   def grant(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
@@ -101,6 +103,8 @@ defmodule Membership.Feature do
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
+
+    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:plans)}
   end
 
   def grant(%{plan: %Plan{id: id}}, %Feature{id: _id} = feature) do

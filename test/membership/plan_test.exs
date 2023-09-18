@@ -10,7 +10,7 @@ defmodule Membership.PlanTest do
     end
 
     test "changeset is valid" do
-      changeset = Plan.build_changeset(%Plan{}, %{identifier: "gold", name: "gold", features: []})
+      changeset = Plan.changeset(%Plan{}, %{identifier: "gold", name: "gold", features: []})
       assert changeset.valid?
     end
   end
@@ -18,7 +18,7 @@ defmodule Membership.PlanTest do
   describe "Membership.Plan.build/2" do
     test "builds correct changeset" do
       classic_changeset =
-        Plan.build_changeset(%Plan{}, %{
+        Plan.changeset(%Plan{}, %{
           identifier: "delete_accounts",
           name: "Can delete accounts",
           features: []

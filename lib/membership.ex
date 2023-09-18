@@ -335,6 +335,10 @@ defmodule Membership do
   @doc """
   Perform feature check on passed member and feature
   """
+  def has_feature?(%Membership.Member{} = member, feature_name) do
+    Enum.member?(member.features, feature_name)
+  end
+
   def has_feature?(%Membership.Member{} = member, func_name, feature_name) do
     member_authorization!(member, func_name, [Atom.to_string(feature_name)]) == :ok
   end
