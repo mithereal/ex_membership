@@ -193,7 +193,7 @@ defmodule Membership.Member do
   end
 
   def revoke(%Member{id: id} = _member, %Feature{id: _id} = feature) do
-    member = Member |> Repo.get!(id) |> Repo.preload(:features)
+    member = Member |> Repo.get!(id)
 
     features =
       Enum.filter(member.features, fn grant ->

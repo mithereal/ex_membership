@@ -164,9 +164,10 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
       feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, feature)
-      Member.grant(member, feature_ban)
+      Member.grant(member, feature, "allow")
+      Member.grant(member, feature_ban, "allow")
       member = Repo.get(Member, member.id)
+
       assert 2 == length(member.features)
 
       Member.revoke(member, feature)
@@ -175,95 +176,94 @@ defmodule Membership.MemberTest do
       assert "ban_accounts" == Enum.at(member.features, 0)
     end
 
-    #
-    #    test "revokes correct feature from inherited member" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
-    #      feature_ban = insert(:feature, identifier: "ban_accounts")
-    #
-    #      Member.grant(member, feature)
-    #      Member.grant(member, feature_ban)
-    #      member = Repo.get(Member, member.id)
-    #      assert 2 == length(member.features)
-    #
-    #      Member.revoke(%{member: member}, feature)
-    #      member = Repo.get(Member, member.id)
-    #      assert 1 == length(member.features)
-    #      assert "ban_accounts" == Enum.at(member.features, 0)
-    #    end
+    test "revokes correct feature from inherited member" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
 
-    #
-    #    test "revokes correct feature from inherited member from id" do
-    #      member = insert(:member)
-    #      feature = insert(:feature, identifier: "delete_accounts")
-    #      feature_ban = insert(:feature, identifier: "ban_accounts")
-    #
-    #      Member.grant(member, feature)
-    #      Member.grant(member, feature_ban)
-    #      member = Repo.get(Member, member.id)
-    #      assert 2 == length(member.features)
-    #
-    #      Member.revoke(%{member_id: member.id}, feature)
-    #      member = Repo.get(Member, member.id)
-    #      assert 1 == length(member.features)
-    #      assert "ban_accounts" == Enum.at(member.features, 0)
-    #    end
-    #
-    #    test "revokes correct plan from member" do
-    #      member = insert(:member)
-    #      plan_admin = insert(:plan, identifier: "admin")
-    #      plan_editor = insert(:plan, identifier: "editor")
-    #
-    #      Member.grant(member, plan_admin)
-    #      Member.grant(member, plan_editor)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 2 == length(member.plans)
-    #
-    #      Member.revoke(member, plan_admin)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 1 == length(member.plans)
-    #      assert plan_editor == Enum.at(member.plans, 0)
-    #    end
+      Member.grant(member, feature, "allow")
+      Member.grant(member, feature_ban, "allow")
+      member = Repo.get(Member, member.id)
+      assert 2 == length(member.features)
 
-    #    test "revokes correct plan from inherited member" do
-    #      member = insert(:member)
-    #      plan_admin = insert(:plan, identifier: "admin")
-    #      plan_editor = insert(:plan, identifier: "editor")
-    #
-    #      Member.grant(member, plan_admin)
-    #      Member.grant(member, plan_editor)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 2 == length(member.plans)
-    #
-    #      Member.revoke(%{member: member}, plan_admin)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 1 == length(member.plans)
-    #      assert plan_editor == Enum.at(member.plans, 0)
-    #    end
-    #
-    #    test "revokes correct plan from inherited member from id" do
-    #      member = insert(:member)
-    #      plan_admin = insert(:plan, identifier: "admin")
-    #      plan_editor = insert(:plan, identifier: "editor")
-    #
-    #      Member.grant(member, plan_admin)
-    #      Member.grant(member, plan_editor)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 2 == length(member.plans)
-    #
-    #      Member.revoke(%{member_id: member.id}, plan_admin)
-    #      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
-    #      assert 1 == length(member.plans)
-    #      assert plan_editor == Enum.at(member.plans, 0)
-    #    end
-    #  end
-    #
-    #  describe "Membership.Member.revoke/3" do
-    #    test "rejects invalid revoke" do
-    #      assert_raise ArgumentError, fn ->
-    #        Member.grant(nil, nil, nil)
-    #      end
-    #    end
+      Member.revoke(%{member: member}, feature)
+      member = Repo.get(Member, member.id)
+      assert 1 == length(member.features)
+      assert "ban_accounts" == Enum.at(member.features, 0)
+    end
+
+    test "revokes correct feature from inherited member from id" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "delete_accounts")
+      feature_ban = insert(:feature, identifier: "ban_accounts")
+
+      Member.grant(member, feature, "allow")
+      Member.grant(member, feature_ban, "allow")
+      member = Repo.get(Member, member.id)
+      assert 2 == length(member.features)
+
+      Member.revoke(%{member_id: member.id}, feature)
+      member = Repo.get(Member, member.id)
+      assert 1 == length(member.features)
+      assert "ban_accounts" == Enum.at(member.features, 0)
+    end
+
+    test "revokes correct plan from member" do
+      member = insert(:member)
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
+
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
+
+      Member.revoke(member, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
+    end
+
+    test "revokes correct plan from inherited member" do
+      member = insert(:member)
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
+
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
+
+      Member.revoke(%{member: member}, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
+    end
+
+    test "revokes correct plan from inherited member from id" do
+      member = insert(:member)
+      plan_admin = insert(:plan, identifier: "admin")
+      plan_editor = insert(:plan, identifier: "editor")
+
+      Member.grant(member, plan_admin)
+      Member.grant(member, plan_editor)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 2 == length(member.plans)
+
+      Member.revoke(%{member_id: member.id}, plan_admin)
+      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      assert 1 == length(member.plans)
+      assert plan_editor == Enum.at(member.plans, 0)
+    end
+  end
+
+  describe "Membership.Member.revoke/3" do
+    test "rejects invalid revoke" do
+      assert_raise ArgumentError, fn ->
+        Member.grant(nil, nil, nil)
+      end
+    end
+
     #
     #    test "revokes feature from member on struct" do
     #      plan = insert(:plan)
