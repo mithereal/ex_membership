@@ -25,7 +25,7 @@ defmodule Membership.Registry do
     {:reply, table, %{table: table}}
   end
 
-  def insert(identifier, name, value) do
+  def insert(identifier, name, value) when is_bitstring(identifier) do
     :ets.insert(identifier, {name, value})
   end
 
