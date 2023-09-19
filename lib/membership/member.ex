@@ -1,7 +1,3 @@
-defmodule Post do
-  defstruct name: "john"
-end
-
 defmodule Membership.Member do
   @moduledoc """
   Member is a main actor for determining features

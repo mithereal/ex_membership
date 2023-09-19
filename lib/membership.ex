@@ -32,8 +32,14 @@ defmodule Membership do
 
   """
 
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     quote do
+      registry =
+        case Keyword.get(opts, :registry) do
+          nil -> raise(ArgumentError, message: "Missing Required opts :registry")
+          data -> data
+        end
+
       import unquote(__MODULE__)
       @before_compile unquote(__MODULE__)
     end
@@ -79,8 +85,8 @@ defmodule Membership do
   @doc """
   Check if membership ets exists for the module
   """
-  def ets_exists() do
-    case :ets.whereis(__MODULE__) do
+  def ets_exists(module \\ __MODULE__) do
+    case :ets.whereis(module) do
       :undefined -> false
       _ -> true
     end
@@ -92,7 +98,7 @@ defmodule Membership do
   Load the plans into ets for the module/functions
   """
   def load_membership_plans() do
-    case ets_exists() do
+    case ets_exists(:membership_plans) do
       true ->
         :ok
 
@@ -482,10 +488,14 @@ defmodule Membership do
   """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
-    {plan, features} = :ets.lookup(:membership_plans, plan)
+    case :ets.lookup(:membership_plans, plan) do
+      [] ->
+        {:error, "plan: #{plan} Not Found"}
 
-    Membership.Registry.add(__MODULE__, func_name, features)
-    {:ok, plan}
+      {plan, features} ->
+        Membership.Registry.add(__MODULE__, func_name, features)
+        {:ok, plan}
+    end
   end
 
   #  def has_plan(

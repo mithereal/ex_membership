@@ -41,6 +41,8 @@ defmodule Membership.Memberships.Supervisor do
     if status == :ok do
       send(pid, :load)
     end
+
+    {status, pid}
   end
 
   def stop(id) do
