@@ -38,11 +38,124 @@ defmodule Membership do
 
       import unquote(__MODULE__)
 
+      def ets_exists(module \\ registry) do
+        case :ets.whereis(module) do
+          :undefined -> false
+          _ -> true
+        end
+
+        true
+      end
+
+      def load_membership_plans() do
+        case ets_exists(:membership_plans) do
+          true ->
+            :ok
+
+          false ->
+            Map.__info__(:functions)
+            |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
+            |> Enum.each(fn {x, _} ->
+              default = %{
+                required_features: [],
+                calculated_as_member: [],
+                extra_rules: []
+              }
+
+              Membership.Registry.insert(registry, x, default)
+            end)
+        end
+      end
+
+      defmacro calculated_member(current_member, func_name)
+               when is_atom(func_name) do
+        quote do
+          {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
+
+          rules = %{calculated_as_member: unquote(func_name)(current_member)}
+
+          registry =
+            Membership.Registry.add(
+              registry,
+              unquote(func_name),
+              rules
+            )
+        end
+      end
+
+      defmacro calculated_member(current_member, callback, func_name) when is_atom(func_name) do
+        quote do
+          {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
+          result = apply(unquote(callback), [current_member])
+
+          rules = %{calculated_as_member: result}
+
+          Membership.Registry.add(
+            registry,
+            unquote(func_name),
+            rules
+          )
+        end
+      end
+
+      defmacro calculated_member(current_member, func_name, bindings) when is_atom(func_name) do
+        quote do
+          {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
+          result = unquote(func_name)(current_member, unquote(bindings))
+          rules = %{calculated_as_member: result}
+
+          Membership.Registry.add(
+            registry,
+            unquote(func_name),
+            rules
+          )
+        end
+      end
+
+      defmacro calculated_member(current_member, callback, bindings, func_name)
+               when is_atom(func_name) do
+        quote do
+          {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
+          result = apply(unquote(callback), [current_member, unquote(bindings)])
+          rules = %{calculated_as_member: result}
+
+          Membership.Registry.add(
+            registry,
+            unquote(func_name),
+            rules
+          )
+        end
+      end
+
+      defp fetch_rules_from_ets(func_name) do
+        {:ok, value} = Membership.Registry.lookup(registry, func_name)
+        value
+      end
+
+      @spec has_plan(atom(), atom()) :: {:ok, atom()}
+      def has_plan(plan, func_name) do
+        case :ets.lookup(:membership_plans, plan) do
+          [] ->
+            {:error, "plan: #{plan} Not Found"}
+
+          {plan, features} ->
+            Membership.Registry.add(registry, func_name, features)
+            {:ok, plan}
+        end
+      end
+
+      @spec has_feature(atom(), atom()) :: {:ok, atom()}
+      def has_feature(feature, func_name) do
+        Membership.Registry.add(registry, func_name, feature)
+        {:ok, feature}
+      end
+
       #      defoverridable fun_with_default: 0
       @before_compile unquote(__MODULE__)
     end
   end
 
+  ### end of using
   defmacro __before_compile__(_env) do
     create_membership()
   end
