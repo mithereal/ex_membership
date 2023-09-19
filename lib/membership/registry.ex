@@ -3,6 +3,8 @@ defmodule Membership.Registry do
 
   use GenServer
 
+  @default %{required_features: []}
+
   def start_link(args) do
     {:ok, pid} =
       __MODULE__
@@ -34,7 +36,7 @@ defmodule Membership.Registry do
   def add(identifier, name, value) when is_binary(identifier) do
     current =
       case lookup(identifier, name) do
-        {:ok, nil} -> %{}
+        {:ok, nil} -> @default
         {:ok, current} -> current
       end
 
@@ -46,7 +48,7 @@ defmodule Membership.Registry do
   def add(identifier, name, value) when is_atom(identifier) do
     current =
       case lookup(identifier, name) do
-        {:ok, nil} -> %{}
+        {:ok, nil} -> @default
         {:ok, current} -> current
       end
 
