@@ -34,13 +34,11 @@ defmodule Membership do
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
-      registry =
-        case Keyword.get(opts, :registry) do
-          nil -> raise(ArgumentError, message: "Missing Required opts :registry")
-          data -> data
-        end
+      registry = Keyword.fetch!(opts, :registry)
 
       import unquote(__MODULE__)
+
+      #      defoverridable fun_with_default: 0
       @before_compile unquote(__MODULE__)
     end
   end
