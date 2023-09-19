@@ -33,7 +33,7 @@ defmodule Membership do
   """
 
   defmacro __using__(opts) do
-    quote do
+    quote bind_quoted: [opts: opts] do
       registry =
         case Keyword.get(opts, :registry) do
           nil -> raise(ArgumentError, message: "Missing Required opts :registry")
