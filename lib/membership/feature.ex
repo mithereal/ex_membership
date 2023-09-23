@@ -94,7 +94,7 @@ defmodule Membership.Feature do
     grant(feature, plan)
   end
 
-  def grant(%Plan{id: plan_id} = _member, %Feature{id: id} = feature) do
+  def grant(%Plan{id: plan_id} = _member, %Feature{id: id} = _feature) do
     # Preload Feature plans
     feature = Feature |> Repo.get!(id)
     plan = Plan |> Repo.get!(plan_id)

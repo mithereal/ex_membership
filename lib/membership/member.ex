@@ -67,7 +67,7 @@ defmodule Membership.Member do
 
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
-  def grant(%Member{id: id} = _member, %Plan{id: plan_id} = plan) do
+  def grant(%Member{id: id} = _member, %Plan{id: plan_id} = _plan) do
     member = Member |> Repo.get!(id)
     plan = Plan |> Repo.get!(plan_id)
 
@@ -86,7 +86,7 @@ defmodule Membership.Member do
     |> grant(plan)
   end
 
-  def grant(%Member{id: id} = _member, %Role{id: role_id} = role) do
+  def grant(%Member{id: id} = _member, %Role{id: role_id} = _role) do
     member = Member |> Repo.get!(id)
     role = Role |> Repo.get!(role_id)
 
@@ -105,7 +105,7 @@ defmodule Membership.Member do
     |> grant(role)
   end
 
-  def grant(%Member{id: id} = _member, %Feature{id: feature_id} = feature, permission) do
+  def grant(%Member{id: id} = _member, %Feature{id: feature_id} = _feature, permission) do
     member = Member |> Repo.get!(id)
     feature = Feature |> Repo.get(feature_id)
 
@@ -195,10 +195,9 @@ defmodule Membership.Member do
         grant != feature.identifier
       end)
 
-    changeset =
-      changeset(member)
-      |> put_change(:features, features)
-      |> Repo.update!()
+    changeset(member)
+    |> put_change(:features, features)
+    |> Repo.update!()
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")

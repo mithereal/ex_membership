@@ -32,9 +32,9 @@ defmodule Membership.Plan do
 
   def changeset(%Plan{} = struct, params) do
     struct
-    |> cast(params, [:identifier, :name])
+    |> cast(params, @params)
     |> cast_assoc(:features, required: false)
-    |> validate_required([:identifier, :name])
+    |> validate_required(@required_fields)
     |> unique_constraint(:identifier, message: "Plan already exists")
   end
 
@@ -48,20 +48,15 @@ defmodule Membership.Plan do
   end
 
   def create(identifier, name, features \\ []) do
-    features =
-      Enum.map(features, fn f ->
-        Feature.create(f.identifier, f.name)
-      end)
+    Enum.map(features, fn f ->
+      Feature.create(f.identifier, f.name)
+    end)
 
     changeset(%Plan{}, %{
       identifier: identifier,
       name: name
     })
     |> Repo.insert_or_update()
-
-    Enum.each(features, fn f ->
-      nil
-    end)
   end
 
   def create(plan = %Plan{}) do
@@ -90,7 +85,7 @@ defmodule Membership.Plan do
   """
 
   @spec grant(Plan.t(), Plan.t() | Feature.t()) :: Member.t()
-  def grant(%Plan{id: id} = _plan, %Feature{id: feature_id} = feature) do
+  def grant(%Plan{id: id} = _plan, %Feature{id: feature_id} = _feature) do
     # Preload Plan features
     plan = Plan |> Repo.get!(id)
     feature = Feature |> Repo.get!(feature_id)
@@ -111,7 +106,7 @@ defmodule Membership.Plan do
     |> grant(feature)
   end
 
-  def grant(%Feature{id: feature_id} = feature, %Plan{id: id} = _plan) do
+  def grant(%Feature{id: feature_id} = _feature, %Plan{id: id} = _plan) do
     plan = Plan |> Repo.get!(id)
     feature = Feature |> Repo.get!(feature_id)
 

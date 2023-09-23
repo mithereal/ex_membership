@@ -72,7 +72,7 @@ defmodule Membership.Role do
   """
 
   @spec grant(Role.t(), Role.t() | Feature.t()) :: Member.t()
-  def grant(%Role{id: id} = _role, %Feature{id: feature_id} = feature) do
+  def grant(%Role{id: id} = _role, %Feature{id: feature_id} = _feature) do
     # Preload Role features
     role = Role |> Repo.get!(id)
     feature = Feature |> Repo.get!(feature_id)
@@ -93,7 +93,7 @@ defmodule Membership.Role do
     |> grant(feature)
   end
 
-  def grant(%Feature{id: feature_id} = feature, %Role{id: id} = _role) do
+  def grant(%Feature{id: feature_id} = _feature, %Role{id: id} = _role) do
     role = Role |> Repo.get!(id)
     feature = Feature |> Repo.get!(feature_id)
 
@@ -179,11 +179,5 @@ defmodule Membership.Role do
       e.role_id == ^role.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
-  end
-
-  defp merge_uniq_grants(grants) do
-    Enum.uniq_by(grants, fn grant ->
-      grant.identifier
-    end)
   end
 end
