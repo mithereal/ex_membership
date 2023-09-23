@@ -8,6 +8,7 @@ defmodule Membership.Permission.Server do
 
   require Logger
   @registry_name :module_permissions
+  @default %{required_features: []}
 
   def child_spec(data) do
     %{
@@ -39,5 +40,40 @@ defmodule Membership.Permission.Server do
   @doc false
   def via_tuple(id, registry \\ @registry_name) do
     {:via, Registry, {registry, id}}
+  end
+
+  def insert(name, value) do
+    :ets.insert(self.ref, {name, value})
+  end
+
+  def add(name, value) do
+    current =
+      case lookup(self.ref, name) do
+        {:ok, nil} -> @default
+        {:ok, current} -> current
+      end
+
+    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+
+    :ets.insert(self.ref, {name, uniq})
+  end
+
+  def add(name, value) do
+    current =
+      case lookup(self.ref, name) do
+        {:ok, nil} -> @default
+        {:ok, current} -> current
+      end
+
+    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+
+    :ets.insert(self.ref, {name, uniq})
+  end
+
+  def lookup(name) do
+    case :ets.lookup(self.ref, name) do
+      [{^name, value}] -> {:ok, value}
+      [] -> {:ok, nil}
+    end
   end
 end
