@@ -348,21 +348,6 @@ defmodule Membership.Behaviour do
       end
 
       @doc false
-      @spec load_and_store_member!(integer()) :: {:ok, Membership.Member.t()}
-      def load_and_store_member!(member_id) when is_integer(member_id) do
-        member = Membership.Repo.get!(Membership.Member, member_id)
-        {status, _} = Membership.Memberships.Supervisor.start(member)
-        {status, member}
-      end
-
-      @doc false
-      @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
-      def load_and_store_member!(%Membership.Member{id: _id} = member) do
-        {status, _} = Membership.Memberships.Supervisor.start(member)
-        {status, member}
-      end
-
-      @doc false
       @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
       def load_member_features(member) do
         member
