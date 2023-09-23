@@ -20,7 +20,7 @@ defmodule Membership.Permission.Server do
   @impl true
   def init(init_arg) do
     ref =
-      :ets.new(String.to_atom(init_arg.module), [
+      :ets.new(String.to_atom(init_arg), [
         :set,
         :named_table,
         :public,

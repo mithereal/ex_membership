@@ -95,12 +95,14 @@ defmodule Membership do
   @doc """
   Load the plans into ets for the module/functions
   """
-  def load_ets_data() do
-    case ets_exists(:membership_plans) do
-      true ->
+  def load_ets_data(current_module \\ __MODULE__) do
+    status = Membership.Permission.Server.start(current_module)
+
+    case status do
+      {:error, _} ->
         :ok
 
-      false ->
+      {:ok, _} ->
         Map.__info__(:functions)
         |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
         |> Enum.each(fn {x, _} ->
@@ -110,7 +112,8 @@ defmodule Membership do
             extra_rules: []
           }
 
-          Membership.Registry.insert(__MODULE__, x, default)
+          Membership.Permission.Server.insert(current_module, x, default)
+          #  Membership.Registry.insert(current_module, x, default)
         end)
     end
   end
