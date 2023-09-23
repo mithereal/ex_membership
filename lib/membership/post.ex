@@ -25,7 +25,7 @@ defmodule Post do
 
     # Notice that you can use both macros or functions
 
-    case member_authorized?() do
+    case authorized?() do
       :ok -> :ok
       {:error, _message} -> "Raise error"
       _ -> "Raise error"

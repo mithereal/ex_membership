@@ -81,18 +81,6 @@ defmodule Membership do
   end
 
   @doc """
-  Check if membership ets exists for the module
-  """
-  def ets_exists(module \\ __MODULE__) do
-    case :ets.whereis(module) do
-      :undefined -> false
-      _ -> true
-    end
-
-    true
-  end
-
-  @doc """
   Load the plans into ets for the module/functions
   """
   def load_ets_data(current_module \\ __MODULE__) do
@@ -288,14 +276,14 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          case member_authorized? do
+          case authorized? do
             :ok -> "Member is authorized"
             {:error, message: _message} -> "Member is not authorized"
         end
       end
   """
-  @spec member_authorized?() :: :ok | {:error, String.t()}
-  def member_authorized? do
+  @spec authorized?() :: :ok | {:error, String.t()}
+  def authorized? do
     member_authorization!()
   end
 

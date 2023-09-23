@@ -44,7 +44,7 @@ defmodule PostTest do
       has_feature(:update_post, :no_macro)
     end
 
-    case member_authorized?() do
+    case authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -56,7 +56,7 @@ defmodule PostTest do
     permissions do
     end
 
-    case member_authorized?() do
+    case authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -75,7 +75,7 @@ defmodule PostTest do
       )
     end
 
-    case member_authorized?() do
+    case authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -88,7 +88,7 @@ defmodule PostTest do
       calculated(member, :confirmed_email, :calculated_macro)
     end
 
-    case member_authorized?() do
+    case authorized?() do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
