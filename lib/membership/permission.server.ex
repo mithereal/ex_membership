@@ -26,4 +26,9 @@ defmodule Membership.Permission.Server do
     name = via_tuple(data)
     GenServer.start_link(__MODULE__, data, name: name)
   end
+
+  @doc false
+  def via_tuple(id, registry \\ @registry_name) do
+    {:via, Registry, {registry, id}}
+  end
 end

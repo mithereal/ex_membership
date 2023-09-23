@@ -6,7 +6,7 @@ defmodule Post do
   def delete(id \\ 1, member_id \\ 1) do
     load_and_authorize_member(%Membership.Member{id: member_id})
 
-    member_permissions do
+    permissions do
       # or
       has_plan("gold", "delete_post")
       # or
@@ -14,12 +14,12 @@ defmodule Post do
       # or
       has_feature("delete_posts", "delete_post")
 
-      #      calculated_member(fn member ->
+      #      calculated(fn member ->
       #        member.email_confirmed?
       #      end)
     end
 
-    #    as_member("delete_post") do
+    #    as_authorized("delete_post") do
     #      :ok
     #    end
 

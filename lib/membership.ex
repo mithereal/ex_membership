@@ -25,7 +25,7 @@ defmodule Membership do
   and all plans are granted to single member, resulting plans will be `[:gold, :silver, :bronze]`
 
 
-  ## Available as_member
+  ## Available as_authorized
   ##todo:: rewrite has_plan to compare features on member vs plan vs plan name in plans array
     * `Membership.has_plan/1` - Requires single plan to be present on member
     * `Membership.has_feature/1` - Requires single feature to be present on member
@@ -56,7 +56,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          member_permissions do
+          permissions do
             has_feature(:admin_feature, :test_authorization)
             has_plan(:gold, :test_authorization)
           end
@@ -64,7 +64,7 @@ defmodule Membership do
       end
   """
 
-  defmacro member_permissions(do: block) do
+  defmacro permissions(do: block) do
     quote do
       load_ets_data()
       unquote(block)
@@ -106,7 +106,7 @@ defmodule Membership do
         |> Enum.each(fn {x, _} ->
           default = %{
             required_features: [],
-            calculated_as_member: [],
+            calculated_as_authorized: [],
             extra_rules: []
           }
 
@@ -126,14 +126,14 @@ defmodule Membership do
         {:ok, member }  = load_and_authorize_member(member)
 
         def test_authorization do
-          as_member(member, :test_authorization) do
+          as_authorized(member, :test_authorization) do
             IO.inspect("This code is executed only for authorized member")
           end
         end
       end
   """
 
-  defmacro as_member(member, func_name, do: block) do
+  defmacro as_authorized(member, func_name, do: block) do
     quote do
       with :ok <- member_authorization!(unquote(member), unquote(func_name)) do
         unquote(block)
@@ -152,13 +152,13 @@ defmodule Membership do
         {:ok, member }  = load_and_authorize_member(member)
 
         def test_authorization do
-          member_permissions do
-            calculated_member(fn member ->
+          permissions do
+            calculated(fn member ->
               member.email_confirmed?
             end)
           end
 
-          as_member(member) do
+          as_authorized(member) do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -174,11 +174,11 @@ defmodule Membership do
         member = HelloTest.Repo.get(Membership.Member, 1)
        {:ok, member } = load_and_authorize_member(member)
 
-          member_permissions do
-            calculated_member(member,:email_confirmed)
+          permissions do
+            calculated(member,:email_confirmed)
           end
 
-          as_member(member) do
+          as_authorized(member) do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -198,14 +198,14 @@ defmodule Membership do
         def test_authorization do
           post = %Post{owner_id: 1}
 
-          member_permissions do
-            calculated_member(member,:is_owner, [post])
-            calculated_member(fn member, [post] ->
+          permissions do
+            calculated(member,:is_owner, [post])
+            calculated(fn member, [post] ->
               post.owner_id == member.id
             end)
           end
 
-          as_member(member) do
+          as_authorized(member) do
             IO.inspect("This code is executed only for authorized member")
           end
         end
@@ -216,12 +216,12 @@ defmodule Membership do
       end
 
   """
-  defmacro calculated_member(current_member, func_name)
+  defmacro calculated(current_member, func_name)
            when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
 
-      rules = %{calculated_as_member: unquote(func_name)(current_member)}
+      rules = %{calculated_as_authorized: unquote(func_name)(current_member)}
 
       registry =
         Membership.Registry.add(
@@ -232,12 +232,12 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated_member(current_member, callback, func_name) when is_atom(func_name) do
+  defmacro calculated(current_member, callback, func_name) when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = apply(unquote(callback), [current_member])
 
-      rules = %{calculated_as_member: result}
+      rules = %{calculated_as_authorized: result}
 
       Membership.Registry.add(
         __MODULE__,
@@ -247,11 +247,11 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated_member(current_member, func_name, bindings) when is_atom(func_name) do
+  defmacro calculated(current_member, func_name, bindings) when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = unquote(func_name)(current_member, unquote(bindings))
-      rules = %{calculated_as_member: result}
+      rules = %{calculated_as_authorized: result}
 
       Membership.Registry.add(
         __MODULE__,
@@ -261,12 +261,12 @@ defmodule Membership do
     end
   end
 
-  defmacro calculated_member(current_member, callback, bindings, func_name)
+  defmacro calculated(current_member, callback, bindings, func_name)
            when is_atom(func_name) do
     quote do
       {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
       result = apply(unquote(callback), [current_member, unquote(bindings)])
-      rules = %{calculated_as_member: result}
+      rules = %{calculated_as_authorized: result}
 
       Membership.Registry.add(
         __MODULE__,
@@ -337,7 +337,7 @@ defmodule Membership do
         required_plans \\ [],
         _extra_rules \\ []
       ) do
-    # If no member is given we can assume that as_member are not granted
+    # If no member is given we can assume that as_authorized are not granted
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
@@ -350,9 +350,9 @@ defmodule Membership do
           end)
         )
 
-      # If no as_member were required then we can assume member is granted
+      # If no as_authorized were required then we can assume member is granted
       if length(plan_features) + length(rules.required_features) +
-           length(rules.calculated_as_member) +
+           length(rules.calculated_as_authorized) +
            length(rules.extra_rules) == 0 do
         :ok
       else
@@ -360,7 +360,7 @@ defmodule Membership do
           authorize!(
             [
               authorize_features(current_member.features, rules.required_features)
-            ] ++ rules.calculated_as_member ++ rules.extra_rules
+            ] ++ rules.calculated_as_authorized ++ rules.extra_rules
           )
 
         if reply == :ok do
@@ -470,7 +470,7 @@ defmodule Membership do
   end
 
   @doc """
-  Requires an plan within member_permissions block
+  Requires an plan within permissions block
 
   ## Example
 
@@ -478,7 +478,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          member_permissions do
+          permissions do
             has_plan(:gold, :test_authorization)
           end
         end
@@ -497,7 +497,7 @@ defmodule Membership do
   end
 
   @doc """
-  Requires a feature within member_permissions block
+  Requires a feature within permissions block
 
   ## Example
 
@@ -505,7 +505,7 @@ defmodule Membership do
         use Membership
 
         def test_authorization do
-          member_permissions do
+          permissions do
             has_feature(:admin)
           end
         end
