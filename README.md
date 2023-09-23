@@ -37,7 +37,7 @@ defmodule Sample.Post
 
     # Notice that you can use both macros or functions
 
-    case member_authorized? do
+    case authorized? do
       :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
       {:error, message} -> "Raise error"
       _ -> "Raise error"
@@ -153,7 +153,7 @@ defmodule Sample.Post
 
     # Notice that you can use both macros or functions
 
-    case member_authorized? do
+    case authorized? do
       :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
       {:error, message} -> "Raise error"
       _ -> "Raise error"
@@ -264,7 +264,7 @@ defmodule Sample.Post do
       end)
     end
 
-    member_authorized?
+    authorized?
   end
 end
 ```
