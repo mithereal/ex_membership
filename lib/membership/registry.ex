@@ -79,12 +79,4 @@ defmodule Membership.Registry do
     __MODULE__
     |> :ets.lookup(name)
   end
-
-  def normalize_struct_name(name) do
-    name
-    |> Atom.to_string()
-    |> String.replace(".", "_")
-    |> String.downcase()
-    |> String.to_atom()
-  end
 end

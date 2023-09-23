@@ -289,11 +289,4 @@ defmodule Membership.Member do
   end
 
   def table, do: :membership_members
-
-  def normalize_struct_name(name) do
-    name
-    |> Atom.to_string()
-    |> String.replace(".", "_")
-    |> String.downcase()
-  end
 end
