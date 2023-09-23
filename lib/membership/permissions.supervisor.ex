@@ -7,7 +7,7 @@ defmodule Membership.Permissions.Supervisor do
   """
 
   #  alias __MODULE__, as: SUPERVISOR
-  alias Membership.Member.Server, as: SERVER
+  alias Membership.Permission.Server, as: SERVER
 
   @name :module_permissions_supervisor
   @registry_name :module_permissions
