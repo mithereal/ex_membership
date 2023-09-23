@@ -19,7 +19,16 @@ defmodule Membership.Permission.Server do
 
   @impl true
   def init(init_arg) do
-    {:ok, nil}
+    ref =
+      :ets.new(String.to_atom(init_arg.module), [
+        :set,
+        :named_table,
+        :public,
+        read_concurrency: true,
+        write_concurrency: false
+      ])
+
+    {:ok, %{ref: ref}}
   end
 
   def start_link(data) do

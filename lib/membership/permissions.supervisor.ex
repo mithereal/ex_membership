@@ -6,7 +6,6 @@ defmodule Membership.Permissions.Supervisor do
     this will supervise the permissions
   """
 
-  #  alias __MODULE__, as: SUPERVISOR
   alias Membership.Permission.Server, as: SERVER
 
   @name :module_permissions_supervisor
@@ -36,13 +35,7 @@ defmodule Membership.Permissions.Supervisor do
   def start(data) do
     child_spec = {SERVER, data}
 
-    {status, pid} = DynamicSupervisor.start_child(@name, child_spec)
-
-    if status == :ok do
-      send(pid, :load)
-    end
-
-    {status, pid}
+    DynamicSupervisor.start_child(@name, child_spec)
   end
 
   def stop(id) do
