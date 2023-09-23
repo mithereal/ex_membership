@@ -34,11 +34,13 @@ defmodule Membership do
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
+      IO.inspect(opts, label: "new opts")
       @registry Keyword.fetch!(opts, :registry)
-      quote do
-        import unquote(__MODULE__)
-        @before_compile unquote(__MODULE__)
-      end
+    end
+
+    quote do
+      import unquote(__MODULE__)
+      @before_compile unquote(__MODULE__)
     end
   end
 
@@ -46,7 +48,6 @@ defmodule Membership do
     create_membership()
   end
 
-  ### Start of funs
   @doc """
   Macro for defining required permissions
 
