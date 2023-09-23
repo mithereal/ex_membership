@@ -38,7 +38,7 @@ defmodule Membership do
 
       @registry Keyword.fetch!(opts, :registry)
 
-      import unquote(__MODULE__)
+      use Membership.Behaviour, registry: @registry
       @before_compile unquote(__MODULE__)
     end
   end
@@ -84,7 +84,7 @@ defmodule Membership do
   Load the plans into ets for the module/functions
   """
   def load_ets_data(current_module \\ __MODULE__) do
-    status = Membership.Permission.Server.start(current_module)
+    status = Membership.Permission.Supervisor.start(current_module)
 
     case status do
       {:error, _} ->
@@ -101,7 +101,6 @@ defmodule Membership do
           }
 
           Membership.Permission.Server.insert(current_module, x, default)
-          #  Membership.Registry.insert(current_module, x, default)
         end)
     end
   end

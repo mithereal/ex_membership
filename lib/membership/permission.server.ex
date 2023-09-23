@@ -42,36 +42,39 @@ defmodule Membership.Permission.Server do
     {:via, Registry, {registry, id}}
   end
 
-  def insert(name, value) do
-    :ets.insert(self.ref, {name, value})
+  def insert(module, name, value) do
+    name = via_tuple(module)
+    Genserver.cast(name, {:insert, value})
   end
 
-  def add(name, value) do
+  def handle_cast({:insert, value}, state) do
+    :ets.insert(state.ref, value)
+    {:noreply, state}
+  end
+
+  def add(module, name, value) do
+    module = via_tuple(module)
+    Genserver.cast(module, {:add, {name, value}})
+  end
+
+  def add(name, value, ref \\ __MODULE__) do
+  end
+
+  def handle_cast({:add, {name, value}}, state) do
     current =
-      case lookup(self.ref, name) do
+      case lookup(name, state.ref) do
         {:ok, nil} -> @default
         {:ok, current} -> current
       end
 
     uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
 
-    :ets.insert(self.ref, {name, uniq})
+    :ets.insert(state.ref, {name, uniq})
+    {:noreply, state}
   end
 
-  def add(name, value) do
-    current =
-      case lookup(self.ref, name) do
-        {:ok, nil} -> @default
-        {:ok, current} -> current
-      end
-
-    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
-
-    :ets.insert(self.ref, {name, uniq})
-  end
-
-  def lookup(name) do
-    case :ets.lookup(self.ref, name) do
+  def lookup(name, ref \\ __MODULE__) do
+    case :ets.lookup(ref, name) do
       [{^name, value}] -> {:ok, value}
       [] -> {:ok, nil}
     end
