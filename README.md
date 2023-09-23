@@ -21,17 +21,17 @@ defmodule Sample.Post
     member = load_and_authorize_member(member)
     post = %Post{id: 1}
 
-    member_permissions do
+    permissions do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
       has_feature(:delete, post) # Entity related features
-      calculated_member(fn member ->
+      calculated(fn member ->
         member.email_confirmed?
       end)
     end
 
-    as_member(member) do
+    as_authorized(member) do
       Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
     end
 
@@ -141,7 +141,7 @@ defmodule Sample.Post
     #  * %AnyStruct{member_id: id} (this will perform database preload)
 
 
-    member_permissions do
+    permissions do
       has_plan(:admin) # or
       has_plan(:editor) # or
       has_feature(:delete_posts) # or
@@ -178,8 +178,8 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    member_permissions do
-      calculated_member(fn member -> do
+    permissions do
+      calculated(fn member -> do
         member.email_confirmed?
       end)
     end
@@ -187,7 +187,7 @@ defmodule Sample.Post do
 end
 ```
 
-We can also use DSL form of `calculated_member` keyword
+We can also use DSL form of `calculated` keyword
 
 ```elixir
 defmodule Sample.Post do
@@ -195,8 +195,8 @@ defmodule Sample.Post do
     user = Sample.Repo.get(Sample.User, 1)
     load_and_authorize_member(user)
 
-    member_permissions do
-      calculated_member(:confirmed_email)
+    permissions do
+      calculated(:confirmed_email)
     end
   end
 
@@ -208,7 +208,7 @@ end
 
 ### Composing calculations
 
-When we need to member calculation based on external data we can invoke bindings to `calculated_member/2`
+When we need to member calculation based on external data we can invoke bindings to `calculated/2`
 
 ```elixir
 defmodule Sample.Post do
@@ -217,9 +217,9 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    member_permissions do
-      calculated_member(:confirmed_email)
-      calculated_member(:is_owner, [post])
+    permissions do
+      calculated(:confirmed_email)
+      calculated(:is_owner, [post])
     end
   end
 
@@ -243,7 +243,7 @@ defmodule Sample.Post do
     post = %Post{owner_id: 1}
     load_and_authorize_member(user)
 
-    member_permissions do
+    permissions do
       has_plan(:editor)
     end
 
@@ -258,8 +258,8 @@ defmodule Sample.Post do
   def is_owner(member, post) do
     load_and_authorize_member(member)
 
-    member_permissions do
-      calculated_member(fn p, [post] ->
+    permissions do
+      calculated(fn p, [post] ->
         p.id == post.owner_id
       end)
     end
@@ -313,7 +313,7 @@ defmodule Sample.Post do
     post = %Post{id: 1}
     load_and_authorize_member(user)
 
-    member_permissions do
+    permissions do
       has_feature(:delete, post)
     end
 
