@@ -1,5 +1,5 @@
 defmodule PostTest do
-  use Membership
+  use Membership, registry: :test
 
   def delete(member) do
     {_, member} = load_and_authorize_member(member)
@@ -99,6 +99,7 @@ defmodule PostTest do
   end
 end
 
+### fixme
 defmodule Membership.MembershipTest do
   use Membership.EctoCase
 

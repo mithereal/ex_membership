@@ -33,12 +33,11 @@ defmodule Membership do
   """
 
   defmacro __using__(opts) do
-    quote bind_quoted: [opts: opts] do
-      IO.inspect(opts, label: "new opts")
-      @registry Keyword.fetch!(opts, :registry)
-    end
-
     quote do
+      opts = unquote(opts)
+
+      @registry Keyword.fetch!(opts, :registry)
+
       import unquote(__MODULE__)
       @before_compile unquote(__MODULE__)
     end
