@@ -4,7 +4,7 @@ defmodule PostTest do
   def delete(member) do
     {_, member} = load_and_authorize_member(member)
 
-    member_permissions do
+    permissions do
       has_plan(:admin, :delete)
     end
 
@@ -16,7 +16,7 @@ defmodule PostTest do
   def update(member) do
     {_, member} = load_and_authorize_member(member)
 
-    member_permissions do
+    permissions do
       has_feature(:update_post, :update)
     end
 
@@ -28,7 +28,7 @@ defmodule PostTest do
   def entity_update(member) do
     {_, member} = load_and_authorize_member(member)
 
-    member_permissions do
+    permissions do
       has_feature(:delete_member, :entity_update)
     end
 
@@ -40,7 +40,7 @@ defmodule PostTest do
   def no_macro(member) do
     load_and_authorize_member(member)
 
-    member_permissions do
+    permissions do
       has_feature(:update_post, :no_macro)
     end
 
@@ -53,7 +53,7 @@ defmodule PostTest do
   def no_permissions(member) do
     load_and_authorize_member(member)
 
-    member_permissions do
+    permissions do
     end
 
     case member_authorized?() do
@@ -65,8 +65,8 @@ defmodule PostTest do
   def calculated(member, email_confirmed) do
     {:ok, member} = load_and_authorize_member(member)
 
-    member_permissions do
-      calculated_member(
+    permissions do
+      calculated(
         member,
         fn _member ->
           email_confirmed
@@ -84,8 +84,8 @@ defmodule PostTest do
   def calculated_macro(member) do
     {:ok, member} = load_and_authorize_member(member)
 
-    member_permissions do
-      calculated_member(member, :confirmed_email, :calculated_macro)
+    permissions do
+      calculated(member, :confirmed_email, :calculated_macro)
     end
 
     case member_authorized?() do
