@@ -9,7 +9,9 @@ defmodule Membership.Application do
     children = [
       {Repo, args},
       {Registry, keys: :unique, name: :active_memberships},
-      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor}
+      {Registry, keys: :unique, name: :module_permissions},
+      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},
+      {DynamicSupervisor, strategy: :one_for_one, name: :module_permissions_supervisor}
     ]
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]

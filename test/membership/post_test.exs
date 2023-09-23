@@ -104,7 +104,7 @@ defmodule Membership.MembershipTest do
   use Membership.EctoCase
 
   setup do
-    Membership.load_membership_plans()
+    Membership.load_ets_data()
     :ok
   end
 
