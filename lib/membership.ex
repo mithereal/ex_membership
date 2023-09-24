@@ -84,7 +84,7 @@ defmodule Membership do
   Load the plans into ets for the module/functions
   """
   def load_ets_data(current_module \\ __MODULE__) do
-    status = Membership.Permission.Supervisor.start(current_module)
+    status = Membership.Permissions.Supervisor.start(current_module)
 
     case status do
       {:error, _} ->

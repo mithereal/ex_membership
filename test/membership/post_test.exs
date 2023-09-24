@@ -8,7 +8,7 @@ defmodule PostTest do
       has_plan(:admin, :delete)
     end
 
-    as_member(member, :delete) do
+    as_authorized(member, :delete) do
       {:ok, "Authorized"}
     end
   end
@@ -20,7 +20,7 @@ defmodule PostTest do
       has_feature(:update_post, :update)
     end
 
-    as_member(member, :update) do
+    as_authorized(member, :update) do
       {:ok, "Authorized"}
     end
   end
@@ -32,7 +32,7 @@ defmodule PostTest do
       has_feature(:delete_member, :entity_update)
     end
 
-    as_member(member, :entity_update) do
+    as_authorized(member, :entity_update) do
       {:ok, "Authorized"}
     end
   end
@@ -62,7 +62,7 @@ defmodule PostTest do
     end
   end
 
-  def calculated(member, email_confirmed) do
+  def is_calculated(member, email_confirmed) do
     {:ok, member} = load_and_authorize_member(member)
 
     permissions do

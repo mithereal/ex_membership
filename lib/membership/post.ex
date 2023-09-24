@@ -27,7 +27,7 @@ defmodule Post do
 
     case authorized?() do
       :ok -> :ok
-      {:error, _message} -> "Raise error"
+      {:error, _message} -> {:error, "Member is not granted to perform this action"}
       _ -> "Raise error"
     end
   end
