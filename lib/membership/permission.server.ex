@@ -57,8 +57,8 @@ defmodule Membership.Permission.Server do
   end
 
   def insert(module, name, value) do
-    name = via_tuple(module)
-    Genserver.cast(name, {:insert, value})
+    module = via_tuple(module)
+    GenServer.cast(module, {:insert, {name, value}})
   end
 
   def handle_cast({:insert, value}, state) do

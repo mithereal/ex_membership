@@ -49,7 +49,7 @@ defmodule Membership.Behaviour do
 
           {:ok, _} ->
             Map.__info__(:functions)
-            |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
+            |> Enum.reject(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
             |> Enum.each(fn {x, _} ->
               default = %{
                 required_features: [],
