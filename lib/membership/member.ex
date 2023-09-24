@@ -75,6 +75,8 @@ defmodule Membership.Member do
 
     %MemberPlans{member_id: member.id, plan_id: plan.id}
     |> Repo.insert()
+
+    sync_features(member)
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -254,7 +256,7 @@ defmodule Membership.Member do
     member =
       Member
       |> Repo.get!(id)
-      |> Repo.preload(:plans)
+      |> Repo.preload(plans: :features)
       |> Repo.preload(:roles)
       |> Repo.preload(:extra_features)
 
@@ -265,6 +267,7 @@ defmodule Membership.Member do
           f.identifier
         end)
       end)
+      |> List.flatten()
 
     extra_features =
       Enum.map(member.extra_features, fn x ->
@@ -280,7 +283,9 @@ defmodule Membership.Member do
       end)
 
     features =
-      Enum.uniq(List.flatten(member.features ++ plan_features ++ role_features ++ extra_features))
+      Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
+
+    IO.inspect(features)
 
     changeset(member)
     |> put_change(:features, features)

@@ -2,8 +2,9 @@ defmodule Membership do
   @moduledoc """
   Main Membership module for including macros
 
-  Membership has 3 main components:
+  Membership has 4 main components:
 
+    * `Membership.Role` -  Representation of a single role e.g. :admin, :luser, :user
     * `Membership.Plan` -  Representation of a single plan e.g. :gold, :silver, :copper
     * `Membership.Member` - Main actor which is holding given plans
     * `Membership.Feature` - Feature of a plan eg. :edit_feature
@@ -14,7 +15,9 @@ defmodule Membership do
 
   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
 
-  `Membership.Plan` -> `Membership.Plan.Feature` [m-n] - Any given plan can have multiple features
+  `Membership.Plan` -> `Membership.Feature` [m-n] - Any given plan can have multiple features
+
+  `Membership.Role` -> `Membership.Feature` [m-n] - Any given role can have multiple features
 
 
   ## Calculating plans
@@ -26,7 +29,6 @@ defmodule Membership do
 
 
   ## Available as_authorized
-  ##todo:: rewrite has_plan to compare features on member vs plan vs plan name in plans array
     * `Membership.has_plan/1` - Requires single plan to be present on member
     * `Membership.has_feature/1` - Requires single feature to be present on member
 
