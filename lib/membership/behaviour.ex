@@ -2,6 +2,7 @@ defmodule Membership.Behaviour do
   defmacro __using__(opts) do
     quote do
       opts = unquote(opts)
+      @registry Keyword.fetch!(opts, :registry)
 
       @doc """
       Macro for defining required permissions
@@ -22,7 +23,7 @@ defmodule Membership.Behaviour do
 
       defmacro permissions(do: block) do
         quote do
-          load_ets_data(unquote(__MODULE__))
+          load_ets_data(unquote(@registry))
           unquote(block)
         end
       end
@@ -39,12 +40,12 @@ defmodule Membership.Behaviour do
       @doc """
       Load the plans into ets for the module/functions
       """
-      def load_ets_data(current_module \\ __MODULE__) do
-        status = Membership.Permission.Supervisor.start(current_module)
+      def load_ets_data(current_module \\ @registry) do
+        status = Membership.Permissions.Supervisor.start(current_module)
 
         case status do
           {:error, _} ->
-            :ok
+            status
 
           {:ok, _} ->
             Map.__info__(:functions)
@@ -171,7 +172,7 @@ defmodule Membership.Behaviour do
 
           registry =
             Membership.Registry.add(
-              __MODULE__,
+              @registry,
               unquote(func_name),
               rules
             )
@@ -186,7 +187,7 @@ defmodule Membership.Behaviour do
           rules = %{calculated_as_authorized: result}
 
           Membership.Registry.add(
-            __MODULE__,
+            @registry,
             unquote(func_name),
             rules
           )
@@ -200,7 +201,7 @@ defmodule Membership.Behaviour do
           rules = %{calculated_as_authorized: result}
 
           Membership.Registry.add(
-            __MODULE__,
+            @registry,
             unquote(func_name),
             rules
           )
@@ -215,7 +216,7 @@ defmodule Membership.Behaviour do
           rules = %{calculated_as_authorized: result}
 
           Membership.Registry.add(
-            __MODULE__,
+            @registry,
             unquote(func_name),
             rules
           )
@@ -323,7 +324,7 @@ defmodule Membership.Behaviour do
       end
 
       defp fetch_rules_from_ets(func_name) do
-        {:ok, value} = Membership.Registry.lookup(__MODULE__, func_name)
+        {:ok, value} = Membership.Registry.lookup(@registry, func_name)
         value
       end
 
@@ -422,7 +423,7 @@ defmodule Membership.Behaviour do
             {:error, "plan: #{plan} Not Found"}
 
           {plan, features} ->
-            Membership.Registry.add(__MODULE__, func_name, features)
+            Membership.Registry.add(@registry, func_name, features)
             {:ok, plan}
         end
       end
@@ -444,7 +445,7 @@ defmodule Membership.Behaviour do
       """
       @spec has_feature(atom(), atom()) :: {:ok, atom()}
       def has_feature(feature, func_name) do
-        Membership.Registry.add(__MODULE__, func_name, feature)
+        Membership.Registry.add(@registry, func_name, feature)
         {:ok, feature}
       end
     end

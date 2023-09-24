@@ -19,9 +19,23 @@ defmodule Membership.Permission.Server do
   end
 
   @impl true
-  def init(init_arg) do
+  def init(init_arg) when is_bitstring(init_arg) do
     ref =
       :ets.new(String.to_atom(init_arg), [
+        :set,
+        :named_table,
+        :public,
+        read_concurrency: true,
+        write_concurrency: false
+      ])
+
+    {:ok, %{ref: ref}}
+  end
+
+  @impl true
+  def init(init_arg) when is_atom(init_arg) do
+    ref =
+      :ets.new(init_arg, [
         :set,
         :named_table,
         :public,
@@ -55,9 +69,6 @@ defmodule Membership.Permission.Server do
   def add(module, name, value) do
     module = via_tuple(module)
     Genserver.cast(module, {:add, {name, value}})
-  end
-
-  def add(name, value, ref \\ __MODULE__) do
   end
 
   def handle_cast({:add, {name, value}}, state) do
