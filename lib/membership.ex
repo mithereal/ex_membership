@@ -15,6 +15,8 @@ defmodule Membership do
 
   `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
 
+  `Membership.Member` -> `Membership.Role` [1-n] - Any given member can have multiple roles
+
   `Membership.Plan` -> `Membership.Feature` [m-n] - Any given plan can have multiple features
 
   `Membership.Role` -> `Membership.Feature` [m-n] - Any given role can have multiple features
