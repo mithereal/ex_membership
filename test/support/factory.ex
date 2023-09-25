@@ -5,11 +5,8 @@ defmodule Membership.Factory do
   alias Membership.Plan
 
   def member_factory do
-    member = Faker.Color.En.name()
-
     %Member{
-      id: id_sequence(),
-      identifier: sequence(:member, [member])
+      id: id_sequence()
     }
   end
 
