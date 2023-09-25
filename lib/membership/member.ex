@@ -285,8 +285,6 @@ defmodule Membership.Member do
     features =
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
 
-    IO.inspect(features)
-
     changeset(member)
     |> put_change(:features, features)
     |> Repo.update!()

@@ -3,23 +3,25 @@ defmodule Post do
 
   alias Membership.Repo
 
-  def delete(id \\ 1, member_id \\ 1) do
-    load_and_authorize_member(%Membership.Member{id: member_id})
+  def delete_post(id \\ 1, member_id \\ 1, function_name \\ :delete_post) do
+    member = load_and_authorize_member(%Membership.Member{id: member_id})
+    IO.puts("delete u fuck")
+    IO.inspect(member)
 
     permissions do
       # or
-      has_plan("gold", "delete_post")
+      has_plan("gold", function_name)
       # or
-      has_plan("bronze", "delete_post")
+      has_plan("bronze", function_name)
       # or
-      has_feature("delete_posts", "delete_post")
+      has_feature("delete_posts", function_name)
 
       #      calculated(fn member ->
       #        member.email_confirmed?
       #      end)
     end
 
-    #    as_authorized("delete_post") do
+    #    as_authorized(function_name) do
     #      :ok
     #    end
 

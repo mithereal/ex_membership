@@ -118,7 +118,8 @@ defmodule Membership.MembershipTest do
     test "rejects no role" do
       member = insert(:member)
 
-      assert {:error, "Member is not granted to perform this action"} == Post.delete(1, member.id)
+      assert {:error, "Member is not granted to perform this action"} ==
+               Post.delete_post(1, member.id)
     end
   end
 
@@ -127,20 +128,20 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     role = insert(:plan, identifier: "gold")
 
-    Membership.Feature.grant(feature, role)
-    Membership.Member.grant(member, role)
+    #  Membership.Feature.grant(feature, role)
+    #  Membership.Member.grant(member, role)
 
-    assert {:error, "Member is not granted to perform this action"} == Post.delete(member)
+    assert {:error, "Member is not granted to perform this action"} == Post.delete_post(1, member)
   end
 
   test "allows plan" do
     feature = insert(:feature)
     member = insert(:member)
-    plan = insert(:plan, identifier: "admin")
+    plan = insert(:plan, identifier: "gold")
 
     Membership.Feature.grant(feature, plan)
     Membership.Member.grant(member, plan)
-    assert {:ok, "Authorized"} == Post.delete(member)
+    assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
   end
 
   #

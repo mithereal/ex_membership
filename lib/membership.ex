@@ -401,9 +401,14 @@ defmodule Membership do
 
   @doc false
   @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
-  def load_and_store_member!(%Membership.Member{id: _id} = member) do
-    {status, _} = Membership.Memberships.Supervisor.start(member)
-    {status, member}
+  def load_and_store_member!(%Membership.Member{id: _id, identifier: _} = member) do
+    #    IO.inspect(member, label: "fsdfsdfsdfsd")
+    status = Membership.Memberships.Supervisor.start(member)
+
+    case status do
+      {:ok, _} -> member
+      {:error, _} -> nil
+    end
   end
 
   @doc false
