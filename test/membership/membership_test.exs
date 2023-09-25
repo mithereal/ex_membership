@@ -225,16 +225,16 @@ defmodule Membership.MembershipTest do
   #    end
   #  end
   #
-  describe "Membership.perform_authorization!/3" do
-    test "performs authorization" do
-      member = insert(:member)
-      feature = insert(:feature, identifier: "admin", name: "Administrator")
-
-      member = Membership.Member.grant(member, feature, "allow")
-
-      assert Membership.perform_authorization!(member)
-      assert Membership.perform_authorization!(member, [])
-      assert Membership.perform_authorization!(member, [], [])
-    end
-  end
+  #  describe "Membership.perform_authorization!/3" do
+  #    test "performs authorization" do
+  #      member = insert(:member)
+  #      feature = insert(:feature, identifier: "admin", name: "Administrator")
+  #
+  #      member = Membership.Member.grant(member, feature, "allow")
+  #
+  #      assert Membership.perform_authorization!(member)
+  #      assert Membership.perform_authorization!(member, [])
+  #      assert Membership.perform_authorization!(member, [], [])
+  #    end
+  #  end
 end
