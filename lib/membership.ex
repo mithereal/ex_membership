@@ -22,12 +22,10 @@ defmodule Membership do
   `Membership.Role` -> `Membership.Feature` [m-n] - Any given role can have multiple features
 
 
-  ## Calculating plans
+  ## Calculating permissions
 
-  Calculation of plans is done by *OR* and *DISTINCT* plans. That means if you have
-
-  `MemberPlans[:user, plans: [:gold]]`, `MemberPlans[:user, plans: [:silver]]`, `MemberPlans[:user, plans: [:bronze]]`
-  and all plans are granted to single member, resulting plans will be `[:gold, :silver, :bronze]`
+  Calculation of permissions is done by 2 ets tables one holding the logged in members permissions the other holds modules function/permissions, then
+    true = Enum.member?(module_permissions, member_permissions)
 
 
   ## Available as_authorized
@@ -446,7 +444,7 @@ defmodule Membership do
 
     conditions =
       case length(conditions) do
-        0 -> conditions ++ [true]
+        0 -> [true]
         _ -> conditions
       end
 
