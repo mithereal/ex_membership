@@ -32,6 +32,7 @@ defmodule Membership do
 
   ## Available as_authorized
     * `Membership.has_plan/1` - Requires single plan to be present on member
+    * `Membership.has_role/1` - Requires single role to be present on member
     * `Membership.has_feature/1` - Requires single feature to be present on member
 
   """
@@ -100,8 +101,7 @@ defmodule Membership do
         |> Enum.each(fn {x, _} ->
           default = %{
             required_features: [],
-            calculated_as_authorized: [],
-            extra_rules: []
+            calculated_as_authorized: []
           }
 
           Membership.Permission.Server.insert(current_module, x, default)
@@ -328,8 +328,7 @@ defmodule Membership do
         current_member \\ nil,
         func_name \\ nil,
         _required_features \\ [],
-        required_plans \\ [],
-        _extra_rules \\ []
+        required_plans \\ []
       ) do
     # If no member is given we can assume that as_authorized are not granted
     if is_nil(current_member) do
@@ -346,15 +345,14 @@ defmodule Membership do
 
       # If no as_authorized were required then we can assume member is granted
       if length(plan_features) + length(rules.required_features) +
-           length(rules.calculated_as_authorized) +
-           length(rules.extra_rules) == 0 do
+           length(rules.calculated_as_authorized) do
         :ok
       else
         reply =
           authorize!(
             [
               authorize_features(current_member.features, rules.required_features)
-            ] ++ rules.calculated_as_authorized ++ rules.extra_rules
+            ] ++ rules.calculated_as_authorized
           )
 
         if reply == :ok do
