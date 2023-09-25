@@ -12,34 +12,34 @@ defmodule Membership.MembershipTest do
 
       assert functions[:load_and_authorize_member] == 1
     end
-
-    test "rejects no role" do
-      member = insert(:member)
-
-      assert {:error, "Member is not granted to perform this action"} ==
-               Post.delete_post(1, member.id)
-    end
   end
 
-  test "rejects invalid role" do
-    feature = insert(:feature)
-    member = insert(:member, identifier: "test")
-    role = insert(:plan, identifier: "gold")
-
-    assert {:error, "Member is not granted to perform this action"} ==
-             Post.delete_post(1, member.id)
-  end
-
-  #  test "allows plan" do
-  #    feature = insert(:feature)
-  #    member = insert(:member)
-  #    plan = insert(:plan, identifier: "gold")
+  #  describe "Membership.base tests" do
+  #    test "rejects no role" do
+  #      member = insert(:member)
   #
-  #    Membership.Feature.grant(feature, plan)
-  #    Membership.Member.grant(member, plan)
-  #    assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
-  #  end
-
+  #      assert {:error, "Member is not granted to perform this action"} ==
+  #               Post.delete_post(1, member.id)
+  #    end
+  #
+  #    test "rejects invalid role" do
+  #      feature = insert(:feature)
+  #      member = insert(:member, identifier: "test")
+  #      role = insert(:plan, identifier: "gold")
+  #
+  #      assert {:error, "Member is not granted to perform this action"} ==
+  #               Post.delete_post(1, member.id)
+  #    end
+  #
+  #    test "allows plan" do
+  #      feature = insert(:feature)
+  #      member = insert(:member)
+  #      plan = insert(:plan, identifier: "gold")
+  #
+  #      Membership.Feature.grant(feature, plan)
+  #      Membership.Member.grant(member, plan)
+  #      assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
+  #    end
   #
   #    test "rejects no features" do
   #      member = insert(:member)
@@ -55,7 +55,7 @@ defmodule Membership.MembershipTest do
   #
   #      assert {:error, "Member is not granted to perform this action"} == Post.update(member)
   #    end
-
+  #
   #    test "allows feature" do
   #      member = insert(:member)
   #      feature = insert(:feature, identifier: "update_post")
@@ -147,6 +147,7 @@ defmodule Membership.MembershipTest do
   #      assert {:ok, "Authorized"} == Post.no_permissions(member)
   #    end
   #  end
+
   #
   #  describe "Membership.authorize!/1" do
   #    test "it evaluates empty conditions as true" do
@@ -224,16 +225,16 @@ defmodule Membership.MembershipTest do
   #    end
   #  end
   #
-  #  describe "Membership.perform_authorization!/3" do
-  #    test "performs authorization" do
-  #      member = insert(:member)
-  #      plan = insert(:plan, identifier: "admin", name: "Administrator")
-  #
-  #      member = Membership.Member.grant(member, plan, "allow")
-  #
-  #      assert Membership.perform_authorization!(member)
-  #      assert Membership.perform_authorization!(member, [])
-  #      assert Membership.perform_authorization!(member, [], [])
-  #    end
-  #  end
+  describe "Membership.perform_authorization!/3" do
+    test "performs authorization" do
+      member = insert(:member)
+      feature = insert(:feature, identifier: "admin", name: "Administrator")
+
+      member = Membership.Member.grant(member, feature, "allow")
+
+      assert Membership.perform_authorization!(member)
+      assert Membership.perform_authorization!(member, [])
+      assert Membership.perform_authorization!(member, [], [])
+    end
+  end
 end

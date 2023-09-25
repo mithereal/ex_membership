@@ -81,7 +81,7 @@ defmodule Membership.Behaviour do
 
       defmacro as_authorized(member, func_name, do: block) do
         quote do
-          with :ok <- member_authorization!(unquote(member), unquote(func_name)) do
+          with :ok <- perform_authorization!(unquote(member), unquote(func_name)) do
             unquote(block)
           end
         end
@@ -239,7 +239,7 @@ defmodule Membership.Behaviour do
       """
       @spec authorized?() :: :ok | {:error, String.t()}
       def authorized? do
-        member_authorization!()
+        perform_authorization!()
       end
 
       @doc """
@@ -247,7 +247,7 @@ defmodule Membership.Behaviour do
       """
       @spec has_plan?(Membership.Member.t(), atom(), String.t()) :: boolean()
       def has_plan?(%Membership.Member{} = member, func_name, plan_name) do
-        member_authorization!(member, func_name, [], [Atom.to_string(plan_name)]) == :ok
+        perform_authorization!(member, func_name, [], [Atom.to_string(plan_name)]) == :ok
       end
 
       #  def has_plan?(
@@ -272,11 +272,11 @@ defmodule Membership.Behaviour do
       end
 
       def has_feature?(%Membership.Member{} = member, func_name, feature_name) do
-        member_authorization!(member, func_name, [Atom.to_string(feature_name)]) == :ok
+        perform_authorization!(member, func_name, [Atom.to_string(feature_name)]) == :ok
       end
 
       @doc false
-      def member_authorization!(
+      def perform_authorization!(
             current_member \\ nil,
             func_name \\ nil,
             _required_features \\ [],
