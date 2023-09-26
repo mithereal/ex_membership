@@ -14,6 +14,7 @@ config :ex_membership, Membership.Repo,
   hostname: "localhost",
   adapter: Ecto.Adapters.Postgres,
   port: 5432,
+  pool_size: 10,
   primary_key_type: :uuid
 
 config :logger,
