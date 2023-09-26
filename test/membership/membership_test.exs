@@ -42,8 +42,6 @@ defmodule Membership.MembershipTest do
     Membership.Feature.grant(feature, plan)
     Membership.Member.grant(member, plan)
 
-    IO.inspect(member)
-
     assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
   end
 

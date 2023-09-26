@@ -1,9 +1,9 @@
 alias Membership.Repo
 
-feature_1 = Membership.Feature.build("Author Document", "Author Document")
-feature_2 = Membership.Feature.build("change settings", "change settings")
+feature_1 = Membership.Feature.create("Author Document", "Author Document")
+feature_2 = Membership.Feature.create("change settings", "change settings")
 
-plan =
-  Membership.Plan.build("Bronze", "Brass Plan", [feature_1, feature_2])
+plan = Membership.Plan.create("Bronze", "Bronze Plan")
 
-Repo.insert(plan)
+Membership.Feature.grant(feature_1, plan)
+Membership.Member.grant(feature_2, plan)

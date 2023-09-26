@@ -28,5 +28,7 @@ defmodule Membership.RoleFeatures do
       role_id: assoc_id
     })
     |> Repo.insert!()
+
+    # send to plan ets
   end
 end
