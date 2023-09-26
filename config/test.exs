@@ -8,11 +8,11 @@ config :logger, :console, format: "[$level] $message\n"
 
 # Configure your database
 config :ex_membership, Membership.Repo,
+  adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
   database: "ex_membership",
   hostname: "localhost",
-  adapter: Ecto.Adapters.Postgres,
   port: 5432,
   pool_size: 10,
   primary_key_type: :uuid
