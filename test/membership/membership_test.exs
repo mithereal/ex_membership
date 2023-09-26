@@ -14,32 +14,39 @@ defmodule Membership.MembershipTest do
     end
   end
 
-  #  describe "Membership.base tests" do
-  #    test "rejects no role" do
-  #      member = insert(:member)
+  describe "Membership.base tests" do
+    test "rejects no role" do
+      member = insert(:member)
+
+      assert {:error, "Member is not granted to perform this action"} ==
+               Post.delete_post(1, member.id)
+    end
+  end
+
   #
-  #      assert {:error, "Member is not granted to perform this action"} ==
-  #               Post.delete_post(1, member.id)
-  #    end
+  test "rejects invalid role" do
+    feature = insert(:feature)
+    member = insert(:member, identifier: "test")
+    role = insert(:plan, identifier: "gold")
+
+    assert {:error, "Member is not granted to perform this action"} ==
+             Post.delete_post(1, member.id)
+  end
+
   #
-  #    test "rejects invalid role" do
-  #      feature = insert(:feature)
-  #      member = insert(:member, identifier: "test")
-  #      role = insert(:plan, identifier: "gold")
-  #
-  #      assert {:error, "Member is not granted to perform this action"} ==
-  #               Post.delete_post(1, member.id)
-  #    end
-  #
-  #    test "allows plan" do
-  #      feature = insert(:feature)
-  #      member = insert(:member)
-  #      plan = insert(:plan, identifier: "gold")
-  #
-  #      Membership.Feature.grant(feature, plan)
-  #      Membership.Member.grant(member, plan)
-  #      assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
-  #    end
+  test "allows plan" do
+    feature = insert(:feature)
+    member = insert(:member)
+    plan = insert(:plan, identifier: "gold")
+
+    Membership.Feature.grant(feature, plan)
+    Membership.Member.grant(member, plan)
+
+    IO.inspect(member)
+
+    assert {:ok, "Authorized"} == Post.delete_post(1, member.id)
+  end
+
   #
   #    test "rejects no features" do
   #      member = insert(:member)

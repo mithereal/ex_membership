@@ -395,8 +395,13 @@ defmodule Membership do
   @spec load_and_store_member!(integer()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(member_id) when is_integer(member_id) do
     member = Membership.Repo.get!(Membership.Member, member_id)
-    {status, _} = Membership.Memberships.Supervisor.start(member)
-    {status, member}
+    status = Membership.Memberships.Supervisor.start(member)
+
+    case status do
+      {:ok, _} -> member
+      {:error, {:already_started, _}} -> member
+      {:error, _} -> nil
+    end
   end
 
   @doc false
@@ -406,6 +411,7 @@ defmodule Membership do
 
     case status do
       {:ok, _} -> member
+      {:error, {:already_started, _}} -> member
       {:error, _} -> nil
     end
   end
