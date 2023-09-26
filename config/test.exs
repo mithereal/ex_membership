@@ -4,6 +4,8 @@
 # the umbrella root.
 import Config
 
+config :logger, :console, format: "[$level] $message\n"
+
 # Configure your database
 config :ex_membership, Membership.Repo,
   username: "postgres",
