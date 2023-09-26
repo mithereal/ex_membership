@@ -33,7 +33,6 @@ defmodule Membership.MembershipTest do
              Post.delete_post(1, member.id)
   end
 
-  #
   test "allows plan" do
     feature = insert(:feature)
     member = insert(:member)

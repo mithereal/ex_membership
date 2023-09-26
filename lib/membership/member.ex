@@ -262,6 +262,8 @@ defmodule Membership.Member do
 
     plan_features =
       Enum.map(member.plans, fn x ->
+        update_registry(:plans, x)
+
         x.features
         |> Enum.map(fn f ->
           f.identifier
@@ -276,6 +278,8 @@ defmodule Membership.Member do
 
     role_features =
       Enum.map(member.roles, fn x ->
+        update_registry(:roles, x)
+
         x.features
         |> Enum.map(fn f ->
           f.identifier
@@ -290,5 +294,11 @@ defmodule Membership.Member do
     |> Repo.update!()
   end
 
+  # FIXME:: when we are adding/granting plans,roles we need to update the plans etc ets table
+
   def table, do: :membership_members
+
+  def update_registry(registry, data) do
+    :ok
+  end
 end
