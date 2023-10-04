@@ -2,8 +2,8 @@ defmodule Membership.Role.Server do
   use GenServer
 
   @moduledoc """
-  Service
-    this will store the member state
+  Role
+    this will store/fetch the {role, features} into ets
   """
 
   require Logger

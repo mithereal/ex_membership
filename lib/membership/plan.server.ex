@@ -2,8 +2,8 @@ defmodule Membership.Plan.Server do
   use GenServer
 
   @moduledoc """
-  Service
-    this will store the member state
+  Plan
+    this will store/fetch the {plan, features} into ets
   """
 
   require Logger
