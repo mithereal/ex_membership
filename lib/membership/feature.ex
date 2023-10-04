@@ -43,6 +43,7 @@ defmodule Membership.Feature do
     case is_nil(record) do
       true ->
         {_, record} = Repo.insert(%Feature{identifier: identifier, name: name})
+        ## todo: add to ets
         record
 
       false ->

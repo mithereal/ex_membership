@@ -43,6 +43,7 @@ defmodule Membership.Role do
     case is_nil(record) do
       true ->
         {_, record} = Repo.insert(%Role{identifier: identifier, name: name})
+        ## todo: add to ets
         record
 
       false ->
@@ -179,5 +180,11 @@ defmodule Membership.Role do
       e.role_id == ^role.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
+  end
+
+  def all() do
+    Repo.all(Membership.Role)
+    |> Repo.preload(:features)
+    |> Enum.map(fn x -> {x.identifier, x.features} end)
   end
 end

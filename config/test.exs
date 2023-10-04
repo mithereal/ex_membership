@@ -10,8 +10,8 @@ config :ex_membership, Membership.Repo,
   password: "postgres",
   database: "ex_membership",
   hostname: "localhost",
-  adapter: Ecto.Adapters.Postgres,
-  port: 5432,
+  pool: Ecto.Adapters.SQL.Sandbox,
+  port: 55432,
   primary_key_type: :uuid
 
 config :logger,

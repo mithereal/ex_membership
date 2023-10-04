@@ -35,4 +35,13 @@ defmodule Membership.Role.Server do
   def start_link(data) do
     GenServer.start_link(__MODULE__, data, name: @name)
   end
+
+  def load() do
+    GenServer.cast(@name, :load)
+  end
+
+  def handle_cast(:load, state) do
+    roles = Membership.Role.all()
+    :ets.insert(@name, roles)
+  end
 end

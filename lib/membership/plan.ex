@@ -57,6 +57,8 @@ defmodule Membership.Plan do
       name: name
     })
     |> Repo.insert_or_update()
+
+    ## todo: add to ets
   end
 
   def create(plan = %Plan{}) do
@@ -192,5 +194,9 @@ defmodule Membership.Plan do
       e.plan_id == ^plan.id and e.feature_id == ^feature_id
     )
     |> Repo.one()
+  end
+
+  def all() do
+    Repo.all(Membership.Plan) |> Repo.preload(:features)
   end
 end

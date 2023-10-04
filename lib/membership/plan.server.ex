@@ -35,4 +35,13 @@ defmodule Membership.Plan.Server do
   def start_link(data) do
     GenServer.start_link(__MODULE__, data, name: @name)
   end
+
+  def load() do
+    GenServer.cast(@name, :load)
+  end
+
+  def handle_cast(:load, state) do
+    plans = Membership.Plan.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
+    :ets.insert(@name, plans)
+  end
 end
