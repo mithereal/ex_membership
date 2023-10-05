@@ -43,5 +43,6 @@ defmodule Membership.Role.Server do
   def handle_cast(:load, state) do
     roles = Membership.Role.all()
     :ets.insert(@name, roles)
+    {:noreply, state}
   end
 end

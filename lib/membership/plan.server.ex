@@ -43,5 +43,6 @@ defmodule Membership.Plan.Server do
   def handle_cast(:load, state) do
     plans = Membership.Plan.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
     :ets.insert(@name, plans)
+    {:noreply, state}
   end
 end
