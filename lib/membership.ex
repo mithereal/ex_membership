@@ -351,7 +351,7 @@ defmodule Membership do
         reply =
           authorize!(
             [
-              authorize_features(current_member.features, rules.required_features)
+              authorize_features(features, rules.required_features)
             ] ++ rules.calculated_as_authorized
           )
 
@@ -442,6 +442,8 @@ defmodule Membership do
 
   @doc false
   def authorize_features(active_features \\ [], required_features \\ []) do
+    active_features = Enum.map(active_features, fn x -> String.to_atom(x) end)
+
     authorized =
       Enum.filter(required_features, fn feature ->
         Enum.member?(active_features, feature)

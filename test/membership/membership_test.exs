@@ -34,7 +34,7 @@ defmodule Membership.MembershipTest do
   end
 
   test "allows plan" do
-    feature = insert(:feature)
+    feature = insert(:feature, identifier: "delete_posts")
     member = insert(:member)
     plan = insert(:plan, identifier: "gold")
 
