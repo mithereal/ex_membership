@@ -296,19 +296,13 @@ defmodule Membership do
     perform_authorization!(member, func_name, [], [Atom.to_string(plan_name)]) == :ok
   end
 
-  #  def has_plan?(
-  #        %Membership.Member{} = member,
-  #        plan_name,
-  #        %{__struct__: _entity_name, id: _entity_id} = entity
-  #      ) do
-  #    active_plans =
-  #      case Membership.Member.load_member_features(member, entity) do
-  #        nil -> []
-  #        entity -> entity.plans
-  #      end
-  #
-  #    Enum.member?(active_plans, Atom.to_string(plan_name))
-  #  end
+  @doc """
+  Perform authorization on passed member and roles
+  """
+  @spec has_role?(Membership.Member.t(), atom(), String.t()) :: boolean()
+  def has_role?(%Membership.Member{} = member, func_name, role_name) do
+    perform_authorization!(member, func_name, [], [], [Atom.to_string(role_name)]) == :ok
+  end
 
   @doc """
   Perform feature check on passed member and feature
@@ -326,7 +320,8 @@ defmodule Membership do
         current_member \\ nil,
         func_name \\ nil,
         _required_features \\ [],
-        required_plans \\ []
+        required_plans \\ [],
+        required_roles \\ []
       ) do
     # If no member is given we can assume that as_authorized are not granted
     if is_nil(current_member) do
@@ -341,8 +336,15 @@ defmodule Membership do
           end)
         )
 
+      role_features =
+        List.flatten(
+          Enum.map(required_roles, fn r ->
+            r.features
+          end)
+        )
+
       # If no as_authorized were required then we can assume member is granted
-      if length(plan_features) + length(rules.required_features) +
+      if length(plan_features) + length(role_features) + length(rules.required_features) +
            length(rules.calculated_as_authorized) do
         :ok
       else
@@ -489,6 +491,33 @@ defmodule Membership do
     case :ets.lookup(:membership_plans, plan) do
       [] ->
         {:error, "plan: #{plan} Not Found"}
+
+      {plan, features} ->
+        Membership.Registry.add(__MODULE__, func_name, features)
+        {:ok, plan}
+    end
+  end
+
+  @doc """
+  Requires an role within permissions block
+
+  ## Example
+
+      defmodule HelloTest do
+        use Membership
+
+        def test_authorization do
+          permissions do
+            has_role(:gold, :test_authorization)
+          end
+        end
+      end
+  """
+  @spec has_role(atom(), atom()) :: {:ok, atom()}
+  def has_role(role, func_name) do
+    case :ets.lookup(:membership_roles, role) do
+      [] ->
+        {:error, "plan: #{role} Not Found"}
 
       {plan, features} ->
         Membership.Registry.add(__MODULE__, func_name, features)
