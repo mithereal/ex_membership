@@ -38,17 +38,13 @@ defmodule Membership.Feature do
   end
 
   def create(identifier, name) do
-    record = Repo.get_by(Feature, identifier: identifier)
+    changeset(%Feature{}, %{
+      identifier: identifier,
+      name: name
+    })
+    |> Repo.insert_or_update()
 
-    case is_nil(record) do
-      true ->
-        {_, record} = Repo.insert(%Feature{identifier: identifier, name: name})
-        ## todo: add to ets
-        record
-
-      false ->
-        record
-    end
+    ## todo: add to ets and pivot
   end
 
   def table, do: :membership_features

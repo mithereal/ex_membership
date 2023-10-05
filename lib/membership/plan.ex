@@ -58,7 +58,7 @@ defmodule Membership.Plan do
     })
     |> Repo.insert_or_update()
 
-    ## todo: add to ets
+    ## todo: add to ets and add pivot
   end
 
   def create(plan = %Plan{}) do

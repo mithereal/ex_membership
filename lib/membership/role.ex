@@ -37,18 +37,18 @@ defmodule Membership.Role do
     })
   end
 
-  def create(identifier, name) do
-    record = Repo.get_by(Role, identifier: identifier)
+  def create(identifier, name, features \\ []) do
+    Enum.map(features, fn f ->
+      Feature.create(f.identifier, f.name)
+    end)
 
-    case is_nil(record) do
-      true ->
-        {_, record} = Repo.insert(%Role{identifier: identifier, name: name})
-        ## todo: add to ets
-        record
+    changeset(%Role{}, %{
+      identifier: identifier,
+      name: name
+    })
+    |> Repo.insert_or_update()
 
-      false ->
-        record
-    end
+    ## todo: add to ets and pivot
   end
 
   def table, do: :membership_features
