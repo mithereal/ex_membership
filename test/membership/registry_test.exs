@@ -2,7 +2,7 @@ defmodule Membership.RegistyTest do
   use ExUnit.Case
   alias Membership.Registry
 
-  @identifier Registry.normalize_struct_name(Registry)
+  @identifier :test_registry
 
   setup do
     Registry.start_link(%{identifier: @identifier})
