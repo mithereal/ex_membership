@@ -3,6 +3,8 @@ defmodule Post do
 
   alias Membership.Repo
 
+  ## TODO:: member features arent loaded even tho granted
+
   def delete_post(id \\ 1, member_id \\ 1, function_name \\ :delete_post) do
     member = load_and_authorize_member(%Membership.Member{id: member_id})
 
@@ -24,6 +26,7 @@ defmodule Post do
     #    end
 
     # Notice that you can use both macros or functions
+    IO.inspect(member)
 
     case authorized?() do
       :ok -> {:ok, "Post #{id} was Deleted"}

@@ -351,7 +351,7 @@ defmodule Membership do
         reply =
           authorize!(
             [
-              authorize_features(features, rules.required_features)
+              authorize_features(current_member.features, rules.required_features)
             ] ++ rules.calculated_as_authorized
           )
 
