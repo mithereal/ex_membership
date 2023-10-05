@@ -4,7 +4,6 @@ defmodule Membership.FeatureTest do
   alias Membership.Plan
 
   setup do
-    Membership.load_membership_plans()
     :ok
   end
 
