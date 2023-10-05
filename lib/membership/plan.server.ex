@@ -50,7 +50,7 @@ defmodule Membership.Plan.Server do
   end
 
   def handle_info(:check_update, state) do
-    Logger.info("OTP UpdateChecker check update tasks were sent.")
+    Logger.info("Reloading Plans.")
     plans = Membership.Plan.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
     :ets.insert(@name, plans)
     Process.send_after(self(), :check_update, @update_check_time)

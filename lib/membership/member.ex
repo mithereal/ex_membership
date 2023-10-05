@@ -257,12 +257,12 @@ defmodule Membership.Member do
       Member
       |> Repo.get!(id)
       |> Repo.preload(plans: :features)
-      |> Repo.preload(:roles)
+      |> Repo.preload(roles: :features)
       |> Repo.preload(:extra_features)
 
     plan_features =
       Enum.map(member.plans, fn x ->
-        update_registry(:plans, x)
+        update_registry(:membership_plans, x)
 
         x.features
         |> Enum.map(fn f ->
@@ -278,7 +278,7 @@ defmodule Membership.Member do
 
     role_features =
       Enum.map(member.roles, fn x ->
-        update_registry(:roles, x)
+        update_registry(:membership_roles, x)
 
         x.features
         |> Enum.map(fn f ->
@@ -293,8 +293,6 @@ defmodule Membership.Member do
     |> put_change(:features, features)
     |> Repo.update!()
   end
-
-  # FIXME:: when we are adding/granting plans,roles we need to update the plans etc ets table
 
   def table, do: :membership_members
 

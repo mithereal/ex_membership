@@ -2,6 +2,7 @@ defmodule Membership.Role do
   @moduledoc """
   Role is main representation of feature flags assigned to a role
   """
+  ## TODO:: refactor the grants we arent sure if typecast works on pattern match
   use Membership.Schema
   import Ecto.Query
 
@@ -190,6 +191,5 @@ defmodule Membership.Role do
   def all() do
     Repo.all(Membership.Role)
     |> Repo.preload(:features)
-    |> Enum.map(fn x -> {x.identifier, x.features} end)
   end
 end

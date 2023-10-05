@@ -201,7 +201,9 @@ defmodule Membership.Plan do
     |> Repo.one()
   end
 
+  ## fixme we prolly want to create a query vs the preload
   def all() do
-    Repo.all(Membership.Plan) |> Repo.preload(:features)
+    Repo.all(Membership.Plan)
+    |> Repo.preload(:features)
   end
 end
