@@ -38,19 +38,24 @@ defmodule Membership.Role.Server do
     GenServer.start_link(__MODULE__, data, name: @name)
   end
 
-  def load() do
+  def reload() do
     GenServer.cast(@name, :load)
   end
 
   def handle_cast(:load, state) do
-    roles = Membership.Role.all()
+    roles =
+      Membership.Role.all()
+
     :ets.insert(@name, roles)
     {:noreply, state}
   end
 
   def handle_info(:check_update, state) do
     Logger.info("Reloading Roles.")
-    plans = Membership.Role.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
+
+    plans =
+      Membership.Role.all()
+
     :ets.insert(@name, plans)
     Process.send_after(self(), :check_update, @update_check_time)
     {:noreply, state}

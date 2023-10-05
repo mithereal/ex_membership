@@ -98,7 +98,7 @@ defmodule Membership.Plan do
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
 
-    Server.load()
+    Server.reload()
   end
 
   def grant(%{plan: %Plan{id: _pid} = plan}, %Feature{id: _id} = feature) do
@@ -120,7 +120,7 @@ defmodule Membership.Plan do
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
 
-    Server.load()
+    Server.reload()
   end
 
   def grant(%{feature: feature}, %Plan{id: _id} = plan) do
@@ -201,9 +201,11 @@ defmodule Membership.Plan do
     |> Repo.one()
   end
 
-  ## fixme we prolly want to create a query vs the preload
   def all() do
     Repo.all(Membership.Plan)
-    |> Repo.preload(:features)
+    |> Enum.map(fn x ->
+      features = Enum.map(x.features, fn f -> f.identifier end)
+      {x.identifier, features}
+    end)
   end
 end

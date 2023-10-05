@@ -39,19 +39,24 @@ defmodule Membership.Plan.Server do
     GenServer.start_link(__MODULE__, data, name: @name)
   end
 
-  def load() do
+  def reload() do
     GenServer.cast(@name, :load)
   end
 
   def handle_cast(:load, state) do
-    plans = Membership.Plan.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
+    plans =
+      Membership.Plan.all()
+
     :ets.insert(@name, plans)
     {:noreply, state}
   end
 
   def handle_info(:check_update, state) do
     Logger.info("Reloading Plans.")
-    plans = Membership.Plan.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
+
+    plans =
+      Membership.Plan.all()
+
     :ets.insert(@name, plans)
     Process.send_after(self(), :check_update, @update_check_time)
     {:noreply, state}
