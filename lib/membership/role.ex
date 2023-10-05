@@ -6,6 +6,7 @@ defmodule Membership.Role do
   import Ecto.Query
 
   alias Membership.Role
+  alias Membership.Role.Sever
   alias Membership.Feature
   alias Membership.RoleFeatures
 
@@ -49,8 +50,6 @@ defmodule Membership.Role do
       Feature.create(f.identifier, f.name)
       |> Feature.grant(role)
     end)
-
-    ## todo: add to ets and pivot
   end
 
   def table, do: :membership_features
@@ -84,6 +83,8 @@ defmodule Membership.Role do
 
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
     |> Repo.insert()
+
+    Server.load()
   end
 
   def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -104,6 +105,8 @@ defmodule Membership.Role do
 
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
     |> Repo.insert()
+
+    Server.load()
   end
 
   def grant(%{feature: feature}, %Role{id: _id} = role) do

@@ -7,6 +7,7 @@ defmodule Membership.Plan do
 
   alias Membership.Feature
   alias Membership.Plan
+  alias Membership.Plan.Server
   alias Membership.PlanFeatures
 
   @typedoc "A plan struct"
@@ -59,8 +60,6 @@ defmodule Membership.Plan do
       Feature.create(f.identifier, f.name)
       |> Plan.grant(plan)
     end)
-
-    ## todo: add to ets and add pivot
   end
 
   def create(plan = %Plan{}) do
@@ -98,6 +97,8 @@ defmodule Membership.Plan do
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
+
+    Server.load()
   end
 
   def grant(%{plan: %Plan{id: _pid} = plan}, %Feature{id: _id} = feature) do
@@ -118,6 +119,8 @@ defmodule Membership.Plan do
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
     |> Repo.insert()
+
+    Server.load()
   end
 
   def grant(%{feature: feature}, %Plan{id: _id} = plan) do
