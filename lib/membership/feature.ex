@@ -43,8 +43,6 @@ defmodule Membership.Feature do
       name: name
     })
     |> Repo.insert_or_update()
-
-    ## todo: add to ets and pivot
   end
 
   def table, do: :membership_features
