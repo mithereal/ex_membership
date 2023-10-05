@@ -5,7 +5,6 @@ defmodule Membership.Application do
   alias Membership.Repo
   alias Membership.Plan.Server, as: Plans
   alias Membership.Role.Server, as: Roles
-  #  alias Membership.EntityServer, as: Entities
 
   @impl true
   def start(_type, args \\ []) do
@@ -13,7 +12,6 @@ defmodule Membership.Application do
       {Repo, args},
       {Plans, []},
       {Roles, []},
-      #      {Entities, []},
       {Registry, keys: :unique, name: :active_memberships},
       {Registry, keys: :unique, name: :module_permissions},
       {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},
@@ -21,15 +19,9 @@ defmodule Membership.Application do
     ]
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]
-    Supervisor.start_link(children, opts) |> load()
+    Supervisor.start_link(children, opts)
   end
 
   @version Mix.Project.config()[:version]
   def version, do: @version
-
-  def load(params) do
-    Plans.load()
-    Roles.load()
-    params
-  end
 end

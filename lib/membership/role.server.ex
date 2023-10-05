@@ -1,6 +1,8 @@
 defmodule Membership.Role.Server do
   use GenServer
 
+  @update_check_time 50000
+
   @moduledoc """
   Role
     this will store/fetch the {role, features} into ets
@@ -29,7 +31,7 @@ defmodule Membership.Role.Server do
         write_concurrency: false
       ])
 
-    {:ok, %{ref: ref}}
+    {:ok, %{ref: ref}, {:continue, :start_task}}
   end
 
   def start_link(data) do
@@ -43,6 +45,19 @@ defmodule Membership.Role.Server do
   def handle_cast(:load, state) do
     roles = Membership.Role.all()
     :ets.insert(@name, roles)
+    {:noreply, state}
+  end
+
+  def handle_info(:check_update, state) do
+    Logger.info("OTP UpdateChecker check update tasks were sent.")
+    plans = Membership.Role.all() |> Enum.map(fn x -> {x.identifier, x.features} end)
+    :ets.insert(@name, plans)
+    Process.send_after(self(), :check_update, @update_check_time)
+    {:noreply, state}
+  end
+
+  def handle_continue(:start_task, state) do
+    Process.send_after(self(), :check_update, @update_check_time)
     {:noreply, state}
   end
 end
