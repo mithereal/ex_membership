@@ -38,15 +38,17 @@ defmodule Membership.Role do
   end
 
   def create(identifier, name, features \\ []) do
+    role =
+      changeset(%Role{}, %{
+        identifier: identifier,
+        name: name
+      })
+      |> Repo.insert_or_update()
+
     Enum.map(features, fn f ->
       Feature.create(f.identifier, f.name)
+      |> Feature.grant(role)
     end)
-
-    changeset(%Role{}, %{
-      identifier: identifier,
-      name: name
-    })
-    |> Repo.insert_or_update()
 
     ## todo: add to ets and pivot
   end

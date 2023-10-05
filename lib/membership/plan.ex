@@ -48,15 +48,17 @@ defmodule Membership.Plan do
   end
 
   def create(identifier, name, features \\ []) do
+    plan =
+      changeset(%Plan{}, %{
+        identifier: identifier,
+        name: name
+      })
+      |> Repo.insert_or_update()
+
     Enum.map(features, fn f ->
       Feature.create(f.identifier, f.name)
+      |> Plan.grant(plan)
     end)
-
-    changeset(%Plan{}, %{
-      identifier: identifier,
-      name: name
-    })
-    |> Repo.insert_or_update()
 
     ## todo: add to ets and add pivot
   end
