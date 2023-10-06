@@ -286,7 +286,7 @@ defmodule Membership.Member do
         end)
       end)
 
-    feature_removals = Enum.reject(member.extra_features, fn x -> x.permission == :deny end)
+    feature_removals = Enum.filter(member.extra_features, fn x -> x.permission == :deny end)
 
     features =
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
