@@ -291,7 +291,7 @@ defmodule Membership.Member do
     features =
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
 
-    features = Enum.reject(features, fn x -> Enum.is_member?(feature_removals, x) end)
+    features = Enum.reject(features, fn x -> Enum.member?(feature_removals, x) end)
 
     changeset(member)
     |> put_change(:features, features)
