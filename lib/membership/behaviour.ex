@@ -237,9 +237,9 @@ defmodule Membership.Behaviour do
             end
           end
       """
-      @spec authorized?() :: :ok | {:error, String.t()}
-      def authorized? do
-        perform_authorization!()
+      @spec authorized?(Membership.Member.t()) :: :ok | {:error, String.t()}
+      def authorized?(member \\ nil) do
+        perform_authorization!(member)
       end
 
       @doc """
@@ -317,7 +317,7 @@ defmodule Membership.Behaviour do
       end
 
       defp fetch_rules_from_ets(nil) do
-        {:error, "Unknown ETS Record for Registry registry"}
+        {:error, "Unknown ETS Record for Registry #{@registry}"}
       end
 
       defp fetch_rules_from_ets(func_name) do

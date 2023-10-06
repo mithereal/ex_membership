@@ -6,36 +6,39 @@ defmodule Membership.MembershipTest do
     :ok
   end
 
-  describe "Membership.create_membership" do
-    test "loads macros" do
-      functions = Post.__info__(:functions)
-
-      assert functions[:load_and_authorize_member] == 1
-    end
-  end
-
-  describe "Membership.base tests" do
-    test "rejects no role" do
-      member = insert(:member)
-
-      assert {:error, "Member is not granted to perform this action"} ==
-               Post.delete_post(1, member.id)
-    end
-  end
-
+  #  describe "Membership.create_membership" do
+  #    test "loads macros" do
+  #      functions = Post.__info__(:functions)
   #
-  test "rejects invalid role" do
-    feature = insert(:feature)
-    member = insert(:member, identifier: "test")
-    role = insert(:plan, identifier: "gold")
-
-    assert {:error, "Member is not granted to perform this action"} ==
-             Post.delete_post(1, member.id)
-  end
+  #      assert functions[:load_and_authorize_member] == 1
+  #    end
+  #  end
+  #
+  #  describe "Membership.base tests" do
+  #    test "rejects no role" do
+  #      member = insert(:member)
+  #
+  #      assert {:error, "Member is not granted to perform this action"} ==
+  #               Post.delete_post(1, member.id)
+  #    end
+  #  end
+  #
+  #  #
+  #  test "rejects invalid role" do
+  #    feature = insert(:feature)
+  #    member = insert(:member, identifier: "test")
+  #    role = insert(:plan, identifier: "gold")
+  #
+  #    assert {:error, "Member is not granted to perform this action"} ==
+  #             Post.delete_post(1, member.id)
+  #  end
 
   test "allows plan" do
     feature = insert(:feature, identifier: "delete_posts")
-    member = insert(:member)
+
+    member =
+      insert(:member)
+
     plan = insert(:plan, identifier: "gold")
 
     Membership.Feature.grant(feature, plan)

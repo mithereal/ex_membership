@@ -283,9 +283,9 @@ defmodule Membership do
         end
       end
   """
-  @spec authorized?() :: :ok | {:error, String.t()}
-  def authorized? do
-    perform_authorization!()
+  # @spec authorized?() :: :ok | {:error, String.t()}
+  def authorized?(member) do
+    perform_authorization!(member)
   end
 
   @doc """
@@ -365,7 +365,7 @@ defmodule Membership do
   end
 
   defp fetch_rules_from_ets(nil) do
-    {:error, "Unknown ETS Record for Registry registry"}
+    {:error, "Unknown ETS Record for Registry #{@registry}"}
   end
 
   defp fetch_rules_from_ets(func_name) do
@@ -409,6 +409,7 @@ defmodule Membership do
   @doc false
   @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(%Membership.Member{} = member) do
+    member = Membership.Repo.get!(Membership.Member, member.id)
     status = Membership.Memberships.Supervisor.start(member)
 
     case status do
