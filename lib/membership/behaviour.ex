@@ -237,9 +237,9 @@ defmodule Membership.Behaviour do
             end
           end
       """
-      @spec authorized?(Membership.Member.t()) :: :ok | {:error, String.t()}
-      def authorized?(member \\ nil) do
-        perform_authorization!(member)
+      @spec authorized?(Membership.Member.t(), String.t()) :: :ok | {:error, String.t()}
+      def authorized?(member \\ nil, func_name \\ nil) do
+        perform_authorization!(member, func_name)
       end
 
       @doc """

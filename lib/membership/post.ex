@@ -26,7 +26,7 @@ defmodule Post do
 
     # Notice that you can use both macros or functions
 
-    case authorized?(member) do
+    case authorized?(member, function_name) do
       :ok -> {:ok, "Post #{id} was Deleted"}
       {:error, message} -> {:error, message}
       _ -> "Raise error"

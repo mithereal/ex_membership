@@ -8,7 +8,7 @@ defmodule Membership.Permission.Server do
 
   require Logger
   @registry_name :module_permissions
-  @default %{required_features: []}
+  @default %{required_features: [], calculated_as_authorized: []}
 
   def child_spec(data) do
     %{

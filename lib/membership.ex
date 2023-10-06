@@ -284,8 +284,8 @@ defmodule Membership do
       end
   """
   # @spec authorized?() :: :ok | {:error, String.t()}
-  def authorized?(member) do
-    perform_authorization!(member)
+  def authorized?(member, func_name) do
+    perform_authorization!(member, func_name)
   end
 
   @doc """

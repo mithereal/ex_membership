@@ -3,7 +3,7 @@ defmodule Membership.Registry do
 
   use GenServer
 
-  @default %{required_features: []}
+  @default %{required_features: [], calculated_as_authorized: []}
 
   def start_link(args) do
     {:ok, pid} =
