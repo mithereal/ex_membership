@@ -286,8 +286,12 @@ defmodule Membership.Member do
         end)
       end)
 
+    feature_removals = Enum.reject(member.extra_features, fn x -> x.permission == :deny end)
+
     features =
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
+
+    features = Enum.reject(features, fn x -> Enum.is_member?(feature_removals, x) end)
 
     changeset(member)
     |> put_change(:features, features)
@@ -297,6 +301,7 @@ defmodule Membership.Member do
   def table, do: :membership_members
 
   def update_registry(registry, data) do
+    ### update the ets for plans/rp;es
     :ok
   end
 end

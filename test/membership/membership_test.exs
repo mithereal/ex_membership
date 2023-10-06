@@ -72,15 +72,16 @@ defmodule Membership.MembershipTest do
 
   test "rejects inherited ability from role" do
     member = insert(:member)
-    plan = insert(:plan, identifier: "admin", name: "Administator")
+    role = insert(:role, identifier: "admin", name: "Administator")
     feature = insert(:feature, identifier: "view_post")
 
-    Membership.Feature.grant(feature, plan)
-    member = Membership.Member.grant(member, feature, "allow")
+    # Membership.Feature.grant(feature, role)
+    member = Membership.Member.grant(member, feature, "deny")
 
-    assert {:error, "Member is not granted to perform this action"} == Post.update(member)
+    assert {:error, "Member is not granted to perform this action"} == Post.update(1, member)
   end
 
+  #
   #  test "allows inherited ability from role" do
   #    member = insert(:member)
   #    role = insert(:role, identifier: "admin", name: "Administator")

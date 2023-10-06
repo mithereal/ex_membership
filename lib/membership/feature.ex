@@ -7,7 +7,9 @@ defmodule Membership.Feature do
 
   alias Membership.Feature
   alias Membership.PlanFeatures
+  alias Membership.RoleFeatures
   alias Membership.Plan
+  alias Membership.Role
 
   @typedoc "A Feature struct"
   @type t :: %Feature{}
@@ -112,6 +114,31 @@ defmodule Membership.Feature do
     |> grant(feature)
   end
 
+  #####
+
+  @spec grant(Feature.t(), Feature.t() | Role.t()) :: Member.t()
+  def grant(%Feature{id: id} = _feature, %Role{id: role_id} = _role) do
+    # Preload Feature plans
+    feature = Feature |> Repo.get!(id)
+    role = Role |> Repo.get!(role_id)
+
+    revoke(feature, role)
+
+    %RoleFeatures{role_id: role.id, feature_id: feature.id}
+    |> Repo.insert()
+
+    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:roles)}
+  end
+
+  def grant(%{feature: %Feature{id: _pid} = feature}, %Role{id: _id} = role) do
+    grant(feature, role)
+  end
+
+  def grant(%{feature_id: id}, %Role{id: _id} = role) do
+    feature = Feature |> Repo.get!(id)
+    grant(feature, role)
+  end
+
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
@@ -163,6 +190,31 @@ defmodule Membership.Feature do
 
   def revoke(%{plan_id: id}, %Feature{id: _id} = feature) do
     revoke(%Plan{id: id}, feature)
+  end
+
+  ###
+
+  def revoke(%Feature{id: id} = _, %Role{id: _id} = role) do
+    from(pa in RoleFeatures)
+    |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
+    |> Repo.delete_all()
+  end
+
+  def revoke(%Role{id: _id} = role, %Feature{id: feature_id} = _feature) do
+    from(pa in RoleFeatures)
+    |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^role.id)
+    |> Repo.delete_all()
+  end
+
+  def revoke(
+        %{role: %Role{id: _pid} = role},
+        %Feature{id: _id} = feature
+      ) do
+    revoke(role, feature)
+  end
+
+  def revoke(%{role_id: id}, %Feature{id: _id} = feature) do
+    revoke(%Role{id: id}, feature)
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
