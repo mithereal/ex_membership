@@ -388,8 +388,12 @@ defmodule Membership do
           when not is_nil(member_id),
           do: load_and_store_member!(member_id)
 
+      def load_and_authorize_member(%{member_id: member_id})
+          when is_nil(member_id),
+          do: nil
+
       def load_and_authorize_member(member),
-        do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")
+        do: nil
     end
   end
 

@@ -3,6 +3,7 @@ defmodule Membership.Factory do
   alias Membership.Member
   alias Membership.Feature
   alias Membership.Plan
+  alias Membership.Role
 
   def member_factory do
     %Member{
@@ -17,6 +18,16 @@ defmodule Membership.Factory do
       id: id_sequence(),
       identifier: sequence(:plan, [plan]),
       name: sequence(:plan_name, &"Generated plan-#{&1}")
+    }
+  end
+
+  def role_factory do
+    plan = Faker.Color.En.name()
+
+    %Role{
+      id: id_sequence(),
+      identifier: sequence(:plan, [plan]),
+      name: sequence(:plan_name, &"Generated role-#{&1}")
     }
   end
 

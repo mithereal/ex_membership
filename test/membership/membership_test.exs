@@ -47,71 +47,52 @@ defmodule Membership.MembershipTest do
     assert {:ok, "Post 1 was Deleted"} == Post.delete_post(1, member.id)
   end
 
+  test "rejects no features" do
+    member = insert(:member)
+
+    assert {:error, "Member is not granted to perform this action"} == Post.update(member)
+  end
+
+  test "rejects invalid features" do
+    member = insert(:member)
+    feature = insert(:feature, identifier: "view_post")
+
+    member = Membership.Member.grant(member, feature, "allow")
+
+    assert {:error, "Member is not granted to perform this action"} == Post.update(member)
+  end
+
+  test "allows feature" do
+    member = insert(:member)
+    feature = insert(:feature, identifier: "update_post")
+
+    member = Membership.Member.grant(member, feature, "allow")
+
+    assert {:ok, "Post was Updated"} == Post.update(1, member)
+  end
+
+  test "rejects inherited ability from role" do
+    member = insert(:member)
+    plan = insert(:plan, identifier: "admin", name: "Administator")
+    feature = insert(:feature, identifier: "view_post")
+
+    Membership.Feature.grant(feature, plan)
+    member = Membership.Member.grant(member, feature, "allow")
+
+    assert {:error, "Member is not granted to perform this action"} == Post.update(member)
+  end
+
+  #  test "allows inherited ability from role" do
+  #    member = insert(:member)
+  #    role = insert(:role, identifier: "admin", name: "Administator")
+  #    feature = insert(:feature, identifier: "update_post")
   #
-  #    test "rejects no features" do
-  #      member = insert(:member)
+  #    Membership.Feature.grant(feature, role)
+  #    member = Membership.Member.grant(member, role, "allow")
   #
-  #      assert {:error, "Member is not granted to perform this action"} == Post.update(member)
-  #    end
-  #
-  #    test "rejects invalid features" do
-  #      member = insert(:member)
-  #      feature = insert(:feature, identifier: "view_post")
-  #
-  #      member = Membership.Member.grant(member, feature, "allow")
-  #
-  #      assert {:error, "Member is not granted to perform this action"} == Post.update(member)
-  #    end
-  #
-  #    test "allows feature" do
-  #      member = insert(:member)
-  #      feature = insert(:feature, identifier: "update_post")
-  #
-  #      member = Membership.Member.grant(member, feature, "allow")
-  #
-  #      assert {:ok, "Authorized"} == Post.update(member)
-  #    end
-  #
-  #    test "allows ability on struct" do
-  #      member = insert(:member)
-  #      feature = insert(:feature, identifier: "delete_member")
-  #
-  #      member = Membership.Member.grant(member, feature, "allow")
-  #
-  #      assert {:ok, "Authorized"} == Post.entity_update(member)
-  #    end
-  #
-  #    test "rejects ability on struct" do
-  #      member = insert(:member)
-  #      feature = insert(:feature, identifier: "update_post")
-  #
-  #      member = Membership.Member.grant(member, feature, "allow")
-  #
-  #      assert {:error, "Member is not granted to perform this action"} ==
-  #               Post.entity_update(member)
-  #    end
-  #
-  #    test "rejects inherited ability from role" do
-  #      member = insert(:member)
-  #      plan = insert(:plan, identifier: "admin", name: "Administator")
-  #      feature = insert(:feature, identifier: "view_post")
-  #
-  #      feature = Membership.Feature.grant(plan, feature, "allow")
-  #      member = Membership.Member.grant(member, feature, "allow")
-  #
-  #      assert {:error, "Member is not granted to perform this action"} == Post.update(member)
-  #    end
-  #
-  #    test "allows inherited ability from role" do
-  #      member = insert(:member)
-  #      plan = insert(:plan, identifier: "admin", name: "Administator")
-  #      feature = insert(:feature, identifier: "update_post")
-  #
-  #      role = Membership.Feature.grant(plan, feature, "allow")
-  #      member = Membership.Member.grant(member, role, "allow")
-  #
-  #      assert {:ok, "Authorized"} == Post.update(member)
-  #    end
+  #    assert {:ok, "Authorized"} == Post.update(member)
+  #  end
+
   #
   #    test "allows inherited ability from multiple roles" do
   #      member = insert(:member)
