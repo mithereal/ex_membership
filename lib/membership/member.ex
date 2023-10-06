@@ -286,12 +286,13 @@ defmodule Membership.Member do
         end)
       end)
 
-    feature_removals = Enum.filter(member.extra_features, fn x -> x.permission == :deny end)
+    ## get the membership_features table to pull permissions out
+    # feature_removals = Enum.filter(member.extra_features, fn x -> x.permission == :deny end)
+    feature_removals = []
 
     features =
-      Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features)
-
-    features = Enum.reject(features, fn x -> Enum.member?(feature_removals, x) end)
+      Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features) --
+        feature_removals
 
     changeset(member)
     |> put_change(:features, features)
