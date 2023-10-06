@@ -54,7 +54,7 @@ defmodule Membership.RegistyTest do
     test "creates and array" do
       Registry.add(@identifier, :test_item, :dummy)
 
-      assert Registry.lookup(@identifier, :test_item) == {:ok, %{required_features: [:dummy]}}
+      assert Registry.lookup(@identifier, :test_item) == {:ok, %{required_features: [:dummy], calculated_as_authorized: []}}
     end
 
     test "insert and lookup array" do
@@ -62,7 +62,7 @@ defmodule Membership.RegistyTest do
       Registry.add(@identifier, :test_item, :dummy2)
 
       assert Registry.lookup(@identifier, :test_item) ==
-               {:ok, %{required_features: [:dummy, :dummy2]}}
+               {:ok, %{required_features: [:dummy, :dummy2] calculated_as_authorized: []}}
     end
   end
 end
