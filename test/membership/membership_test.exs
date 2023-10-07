@@ -49,7 +49,7 @@ defmodule Membership.MembershipTest do
   test "rejects no features" do
     member = insert(:member)
 
-    assert {:error, "Member is not granted to perform this action"} == Post.update(1,member)
+    assert {:error, "Member is not granted to perform this action"} == Post.update(1, member)
   end
 
   test "rejects invalid features" do
@@ -104,7 +104,7 @@ defmodule Membership.MembershipTest do
     member = Membership.Member.grant(member, plan, "allow")
     member = Membership.Member.grant(member, plan_1, "allow")
 
-    assert {:ok, "Authorized"} == Post.update(1,member)
+    assert {:ok, "Authorized"} == Post.update(1, member)
   end
 
   test "rejects ability without macro block" do

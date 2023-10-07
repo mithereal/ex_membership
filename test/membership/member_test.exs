@@ -20,7 +20,7 @@ defmodule Membership.MemberTest do
     test "grant feature to member" do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
-      Member.grant(member, feature, "allow")
+      Member.grant(member, feature, "required")
 
       member = Repo.get(Member, member.id)
 
@@ -32,7 +32,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(%{member: member}, feature, "allow")
+      Member.grant(%{member: member}, feature, "required")
 
       member = Repo.get(Member, member.id)
 
@@ -44,7 +44,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(%{member_id: member.id}, feature, "allow")
+      Member.grant(%{member_id: member.id}, feature, "required")
 
       member = Repo.get(Member, member.id)
 
@@ -56,8 +56,8 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
 
-      Member.grant(member, feature, "allow")
-      Member.grant(member, feature, "allow")
+      Member.grant(member, feature, "required")
+      Member.grant(member, feature, "required")
 
       member = Repo.get(Member, member.id)
 
@@ -70,10 +70,9 @@ defmodule Membership.MemberTest do
       feature_delete = insert(:feature, identifier: "delete_accounts")
       feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, feature_delete, "allow")
-      Member.grant(member, feature_ban, "allow")
+      Member.grant(member, feature_delete, "required")
+      member = Member.grant(member, feature_ban, "required")
 
-      member = Repo.get(Member, member.id)
       assert 2 == length(member.features)
       assert [feature_delete.identifier] ++ [feature_ban.identifier] == member.features
     end
@@ -82,9 +81,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       plan = insert(:plan, identifier: "admin")
 
-      Member.grant(member, plan)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(member, plan)
 
       assert 1 == length(member.plans)
       assert plan == Enum.at(member.plans, 0)
@@ -94,9 +91,8 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       plan = insert(:plan, identifier: "admin")
 
-      Member.grant(%{member: member}, plan)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(%{member: member}, plan)
+      plan = Repo.get(Membership.Plan, plan.id) |> Repo.preload(:features)
 
       assert 1 == length(member.plans)
       assert plan == Enum.at(member.plans, 0)
@@ -106,9 +102,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       plan = insert(:plan, identifier: "admin")
 
-      Member.grant(%{member_id: member.id}, plan)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(%{member_id: member.id}, plan)
 
       assert 1 == length(member.plans)
       assert plan == Enum.at(member.plans, 0)
@@ -119,9 +113,7 @@ defmodule Membership.MemberTest do
       plan = insert(:plan, identifier: "admin")
 
       Member.grant(member, plan)
-      Member.grant(member, plan)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(member, plan)
 
       assert 1 == length(member.plans)
       assert plan == Enum.at(member.plans, 0)
@@ -133,9 +125,7 @@ defmodule Membership.MemberTest do
       plan_editor = insert(:plan, identifier: "editor")
 
       Member.grant(member, plan_admin)
-      Member.grant(member, plan_editor)
-
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(member, plan_editor)
 
       assert 2 == length(member.plans)
       assert [plan_admin] ++ [plan_editor] == member.plans
@@ -154,9 +144,8 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
       feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, feature, "allow")
-      Member.grant(member, feature_ban, "allow")
-      member = Repo.get(Member, member.id)
+      Member.grant(member, feature, "required")
+      member = Member.grant(member, feature_ban, "required")
 
       assert 2 == length(member.features)
 
@@ -171,9 +160,9 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
       feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, feature, "allow")
-      Member.grant(member, feature_ban, "allow")
-      member = Repo.get(Member, member.id)
+      Member.grant(member, feature, "required")
+      member = Member.grant(member, feature_ban, "required")
+
       assert 2 == length(member.features)
 
       Member.revoke(%{member: member}, feature)
@@ -187,9 +176,9 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
       feature_ban = insert(:feature, identifier: "ban_accounts")
 
-      Member.grant(member, feature, "allow")
-      Member.grant(member, feature_ban, "allow")
-      member = Repo.get(Member, member.id)
+      Member.grant(member, feature, "required")
+      member = Member.grant(member, feature_ban, "required")
+
       assert 2 == length(member.features)
 
       Member.revoke(%{member_id: member.id}, feature)
@@ -204,8 +193,7 @@ defmodule Membership.MemberTest do
       plan_editor = insert(:plan, identifier: "editor")
 
       Member.grant(member, plan_admin)
-      Member.grant(member, plan_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = Member.grant(member, plan_editor)
       assert 2 == length(member.plans)
 
       Member.revoke(member, plan_admin)
@@ -258,7 +246,7 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "view_plan")
 
-      Member.grant(member, feature, "allow")
+      Member.grant(member, feature, "required")
       member = Repo.get(Member, member.id)
 
       assert 1 == length(member.features)
