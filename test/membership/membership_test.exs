@@ -56,7 +56,7 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     feature = insert(:feature, identifier: "view_post")
 
-    member = Membership.Member.grant(member, feature, "allow")
+    member = Membership.Member.grant(member, feature, "required")
 
     assert {:error, "Member is not granted to perform this action"} == Post.update(1, member)
   end
@@ -65,7 +65,7 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     feature = insert(:feature, identifier: "update_post")
 
-    member = Membership.Member.grant(member, feature, "allow")
+    member = Membership.Member.grant(member, feature, "required")
 
     assert {:ok, "Post was Updated"} == Post.update(1, member)
   end
@@ -87,7 +87,7 @@ defmodule Membership.MembershipTest do
     feature = insert(:feature, identifier: "update_post")
 
     Membership.Feature.grant(feature, role)
-    member = Membership.Member.grant(member, role, "allow")
+    member = Membership.Member.grant(member, role, "required")
 
     assert {:ok, "Authorized"} == Post.update(1, member)
   end
@@ -99,10 +99,10 @@ defmodule Membership.MembershipTest do
     feature = insert(:feature, identifier: "delete_post")
     feature_update = insert(:feature, identifier: "update_post")
 
-    role = Membership.Feature.grant(plan, feature, "allow")
-    role_editor = Membership.Feature.grant(plan_1, feature_update, "allow")
-    member = Membership.Member.grant(member, plan, "allow")
-    member = Membership.Member.grant(member, plan_1, "allow")
+    role = Membership.Feature.grant(plan, feature, "required")
+    role_editor = Membership.Feature.grant(plan_1, feature_update, "required")
+    member = Membership.Member.grant(member, plan, "required")
+    member = Membership.Member.grant(member, plan_1, "required")
 
     assert {:ok, "Authorized"} == Post.update(1, member)
   end
@@ -119,7 +119,7 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     feature = insert(:feature, identifier: "update_post")
 
-    member = Membership.Member.grant(member, feature, "allow")
+    member = Membership.Member.grant(member, feature, "required")
 
     assert {:ok, "Authorized"} == Post.no_macro(member)
   end
@@ -128,7 +128,7 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     feature = insert(:feature, identifier: "update_post")
 
-    member = Membership.Member.grant(member, feature, "allow")
+    member = Membership.Member.grant(member, feature, "required")
 
     assert {:ok, "Authorized"} == Post.no_permissions(member)
   end
@@ -145,9 +145,9 @@ defmodule Membership.MembershipTest do
       feature = insert(:feature, identifier: "update_post")
 
       not_loaded_member = %{member_id: member.id}
-      Membership.Member.grant(member, feature, "allow")
+      not_loaded_member = Membership.Member.grant(member.id, feature, "required")
 
-      assert {:ok, "Authorized"} == Post.update(not_loaded_member)
+      assert {:ok, "Authorized"} == Post.update(1, not_loaded_member)
     end
   end
 
@@ -156,7 +156,7 @@ defmodule Membership.MembershipTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, feature, "allow")
+      member = Membership.Member.grant(member, feature, "required")
       user = %{member: member}
 
       assert {:ok, "Authorized"} == Post.update(1, user)
@@ -188,7 +188,7 @@ defmodule Membership.MembershipTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "update_post")
 
-      member = Membership.Member.grant(member, feature, "allow")
+      member = Membership.Member.grant(member, feature, "required")
 
       assert Membership.has_feature?(member, :update_post)
 
@@ -201,7 +201,7 @@ defmodule Membership.MembershipTest do
       member = insert(:member)
       plan = insert(:plan, identifier: "admin", name: "Administrator")
 
-      member = Membership.Member.grant(member, plan, "allow")
+      member = Membership.Member.grant(member, plan, "required")
 
       assert Membership.has_plan?(member, :admin)
 
@@ -214,7 +214,7 @@ defmodule Membership.MembershipTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "admin", name: "Administrator")
 
-      member = Membership.Member.grant(member, feature, "allow")
+      member = Membership.Member.grant(member, feature, "required")
 
       assert Membership.perform_authorization!(member)
       assert Membership.perform_authorization!(member, [])
