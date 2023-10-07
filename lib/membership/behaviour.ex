@@ -279,10 +279,11 @@ defmodule Membership.Behaviour do
       def perform_authorization!(
             current_member \\ nil,
             func_name \\ nil,
-            _required_features \\ [],
-            required_plans \\ []
+            required_features \\ [],
+            required_plans \\ [],
+            required_roles \\ []
           ) do
-        # If no member is given we can assume that as_authorized are not granted
+        # If no mIO.inspect(ember is given we can assume that as_authorized are not granted
         if is_nil(current_member) do
           {:error, "Member is not granted to perform this action"}
         else
@@ -295,16 +296,28 @@ defmodule Membership.Behaviour do
               end)
             )
 
+          role_features =
+            List.flatten(
+              Enum.map(required_roles, fn r ->
+                r.features
+              end)
+            )
+
+          required_features =
+            required_features ++
+              plan_features ++
+              role_features ++ rules.required_features
+
           # If no as_authorized were required then we can assume member is granted
-          if length(plan_features) + length(rules.required_features) +
-               length(rules.calculated_as_authorized) do
+          if length(required_features) == 0 do
             :ok
           else
             reply =
               authorize!(
                 [
-                  authorize_features(current_member.features, rules.required_features)
-                ] ++ rules.calculated_as_authorized
+                  authorize_features(current_member.features, required_features)
+                ] ++
+                  rules.calculated_as_authorized
               )
 
             if reply == :ok do

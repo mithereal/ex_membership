@@ -353,10 +353,12 @@ defmodule Membership do
         :ok
       else
         reply =
-          authorize!([
-            authorize_features(current_member.features, required_features) ++
+          authorize!(
+            [
+              authorize_features(current_member.features, required_features)
+            ] ++
               rules.calculated_as_authorized
-          ])
+          )
 
         if reply == :ok do
           reply
