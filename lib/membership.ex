@@ -380,7 +380,7 @@ defmodule Membership do
   @doc false
   def create_membership() do
     quote do
-      import Membership, only: [load_and_store_member!: 1]
+      import Membership, only: [load_and_store_member!: 1, calculate_features: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
         do: load_and_store_member!(member)
@@ -431,22 +431,6 @@ defmodule Membership do
   @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
   def load_member_features(member) do
     member
-  end
-
-  @doc false
-  def authorize_inherited_features(active_features \\ [], required_features \\ []) do
-    active_features =
-      active_features
-      |> Enum.map(& &1.features)
-      |> List.flatten()
-      |> Enum.uniq()
-
-    authorized =
-      Enum.filter(required_features, fn feature ->
-        Enum.member?(active_features, feature)
-      end)
-
-    length(authorized) > 0
   end
 
   @doc false
