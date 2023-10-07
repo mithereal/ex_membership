@@ -6,11 +6,11 @@ jobs:
   build:
     docker:
       # specify the version here
-      - image: circleci/elixir:1.13  # ...with this image as the primary container; this is where all `steps` will run
-        environment:  # environment variables for primary container
+      - image: cimg/elixir:1.15.5-erlang-26.0.2  # ...with this image as the primary container; this is where all `steps` will run
+        environment: # environment variables for primary container
           MIX_ENV: test
-      - image: circleci/postgres:10.1-alpine  # database image
-        environment:  # environment variables for database
+      - image: cimg/postgres:16.0.0  # database image
+        environment: # environment variables for database
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: ex_membership
@@ -26,28 +26,28 @@ jobs:
 
       - run: mix deps.get
 
-      - restore_cache:  # restores saved mix cache
-          keys:  # list of cache keys, in decreasing specificity
+      - restore_cache: # restores saved mix cache
+          keys: # list of cache keys, in decreasing specificity
             - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
             - v1-mix-cache-{{ .Branch }}
             - v1-mix-cache
 
-      - restore_cache:  # restores saved build cache
+      - restore_cache: # restores saved build cache
           keys:
             - v1-build-cache-{{ .Branch }}
             - v1-build-cache
 
       - run: mix do deps.get, compile  # get updated dependencies & compile them
 
-      - save_cache:  # generate and store mix cache
+      - save_cache: # generate and store mix cache
           key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
           paths: "deps"
 
-      - save_cache:  # make another, less specific cache
+      - save_cache: # make another, less specific cache
           key: v1-mix-cache-{{ .Branch }}
           paths: "deps"
 
-      - save_cache:  # you should really save one more cache (just in case)
+      - save_cache: # you should really save one more cache (just in case)
           key: v1-mix-cache
           paths: "deps"
 
@@ -59,7 +59,7 @@ jobs:
           key: v1-build-cache
           paths: "_build"
 
-      - run:  # special utility that stalls main process until DB is ready
+      - run: # special utility that stalls main process until DB is ready
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
