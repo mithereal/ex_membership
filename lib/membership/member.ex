@@ -262,8 +262,6 @@ defmodule Membership.Member do
 
     plan_features =
       Enum.map(member.plans, fn x ->
-        update_registry(:membership_plans, x)
-
         x.features
         |> Enum.map(fn f ->
           f.identifier
@@ -278,31 +276,34 @@ defmodule Membership.Member do
 
     role_features =
       Enum.map(member.roles, fn x ->
-        update_registry(:membership_roles, x)
-
         x.features
         |> Enum.map(fn f ->
           f.identifier
         end)
       end)
 
-    ## get the membership_features table to pull permissions out
-    # feature_removals = Enum.filter(member.extra_features, fn x -> x.permission == :deny end)
-    feature_removals = []
+    feature_removals = fetch_removed_features(member.id)
 
     features =
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features) --
         feature_removals
 
-    changeset(member)
-    |> put_change(:features, features)
-    |> Repo.update!()
+    member =
+      changeset(member)
+      |> put_change(:features, features)
+      |> Repo.update!()
   end
 
   def table, do: :membership_members
 
-  def update_registry(registry, data) do
-    ### update the ets for plans/rp;es
-    :ok
+  def fetch_removed_features(id) do
+    Repo.all(
+      from(mf in MemberFeatures,
+        join: f in Feature,
+        on: mf.feature_id == f.id,
+        where: mf.member_id == ^id and mf.permission != "required",
+        select: f.identifier
+      )
+    )
   end
 end
