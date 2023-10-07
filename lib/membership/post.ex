@@ -3,7 +3,6 @@ defmodule Post do
 
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
     member = load_and_authorize_member(%{member_id: member_id})
-    # member = nil
 
     permissions do
       # or check 1st arg for being an atom vs string

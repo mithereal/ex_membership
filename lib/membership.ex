@@ -343,12 +343,10 @@ defmodule Membership do
           end)
         )
 
-      calculated_features = calculate_features(rules.calculated_as_authorized)
-
       required_features =
         required_features ++
           plan_features ++
-          role_features ++ rules.required_features ++ calculated_features
+          role_features ++ rules.required_features
 
       # If no as_authorized were required then we can assume member is granted
       if length(required_features) do
@@ -356,7 +354,8 @@ defmodule Membership do
       else
         reply =
           authorize!([
-            authorize_features(current_member.features, required_features)
+            authorize_features(current_member.features, required_features) ++
+              rules.calculated_as_authorized
           ])
 
         if reply == :ok do
@@ -380,7 +379,7 @@ defmodule Membership do
   @doc false
   def create_membership() do
     quote do
-      import Membership, only: [load_and_store_member!: 1, calculate_features: 1]
+      import Membership, only: [load_and_store_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
         do: load_and_store_member!(member)
@@ -389,12 +388,11 @@ defmodule Membership do
         do: load_and_store_member!(member)
 
       def load_and_authorize_member(%{member_id: member_id})
-          when not is_nil(member_id),
-          do: load_and_store_member!(member_id)
-
-      def load_and_authorize_member(%{member_id: member_id})
           when is_nil(member_id),
           do: nil
+
+      def load_and_authorize_member(%{member_id: member_id}),
+        do: load_and_store_member!(%Membership.Member{id: member_id})
 
       def load_and_authorize_member(member),
         do: nil
@@ -550,8 +548,4 @@ defmodule Membership do
   """
   @version Mix.Project.config()[:version]
   def version, do: @version
-
-  def calculate_features(data) do
-    data
-  end
 end

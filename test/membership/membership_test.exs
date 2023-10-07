@@ -78,7 +78,7 @@ defmodule Membership.MembershipTest do
     # Membership.Feature.grant(feature, role)
     # member = Membership.Member.grant(member, feature, "deny")
 
-    assert {:error, "Member is not granted to perform this action"} == Post.update(1, member)
+    assert {:error, "Member is not granted to perform this action"} == Post.update(1, member.id)
   end
 
   #
