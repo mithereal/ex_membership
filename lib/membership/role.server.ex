@@ -21,7 +21,7 @@ defmodule Membership.Role.Server do
   end
 
   @impl true
-  def init(init_arg) do
+  def init(_init_arg) do
     ref =
       :ets.new(@name, [
         :set,
@@ -42,6 +42,7 @@ defmodule Membership.Role.Server do
     GenServer.cast(@name, :load)
   end
 
+  @impl true
   def handle_cast(:load, state) do
     roles =
       Membership.Role.all()
@@ -50,6 +51,7 @@ defmodule Membership.Role.Server do
     {:noreply, state}
   end
 
+  @impl true
   def handle_info(:check_update, state) do
     Logger.info("Reloading Roles.")
 
@@ -61,6 +63,7 @@ defmodule Membership.Role.Server do
     {:noreply, state}
   end
 
+  @impl true
   def handle_continue(:start_task, state) do
     Process.send_after(self(), :check_update, @update_check_time)
     {:noreply, state}

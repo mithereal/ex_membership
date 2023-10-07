@@ -365,7 +365,7 @@ defmodule Membership do
   end
 
   defp fetch_rules_from_ets(nil) do
-    {:error, "Unknown ETS Record for Registry #{@registry}"}
+    {:error, "Unknown ETS Record for Registry nil"}
   end
 
   defp fetch_rules_from_ets(func_name) do

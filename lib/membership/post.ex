@@ -1,9 +1,7 @@
 defmodule Post do
   use Membership, registry: :test
 
-  alias Membership.Repo
-
-  def update(id \\ 1, member_id \\ nil, function_name \\ "update_post") do
+  def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
     member = load_and_authorize_member(%{member_id: member_id})
     # member = nil
 

@@ -7,7 +7,7 @@ defmodule Membership.Role do
   import Ecto.Query
 
   alias Membership.Role
-  alias Membership.Role.Sever
+  alias Membership.Role.Server
   alias Membership.Feature
   alias Membership.RoleFeatures
 
@@ -85,7 +85,7 @@ defmodule Membership.Role do
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
     |> Repo.insert()
 
-    Server.load()
+    Server.reload()
   end
 
   def grant(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -107,7 +107,7 @@ defmodule Membership.Role do
     %RoleFeatures{role_id: role.id, feature_id: feature.id}
     |> Repo.insert()
 
-    Server.load()
+    Server.reload()
   end
 
   def grant(%{feature: feature}, %Role{id: _id} = role) do

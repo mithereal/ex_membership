@@ -61,14 +61,15 @@ defmodule Membership.Permission.Server do
     GenServer.cast(module, {:insert, {name, value}})
   end
 
-  def handle_cast({:insert, value}, state) do
-    :ets.insert(state.ref, value)
-    {:noreply, state}
-  end
-
   def add(module, name, value) do
     module = via_tuple(module)
     GenServer.cast(module, {:add, {name, value}})
+  end
+
+  @impl true
+  def handle_cast({:insert, value}, state) do
+    :ets.insert(state.ref, value)
+    {:noreply, state}
   end
 
   def handle_cast({:add, {name, value}}, state) do

@@ -107,6 +107,8 @@ defmodule Membership.Member do
     |> grant(role)
   end
 
+  def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
+
   def grant(%Member{id: id} = _member, %Feature{id: feature_id} = _feature, permission) do
     member = Member |> Repo.get!(id)
     feature = Feature |> Repo.get(feature_id)
@@ -126,8 +128,6 @@ defmodule Membership.Member do
     %Member{id: id}
     |> grant(feature, permission)
   end
-
-  def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
@@ -288,10 +288,9 @@ defmodule Membership.Member do
       Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features) --
         feature_removals
 
-    member =
-      changeset(member)
-      |> put_change(:features, features)
-      |> Repo.update!()
+    changeset(member)
+    |> put_change(:features, features)
+    |> Repo.update!()
   end
 
   def table, do: :membership_members

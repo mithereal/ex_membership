@@ -72,7 +72,7 @@ defmodule Membership.MembershipTest do
 
   test "rejects inherited ability from role" do
     member = insert(:member)
-    role = insert(:role, identifier: "admin", name: "Administator")
+    _role = insert(:role, identifier: "admin", name: "Administator")
     feature = insert(:feature, identifier: "view_post")
 
     # Membership.Feature.grant(feature, role)
