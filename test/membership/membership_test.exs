@@ -76,7 +76,7 @@ defmodule Membership.MembershipTest do
     feature = insert(:feature, identifier: "view_post")
 
     # Membership.Feature.grant(feature, role)
-    member = Membership.Member.grant(member, feature, "deny")
+    # member = Membership.Member.grant(member, feature, "deny")
 
     assert {:error, "Member is not granted to perform this action"} == Post.update(1, member)
   end

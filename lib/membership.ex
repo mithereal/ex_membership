@@ -319,7 +319,7 @@ defmodule Membership do
   def perform_authorization!(
         current_member \\ nil,
         func_name \\ nil,
-        _required_features \\ [],
+        required_features \\ [],
         required_plans \\ [],
         required_roles \\ []
       ) do
@@ -343,17 +343,21 @@ defmodule Membership do
           end)
         )
 
+      calculated_features = calculate_features(rules.calculated_as_authorized)
+
+      required_features =
+        required_features ++
+          plan_features ++
+          role_features ++ rules.required_features ++ calculated_features
+
       # If no as_authorized were required then we can assume member is granted
-      if length(plan_features) + length(role_features) + length(rules.required_features) +
-           length(rules.calculated_as_authorized) do
+      if length(required_features) do
         :ok
       else
         reply =
-          authorize!(
-            [
-              authorize_features(current_member.features, rules.required_features)
-            ] ++ rules.calculated_as_authorized
-          )
+          authorize!([
+            authorize_features(current_member.features, required_features)
+          ])
 
         if reply == :ok do
           reply
@@ -562,4 +566,8 @@ defmodule Membership do
   """
   @version Mix.Project.config()[:version]
   def version, do: @version
+
+  def calculate_features(data) do
+    data
+  end
 end
