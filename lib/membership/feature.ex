@@ -22,6 +22,11 @@ defmodule Membership.Feature do
       join_through: PlanFeatures,
       on_replace: :delete
     )
+
+    many_to_many(:roles, Role,
+      join_through: RoleFeatures,
+      on_replace: :delete
+    )
   end
 
   def changeset(%Feature{} = struct, params \\ %{}) do
@@ -124,19 +129,18 @@ defmodule Membership.Feature do
 
     revoke(feature, role)
 
-    %RoleFeatures{role_id: role.id, feature_id: feature.id}
+    RoleFeatures.changeset(%Membership.RoleFeatures{}, %{role_id: role.id, feature_id: feature.id})
     |> Repo.insert()
 
     {:ok, Feature |> Repo.get!(id) |> Repo.preload(:roles)}
   end
 
-  def grant(%{feature: %Feature{id: _pid} = feature}, %Role{id: _id} = role) do
+  def grant(%{feature: %Feature{id: _id} = feature}, %Role{id: _id} = role) do
     grant(feature, role)
   end
 
   def grant(%{feature_id: id}, %Role{id: _id} = role) do
-    feature = Feature |> Repo.get!(id)
-    grant(feature, role)
+    grant(%Feature{id: id}, role)
   end
 
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")

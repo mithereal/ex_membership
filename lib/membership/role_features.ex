@@ -15,7 +15,7 @@ defmodule Membership.RoleFeatures do
   def changeset(%RoleFeatures{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:feature_id, :role_id])
-    |> validate_required([:feature_id, :feature_id])
+    |> validate_required([:feature_id, :role_id])
   end
 
   def create(
