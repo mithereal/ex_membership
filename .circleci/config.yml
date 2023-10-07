@@ -6,10 +6,10 @@ jobs:
   build:
     docker:
       # specify the version here
-      - image: cimg/elixir:1.15.5-erlang-26.0.2  # ...with this image as the primary container; this is where all `steps` will run
+      - image: circleci/elixir:1.13  # ...with this image as the primary container; this is where all `steps` will run
         environment: # environment variables for primary container
           MIX_ENV: test
-      - image: cimg/postgres:16.0  # database image
+      - image: circleci/postgres:10.1-alpine  # database image
         environment: # environment variables for database
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
