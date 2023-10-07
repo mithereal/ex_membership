@@ -68,6 +68,8 @@ defmodule Membership.MixProject do
     [
       extras: ["README.md"],
       main: "readme",
+      homepage_url: @source_url,
+      source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
         Models: [
