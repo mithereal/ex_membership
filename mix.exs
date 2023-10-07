@@ -103,10 +103,11 @@ defmodule Membership.MixProject do
         "ecto.migrate --quiet",
         "test"
       ],
+      c: "compile",
       setup: ["run priv/repo/seeds.exs"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      install: ["ecto.create", "ecto.migrate"]
+      install: ["Membership.install", "ecto.setup"]
     ]
   end
 end
