@@ -53,7 +53,7 @@ defmodule Membership.Role do
     end)
   end
 
-  def table, do: :membership_features
+  def table, do: :membership_roles
 
   @doc """
   Grant given grant type to a feature.
