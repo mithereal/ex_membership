@@ -10,7 +10,7 @@ defmodule Post do
       # or
       has_plan("bronze", function_name)
       # or
-      has_feature("delete_posts", function_name)
+      has_feature("update_posts", function_name)
     end
 
     case authorized?(member, function_name) do
