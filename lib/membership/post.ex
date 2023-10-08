@@ -6,11 +6,11 @@ defmodule Post do
 
     permissions do
       # or check 1st arg for being an atom vs string
-      has_plan(:gold, function_name)
+      has_plan("gold", function_name)
       # or
-      has_plan(:bronze, function_name)
+      has_plan("bronze", function_name)
       # or
-      has_feature(:delete_posts, function_name)
+      has_feature("delete_posts", function_name)
     end
 
     case authorized?(member, function_name) do
@@ -20,7 +20,7 @@ defmodule Post do
     end
   end
 
-  def delete_post(id \\ 1, member_id \\ 1, function_name \\ :delete_post) do
+  def delete_post(id \\ 1, member_id \\ 1, function_name \\ "delete_post") do
     member =
       load_and_authorize_member(%Membership.Member{id: member_id})
 

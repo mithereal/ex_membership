@@ -41,7 +41,7 @@ defmodule Membership.MembershipTest do
     plan = insert(:plan, identifier: "gold")
 
     Membership.Feature.grant(feature, plan)
-    Membership.Member.grant(member, plan)
+    member = Membership.Member.grant(member, plan)
 
     assert {:ok, "Post 1 was Deleted"} == Post.delete_post(1, member.id)
   end
