@@ -29,7 +29,7 @@ defmodule Post do
   def calculated_post(member, email_confirmed) do
     member = load_and_authorize_member(member)
 
-    permissions(member) do
+    permissions do
       calculated(
         member,
         fn _member ->
@@ -47,7 +47,7 @@ defmodule Post do
   def calculated_macro(member, function_name \\ "no_permissions") do
     member = load_and_authorize_member(member)
 
-    permissions(member) do
+    permissions do
       calculated(member, :confirmed_email)
     end
 
