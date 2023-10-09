@@ -135,7 +135,7 @@ defmodule Membership.Feature do
     {:ok, Feature |> Repo.get!(id) |> Repo.preload(:roles)}
   end
 
-  def grant(%{feature: %Feature{id: _id} = feature}, %Role{id: _id} = role) do
+  def grant(%{feature: %Feature{id: _id} = feature}, %Role{id: _role_id} = role) do
     grant(feature, role)
   end
 

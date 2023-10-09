@@ -88,8 +88,8 @@ defmodule Membership.FeatureTest do
       plan = insert(:plan)
       ban_feature = insert(:feature, identifier: "ban_accounts")
 
-      feature_1 = Feature.grant(feature, plan)
-      feature_2 = Feature.grant(plan, ban_feature)
+      Feature.grant(feature, plan)
+      Feature.grant(plan, ban_feature)
 
       plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
 

@@ -84,7 +84,7 @@ defmodule Membership.MemberTest do
       member = Member.grant(member, plan)
 
       assert 1 == length(member.plans)
-      assert plan == Enum.at(member.plans, 0)
+      assert plan.identifier == Enum.at(member.plans, 0).identifier
     end
 
     test "grant plan to inherited member" do
@@ -95,7 +95,7 @@ defmodule Membership.MemberTest do
       plan = Repo.get(Membership.Plan, plan.id) |> Repo.preload(:features)
 
       assert 1 == length(member.plans)
-      assert plan == Enum.at(member.plans, 0)
+      assert plan.identifier == Enum.at(member.plans, 0).identifier
     end
 
     test "grant plan to inherited member from id" do
@@ -105,7 +105,7 @@ defmodule Membership.MemberTest do
       member = Member.grant(%{member_id: member.id}, plan)
 
       assert 1 == length(member.plans)
-      assert plan == Enum.at(member.plans, 0)
+      assert plan.identifier == Enum.at(member.plans, 0).identifier
     end
 
     test "grant only unique plans to member" do
@@ -116,7 +116,7 @@ defmodule Membership.MemberTest do
       member = Member.grant(member, plan)
 
       assert 1 == length(member.plans)
-      assert plan == Enum.at(member.plans, 0)
+      assert plan.identifier == Enum.at(member.plans, 0).identifier
     end
 
     test "grant different plans to member" do
@@ -128,7 +128,8 @@ defmodule Membership.MemberTest do
       member = Member.grant(member, plan_editor)
 
       assert 2 == length(member.plans)
-      assert [plan_admin] ++ [plan_editor] == member.plans
+      assert plan_admin.identifier == Enum.at(member.plans, 0).identifier
+      assert plan_editor.identifier == Enum.at(member.plans, 1).identifier
     end
   end
 

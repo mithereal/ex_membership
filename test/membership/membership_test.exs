@@ -24,9 +24,9 @@ defmodule Membership.MembershipTest do
 
   #
   test "rejects invalid role" do
-    feature = insert(:feature)
+    insert(:feature)
     member = insert(:member, identifier: "test")
-    role = insert(:plan, identifier: "gold")
+    insert(:plan, identifier: "gold")
 
     assert {:error, "Member is not granted to perform this action"} ==
              Post.delete_post(1, member.id)
@@ -65,9 +65,9 @@ defmodule Membership.MembershipTest do
     member = insert(:member)
     feature = insert(:feature, identifier: "update_post")
 
-    member = Membership.Member.grant(member, feature, "required")
+    Membership.Member.grant(member, feature, "required")
 
-    assert {:ok, "Post was Updated"} == Post.update(1, member)
+    assert {:ok, "Post was Updated"} == Post.update(1, member.id)
   end
 
   test "rejects inherited ability from role" do
@@ -75,8 +75,8 @@ defmodule Membership.MembershipTest do
     role = insert(:role, identifier: "admin", name: "Administator")
     feature = insert(:feature, identifier: "view_post")
 
-    # Membership.Feature.grant(feature, role)
-    # member = Membership.Member.grant(member, feature, "deny")
+    Membership.Feature.grant(feature, role)
+    member = Membership.Member.grant(member, feature, "deny")
 
     assert {:error, "Member is not granted to perform this action"} == Post.update(1, member.id)
   end
@@ -145,7 +145,7 @@ defmodule Membership.MembershipTest do
       feature = insert(:feature, identifier: "update_post")
 
       not_loaded_member = %{member_id: member.id}
-      not_loaded_member = Membership.Member.grant(member.id, feature, "required")
+      not_loaded_member = Membership.Member.grant(member, feature, "required")
 
       assert {:ok, "Authorized"} == Post.update(1, not_loaded_member)
     end
@@ -157,9 +157,8 @@ defmodule Membership.MembershipTest do
       feature = insert(:feature, identifier: "update_post")
 
       member = Membership.Member.grant(member, feature, "required")
-      user = %{member: member}
 
-      assert {:ok, "Authorized"} == Post.update(1, user)
+      assert {:ok, "Authorized"} == Post.update(1, member)
     end
   end
 
@@ -190,9 +189,9 @@ defmodule Membership.MembershipTest do
 
       member = Membership.Member.grant(member, feature, "required")
 
-      assert Membership.has_feature?(member, :update_post)
+      assert Membership.has_feature?(member, "update_post")
 
-      refute Membership.has_feature?(member, :delete_post)
+      refute Membership.has_feature?(member, "delete_post")
     end
   end
 

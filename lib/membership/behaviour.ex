@@ -239,7 +239,6 @@ defmodule Membership.Behaviour do
       """
       @spec authorized?(Membership.Member.t(), String.t()) :: :ok | {:error, String.t()}
       def authorized?(member \\ nil, func_name \\ nil) do
-        IO.inspect(member)
         perform_authorization!(member, func_name)
       end
 
@@ -284,8 +283,6 @@ defmodule Membership.Behaviour do
             required_plans \\ [],
             required_roles \\ []
           ) do
-        IO.puts("edsfdsfsrwers")
-
         # If no mIO.inspect(ember is given we can assume that as_authorized are not granted
         if is_nil(current_member) do
           {:error, "Member is not granted to perform this action"}
@@ -305,9 +302,6 @@ defmodule Membership.Behaviour do
                 r.features
               end)
             )
-
-          ## Todo make the atom an string
-          IO.inspect(rules.required_features)
 
           required_features =
             required_features ++
