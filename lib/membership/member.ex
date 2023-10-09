@@ -96,6 +96,8 @@ defmodule Membership.Member do
 
     %MemberRoles{member_id: member.id, role_id: role.id}
     |> Repo.insert()
+
+    sync_features(member)
   end
 
   def grant(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do

@@ -172,16 +172,16 @@ defmodule Membership.MembershipTest do
     end
   end
 
-  describe "Membership.has_plan?/2" do
+  describe "Membership.has_role?/2" do
     test "grants role passed as an argument" do
       member = insert(:member)
-      plan = insert(:plan, identifier: "admin", name: "Administrator")
+      role = insert(:role, identifier: "admin", name: "Administrator")
 
-      member = Membership.Member.grant(member, plan, "required")
+      member = Membership.Member.grant(member, role)
+      IO.inspect(member)
+      assert Membership.has_role?(member, "admin")
 
-      assert Membership.has_plan?(member, :admin)
-
-      refute Membership.has_plan?(member, :editor)
+      refute Membership.has_role?(member, "editor")
     end
   end
 

@@ -1,12 +1,64 @@
 defmodule Post do
   use Membership, registry: :test
 
-  def no_macro(_id \\ 1, member_id \\ nil, function_name \\ "no_permissions") do
-    {:ok, "Authorized"}
+  def no_macro(member, function_name \\ "no_macro") do
+    member = load_and_authorize_member(member)
+
+    permissions do
+      has_feature("update_post", function_name)
+    end
+
+    case authorized?(member, function_name) do
+      :ok -> {:ok, "Authorized"}
+      _ -> raise ArgumentError, message: "Not authorized"
+    end
   end
 
-  def no_permissions(_id \\ 1, member_id \\ nil, function_name \\ "no_permissions") do
-    {:ok, "Authorized"}
+  def no_permissions(member, function_name \\ "no_permissions") do
+    member = load_and_authorize_member(member)
+
+    permissions do
+    end
+
+    case authorized?(member, function_name) do
+      :ok -> {:ok, "Authorized"}
+      _ -> raise ArgumentError, message: "Not authorized"
+    end
+  end
+
+  def calculated_post(member, email_confirmed) do
+    member = load_and_authorize_member(member)
+
+    permissions do
+      calculated(
+        fn _member ->
+          email_confirmed
+        end,
+        :calculated_post
+      )
+    end
+
+    case authorized?(member, "calculated") do
+      :ok -> {:ok, "Authorized"}
+      _ -> raise ArgumentError, message: "Not authorized"
+    end
+  end
+
+  def calculated_macro(member, function_name \\ "no_permissions") do
+    member = load_and_authorize_member(member)
+
+    permissions do
+      calculated(:confirmed_email, :no_permissions)
+    end
+
+    case authorized?(member, function_name) do
+      :ok -> {:ok, "Authorized"}
+      _ -> raise ArgumentError, message: "Not authorized"
+    end
+  end
+
+  def confirmed_email(_member) do
+    false
   end
 
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
