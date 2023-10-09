@@ -31,7 +31,7 @@ defmodule Membership.Behaviour do
       defmacro permissions(member, do: block) do
         quote do
           load_ets_data(unquote(@registry))
-          unquote(block(unquote(member)))
+          unquote(block)
         end
       end
 

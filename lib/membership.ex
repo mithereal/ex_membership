@@ -77,7 +77,7 @@ defmodule Membership do
   defmacro permissions(member, do: block) do
     quote do
       load_ets_data(unquote(__MODULE__))
-      unquote(block(unquote(member)))
+      unquote(block)
     end
   end
 
