@@ -31,10 +31,10 @@ defmodule Post do
 
     permissions do
       calculated(
+        member,
         fn _member ->
           email_confirmed
-        end,
-        :calculated_post
+        end
       )
     end
 
@@ -48,7 +48,7 @@ defmodule Post do
     member = load_and_authorize_member(member)
 
     permissions do
-      calculated(:confirmed_email, :no_permissions)
+      calculated(member, :confirmed_email)
     end
 
     case authorized?(member, function_name) do

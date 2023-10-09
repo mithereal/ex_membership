@@ -74,6 +74,13 @@ defmodule Membership do
     end
   end
 
+  defmacro permissions(member, do: block) do
+    quote do
+      load_ets_data(unquote(__MODULE__))
+      unquote(block(unquote(member)))
+    end
+  end
+
   @doc """
   The Function list to ignore when building the permissions registry's
   """
