@@ -13,11 +13,36 @@ we then can hold each user in a registry and compare features on a function leve
 Here is a small example:
 
 ```elixir
-defmodule Sample.Post
+defmodule Sample.Post do
   use Membership
+  
+  alias Sample.Post 
+  alias Sample.Repo 
+  alias Membership.Member
+  
+   def create_post(id, member_id \\ 1) do
+    member = Repo.get(Member, member_id)
+    post = %Post{id: 151}
 
-  def delete_post(id) do
-    member = Sample.Repo.get(Membership.Member, 1)
+    permissions(member) do
+      has_plan(:editor)
+    end
+
+    as_authorized(member) do
+      Repo.get(Post, id) |> Repo.insert_or_update()
+    end
+
+    # Notice that you can use both macros or functions
+
+    case authorized? do
+      :ok -> Repo.get(Post, id) |> Repo.delete()
+      {:error, message} -> "Raise error"
+      _ -> "Raise error"
+    end
+  end
+
+  def delete_post(id, member_id \\ 1) do
+    member = Repo.get(Member, member_id)
     member = load_and_authorize_member(member)
     post = %Post{id: 1}
 
@@ -32,16 +57,17 @@ defmodule Sample.Post
     end
 
     as_authorized(member) do
-      Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
+      Repo.get(Post, id) |> Repo.delete()
     end
 
     # Notice that you can use both macros or functions
 
     case authorized? do
-      :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
+      :ok -> Repo.get(Post, id) |> Repo.delete()
       {:error, message} -> "Raise error"
       _ -> "Raise error"
     end
+  end
   end
 
 ```
