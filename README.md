@@ -36,8 +36,8 @@ defmodule Sample.Post do
 
     case authorized? do
       :ok -> Repo.get(Post, id) |> Repo.delete()
-      {:error, message} -> "Raise error"
-      _ -> "Raise error"
+      {:error, message} -> raise message
+      _ -> raise "Member is not authorized"
     end
   end
 
