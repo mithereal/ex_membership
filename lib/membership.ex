@@ -66,7 +66,7 @@ defmodule Membership do
         end
       end
   """
-
+  ## todo: somehow we need to get which function name we are nested under then we need to inject function_name in the quoted expr
   defmacro permissions(do: block) do
     quote do
       load_ets_data(unquote(__MODULE__))
@@ -79,6 +79,10 @@ defmodule Membership do
       load_ets_data(unquote(__MODULE__))
       unquote(block)
     end
+  end
+
+  def add_function_param_to_block(block) do
+    :ok
   end
 
   @doc """
@@ -94,10 +98,13 @@ defmodule Membership do
   Load the plans into ets for the module/functions
   """
   def load_ets_data(current_module \\ __MODULE__) do
+    require Logger
+
     status = Membership.Permissions.Supervisor.start(current_module)
 
     case status do
-      {:error, _} ->
+      {:error, error} ->
+        Logger.error(error)
         :ok
 
       {:ok, _} ->

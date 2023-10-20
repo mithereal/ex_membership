@@ -26,16 +26,16 @@ defmodule Post do
     end
   end
 
-  def calculated_post(member, email_confirmed) do
+  def calculated_fun(member, email_confirmed) do
     member = load_and_authorize_member(member)
 
     permissions do
-      calculated(
-        member,
-        fn _member ->
-          email_confirmed
-        end
-      )
+      #      calculated(
+      #        member,
+      #        fn _member ->
+      #          email_confirmed
+      #        end
+      #      )
     end
 
     case authorized?(member, "calculated") do

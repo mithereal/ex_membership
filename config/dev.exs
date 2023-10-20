@@ -7,3 +7,6 @@ config :ex_membership, Membership.Repo,
   hostname: "localhost",
   primary_key_type: :uuid,
   port: 5432
+
+config :mix_test_watch,
+  clear: true
