@@ -329,7 +329,7 @@ end
 
 ### Member related features
 
-## todo: add feature
+## TODO: add feature to generic struct
 
 Membership allows you to grant features on any particular struct. Struct needs to have signature
 of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete`
