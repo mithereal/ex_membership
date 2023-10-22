@@ -82,7 +82,7 @@ defmodule Membership do
   end
 
   def add_function_param_to_block(block) do
-    :ok
+    {:ok, block}
   end
 
   @doc """

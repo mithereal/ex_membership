@@ -26,7 +26,7 @@ defmodule Post do
     end
   end
 
-  def calculated_fun(member, email_confirmed) do
+  def calculated(member, email_confirmed) do
     member = load_and_authorize_member(member)
 
     permissions do

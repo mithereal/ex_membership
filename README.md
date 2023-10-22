@@ -14,7 +14,7 @@ Here is a small example:
 
 ```elixir
 defmodule Sample.Post do
-  use Membership
+  use Membership, registry: :post
   
   alias Sample.Post 
   alias Sample.Repo 
@@ -154,11 +154,11 @@ end
 
 ```elixir
 # In your model
-defmodule Sample.Post
-  use Membership
+defmodule Sample.Post do
+  use Membership, registry: :post
 
-  def delete_post(id) do
-    user = Sample.Repo.get(Sample.User, 1)
+  def delete_post(id, member_id) do
+    user = Sample.Repo.get(Sample.User, member_id)
     load_and_authorize_member(user)
     # Function allows multiple signatues of member it can
     # be either:
@@ -181,9 +181,10 @@ defmodule Sample.Post
 
     case authorized? do
       :ok -> Sample.Repo.get(Sample.Post, id) |> Sample.repo.delete()
-      {:error, message} -> "Raise error"
-      _ -> "Raise error"
+      {:error, message} -> raise message
+      _ -> raise "Member is not authorized"
     end
+  end
   end
 
 ```
@@ -200,9 +201,11 @@ email address.
 
 ```elixir
 defmodule Sample.Post do
-  def create() do
-    user = Sample.Repo.get(Sample.User, 1)
-    load_and_authorize_member(user)
+ use Membership, registry: :post
+ 
+  def create(id \\ 1) do
+    member = Sample.Repo.get(Sample.User, id)
+    load_and_authorize_member(member)
 
     permissions do
       calculated(fn member -> do
@@ -217,18 +220,20 @@ We can also use DSL form of `calculated` keyword
 
 ```elixir
 defmodule Sample.Post do
-  def create() do
-    user = Sample.Repo.get(Sample.User, 1)
-    load_and_authorize_member(user)
+ use Membership, registry: :post
+ 
+  def create(id \\ 1) do
+    member = Sample.Repo.get(Sample.User, id)
+    load_and_authorize_member(member)
 
     permissions do
       calculated(:confirmed_email)
     end
-  end
 
   def confirmed_email(member) do
     member.email_confirmed?
   end
+end
 end
 ```
 
@@ -238,10 +243,12 @@ When we need to member calculation based on external data we can invoke bindings
 
 ```elixir
 defmodule Sample.Post do
-  def create() do
-    user = Sample.Repo.get(Sample.User, 1)
-    post = %Post{owner_id: 1}
-    load_and_authorize_member(user)
+ use Membership, registry: :post
+ 
+  def create(id \\ 1) do
+    member = Sample.Repo.get(Sample.User, id)
+    load_and_authorize_member(member)
+    post = %Post{owner_id: member.id}
 
     permissions do
       calculated(:confirmed_email)
@@ -264,10 +271,12 @@ example
 
 ```elixir
 defmodule Sample.Post do
-  def create() do
-    user = Sample.Repo.get(Sample.User, 1)
-    post = %Post{owner_id: 1}
-    load_and_authorize_member(user)
+ use Membership, registry: :post
+ 
+  def create(member_id \\ 1) do
+    member = Sample.Repo.get(Sample.User, member_id)
+    load_and_authorize_member(member)
+    post = %Post{owner_id: member.id}
 
     permissions do
       has_plan(:editor)
@@ -275,8 +284,8 @@ defmodule Sample.Post do
 
     member_authorized do
       case is_owner(member, post) do
-        :ok -> ...
-        {:error, message} -> ...
+        :ok -> {:ok, "Member is the Owner of Post"}
+        {:error, message} -> {:error, message}
       end
     end
   end
@@ -299,13 +308,16 @@ We can simplify example in this case by excluding DSL for permissions
 
 ```elixir
 defmodule Sample.Post do
-  def create() do
-    user = Sample.Repo.get(Sample.User, 1)
-    post = %Post{owner_id: 1}
+ use Membership, registry: :post
+ 
+  def create(id \\ 1 , member_id \\ 1) do
+    member = Sample.Repo.get(Sample.User, member_id)
+    load_and_authorize_member(member)
+    post = %Post{owner_id: member.id}
 
     # We can also use has_feature?/2
-    if has_plan?(user, :admin) and is_owner(user, post) do
-      ...
+    if has_plan?(member, :admin) and is_owner(member, post) do
+      {:ok, "Member Can Modify Post"}
     end
   end
 
@@ -334,10 +346,13 @@ true
 
 ```elixir
 defmodule Sample.Post do
-  def delete() do
-    user = Sample.Repo.get(Sample.User, 1)
-    post = %Post{id: 1}
-    load_and_authorize_member(user)
+ use Membership, registry: :post
+ 
+  def delete(id \\ 1, member_id \\ 1) do
+    member = Sample.Repo.get(Sample.User, member_id)
+    load_and_authorize_member(member)
+    
+    post = %Post{id: id}
 
     permissions do
       has_feature(:delete, post)
