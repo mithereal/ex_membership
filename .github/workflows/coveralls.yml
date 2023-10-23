@@ -1,7 +1,7 @@
 # Created with GitHubActions version 0.2.16
 name: Coveralls Report
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 on:
   - pull_request
   - push
