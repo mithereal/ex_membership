@@ -1,6 +1,6 @@
 # 🛡 Membership 🛡
 
-[![Coverage Status](https://img.shields.io/coveralls/github/mithereal/ex_membership.svg?style=flat-square)](https://coveralls.io/github/mithereal/ex_membership)
+[![Coverage Status](https://coveralls.io/repos/github/mithereal/ex_membership/badge.svg?branch=main)](https://coveralls.io/github/mithereal/ex_membership?branch=main)
 [![Build Status](https://img.shields.io/travis/mithereal/ex_membership.svg?style=flat-square)](https://travis-ci.org/mithereal/ex_membership)
 [![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 
