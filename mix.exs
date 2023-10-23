@@ -15,6 +15,9 @@ defmodule Membership.MixProject do
       description: description(),
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test
+      ],
       package: package(),
       docs: docs(),
       dialyzer: dialyzer()
