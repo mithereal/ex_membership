@@ -85,9 +85,8 @@ defmodule Post do
     member =
       load_and_authorize_member(%Membership.Member{id: member_id})
 
-    IO.inspect(member)
-
     permissions(member) do
+      IO.inspect(member)
       # or check 1st arg for being an atom vs string
       has_plan("gold", function_name)
       # or

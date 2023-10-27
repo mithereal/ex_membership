@@ -183,7 +183,7 @@ defmodule Membership.Behaviour do
       defmacro calculated(current_member, func_name)
                when is_atom(func_name) do
         quote do
-          {:ok, current_member} = Membership.Member.Server.show(unquote(current_member))
+          current_member = Membership.Member.Server.show(unquote(current_member))
 
           rules = %{calculated_as_authorized: unquote(func_name)(current_member)}
 
@@ -198,7 +198,7 @@ defmodule Membership.Behaviour do
 
       defmacro calculated(current_member, callback, func_name) when is_atom(func_name) do
         quote do
-          {:ok, current_member} =
+          current_member =
             Membership.Member.Server.show(unquote(current_member))
 
           result = apply(unquote(callback), [current_member])
@@ -215,7 +215,7 @@ defmodule Membership.Behaviour do
 
       defmacro calculated(current_member, func_name, bindings) when is_atom(func_name) do
         quote do
-          {:ok, current_member} =
+          current_member =
             Membership.Member.Server.show(unquote(current_member))
 
           result = unquote(func_name)(current_member, unquote(bindings))
@@ -232,7 +232,7 @@ defmodule Membership.Behaviour do
       defmacro calculated(current_member, callback, bindings, func_name)
                when is_atom(func_name) do
         quote do
-          {:ok, current_member} =
+          current_member =
             Membership.Member.Server.show(unquote(current_member))
 
           result = apply(unquote(callback), [current_member, unquote(bindings)])
