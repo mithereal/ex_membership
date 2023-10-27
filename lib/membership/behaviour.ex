@@ -3,6 +3,7 @@ defmodule Membership.Behaviour do
     quote do
       opts = unquote(opts)
       @registry Keyword.fetch!(opts, :registry)
+      @default_features %{required_features: []}
 
       @doc """
       Macro for defining required permissions
@@ -24,14 +25,24 @@ defmodule Membership.Behaviour do
       defmacro permissions(do: block) do
         quote do
           load_ets_data(unquote(@registry))
-          unquote(block)
+          data = unquote(block)
+
+          case is_nil(data) do
+            true -> @default_features
+            false -> data
+          end
         end
       end
 
       defmacro permissions(member, do: block) do
         quote do
           load_ets_data(unquote(@registry))
-          unquote(block)
+          data = unquote(block)
+
+          case is_nil(data) do
+            true -> @default_features
+            false -> data
+          end
         end
       end
 
@@ -316,6 +327,12 @@ defmodule Membership.Behaviour do
           {:error, "Member is not granted to perform this action"}
         else
           rules = fetch_rules_from_ets(func_name)
+
+          rules =
+            case is_nil(rules) do
+              true -> @default_features
+              false -> rules
+            end
 
           plan_features =
             List.flatten(

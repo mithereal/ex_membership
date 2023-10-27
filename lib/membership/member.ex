@@ -287,8 +287,10 @@ defmodule Membership.Member do
     feature_removals = fetch_removed_features(member.id)
 
     features =
-      Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features) --
-        feature_removals
+      List.flatten(
+        Enum.uniq(member.features ++ plan_features ++ role_features ++ extra_features) --
+          feature_removals
+      )
 
     changeset(member)
     |> put_change(:features, features)

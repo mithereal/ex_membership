@@ -87,9 +87,9 @@ defmodule Membership.MembershipTest do
     feature = insert(:feature, identifier: "update_post")
 
     Membership.Feature.grant(feature, role)
-    member = Membership.Member.grant(member, role, "required")
+    member = Membership.Member.grant(member, role)
 
-    assert {:ok, "Authorized"} == Post.update(1, member)
+    assert {:ok, "Post was Updated"} == Post.update(1, member.id)
   end
 
   test "allows inherited ability from multiple roles" do
@@ -99,12 +99,12 @@ defmodule Membership.MembershipTest do
     feature = insert(:feature, identifier: "delete_post")
     feature_update = insert(:feature, identifier: "update_post")
 
-    role = Membership.Feature.grant(plan, feature, "required")
-    role_editor = Membership.Feature.grant(plan_1, feature_update, "required")
-    member = Membership.Member.grant(member, plan, "required")
-    member = Membership.Member.grant(member, plan_1, "required")
+    _role = Membership.Feature.grant(plan, feature)
+    _role_editor = Membership.Feature.grant(plan_1, feature_update)
+    member = Membership.Member.grant(member, plan)
+    member = Membership.Member.grant(member, plan_1)
 
-    assert {:ok, "Authorized"} == Post.update(1, member)
+    assert {:ok, "Post was Updated"} == Post.update(1, member.id)
   end
 
   test "rejects ability without macro block" do
@@ -142,20 +142,20 @@ defmodule Membership.MembershipTest do
   describe "Membership.calculated/1" do
     test "grants calculated permissions" do
       member = insert(:member)
-      assert {:ok, "Authorized"} == Post.calculated(member, true)
+      assert {:ok, "Authorized"} == Post.calculated_function(member, true)
     end
 
     test "rejects calculated permissions" do
       member = insert(:member)
 
       assert_raise ArgumentError, fn ->
-        Post.calculated(member, false)
+        Post.calculated_function(member, false)
       end
     end
 
     test "rejects macro calculated permissions" do
       member = insert(:member)
-      assert {:ok, "Authorized"} == Post.calculated(member, true)
+      assert {:ok, "Authorized"} == Post.calculated_function(member, true)
     end
   end
 
@@ -178,7 +178,7 @@ defmodule Membership.MembershipTest do
       role = insert(:role, identifier: "admin", name: "Administrator")
 
       member = Membership.Member.grant(member, role)
-      IO.inspect(member)
+
       assert Membership.has_role?(member, "admin")
 
       refute Membership.has_role?(member, "editor")

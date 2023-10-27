@@ -35,6 +35,8 @@ defmodule Membership do
 
   """
 
+  @default_features %{required_features: []}
+
   defmacro __using__(opts) do
     quote do
       opts = unquote(opts)
@@ -69,7 +71,12 @@ defmodule Membership do
   defmacro permissions(do: block) do
     quote do
       load_ets_data(unquote(__MODULE__))
-      unquote(block)
+      data = unquote(block)
+
+      case is_nil(data) do
+        true -> @default_features
+        false -> data
+      end
     end
   end
 
@@ -77,7 +84,12 @@ defmodule Membership do
     quote do
       load_and_authorize_member(unquote(member))
       load_ets_data(unquote(__MODULE__))
-      unquote(block)
+      data = unquote(block)
+
+      case is_nil(data) do
+        true -> @default_features
+        false -> data
+      end
     end
   end
 
@@ -181,7 +193,7 @@ defmodule Membership do
        {:ok, member } = load_and_authorize_member(member)
 
           permissions do
-            calculated(member,:email_confirmed)
+            calculated(member,:email_confirmed, :calculated)
           end
 
           as_authorized(member) do
@@ -314,6 +326,15 @@ defmodule Membership do
   Perform authorization on passed member and roles
   """
   @spec has_role?(Membership.Member.t(), atom(), String.t()) :: boolean()
+  def has_role?(%Membership.Member{} = member, role_name) do
+    roles = Enum.map(member.roles, fn x -> x.identifier end)
+    Enum.member?(roles, role_name) == true
+  end
+
+  @doc """
+  Perform authorization on passed member and roles
+  """
+  @spec has_role?(Membership.Member.t(), atom(), String.t()) :: boolean()
   def has_role?(%Membership.Member{} = member, func_name, role_name) do
     perform_authorization!(member, func_name, [], [], [Atom.to_string(role_name)]) == :ok
   end
@@ -342,6 +363,12 @@ defmodule Membership do
       {:error, "Member is not granted to perform this action"}
     else
       rules = fetch_rules_from_ets(func_name)
+
+      rules =
+        case is_nil(rules) do
+          true -> @default_features
+          false -> rules
+        end
 
       plan_features =
         List.flatten(
