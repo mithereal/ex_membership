@@ -26,16 +26,17 @@ defmodule Post do
     end
   end
 
-  def calculated(member, email_confirmed) do
+  def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member)
 
     permissions do
-      #      calculated(
-      #        member,
-      #        fn _member ->
-      #          email_confirmed
-      #        end
-      #      )
+      calculated(
+        member,
+        fn _member ->
+          email_confirmed
+        end,
+        :calculated_function
+      )
     end
 
     case authorized?(member, "calculated") do
@@ -92,9 +93,13 @@ defmodule Post do
       # or
       has_feature("delete_posts", function_name)
 
-      #      calculated(fn member ->
-      #        member.email_confirmed?
-      #      end)
+      calculated(
+        member,
+        fn member ->
+          member.email_confirmed?
+        end,
+        :calculated_function
+      )
     end
 
     #    as_authorized(function_name) do
