@@ -29,9 +29,9 @@ defmodule Post do
   def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member)
 
-    permissions do
+    permissions(member) do
       calculated(
-        member.identifier,
+        member,
         fn _member ->
           email_confirmed
         end,
@@ -48,8 +48,8 @@ defmodule Post do
   def calculated_macro(member, function_name \\ "no_permissions") do
     member = load_and_authorize_member(member)
 
-    permissions do
-      calculated(member.identifier, :confirmed_email)
+    permissions(member) do
+      calculated(member, :confirmed_email)
     end
 
     case authorized?(member, function_name) do
@@ -85,6 +85,8 @@ defmodule Post do
     member =
       load_and_authorize_member(%Membership.Member{id: member_id})
 
+    IO.inspect(member)
+
     permissions(member) do
       # or check 1st arg for being an atom vs string
       has_plan("gold", function_name)
@@ -93,10 +95,8 @@ defmodule Post do
       # or
       has_feature("delete_posts", function_name)
 
-      ## TODO: create a fun to give a default identifier for member, because identifier is nil
-
       calculated(
-        member.identifier,
+        member,
         fn member ->
           member.email_confirmed?
         end,

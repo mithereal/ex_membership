@@ -6,6 +6,7 @@ defmodule Membership.Member do
 
   import Ecto.Query
 
+  alias Membership.Repo
   alias Membership.Plan
   alias Membership.Feature
   alias Membership.Role
@@ -301,6 +302,19 @@ defmodule Membership.Member do
     changeset(member)
     |> put_change(:features, features)
     |> Repo.update!()
+  end
+
+  def build(name) do
+    changeset(%Member{}, %{
+      name: name
+    })
+  end
+
+  def create(name) do
+    changeset(%Member{}, %{
+      name: name
+    })
+    |> Repo.insert_or_update()
   end
 
   def table, do: :membership_members

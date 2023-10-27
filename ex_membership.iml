@@ -58,6 +58,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mix_audit" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/yaml_elixir" />
       <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/nanoid" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/nanoid" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
