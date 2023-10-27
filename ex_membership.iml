@@ -57,6 +57,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/jason" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mix_audit" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/yaml_elixir" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/nanoid" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -102,5 +103,6 @@
     <orderEntry type="library" name="mix_audit" level="project" />
     <orderEntry type="library" name="yaml_elixir" level="project" />
     <orderEntry type="library" name="credo_naming" level="project" />
+    <orderEntry type="library" name="nanoid" level="project" />
   </component>
 </module>

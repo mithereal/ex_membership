@@ -70,7 +70,7 @@ defmodule Membership.Member.Server do
     {:noreply, state}
   end
 
-  def handle_call(_msg, state) do
+  def handle_call(_msg, _, state) do
     {:reply, state, state}
   end
 

@@ -43,9 +43,15 @@ defmodule Membership.Member do
   def changeset(%Member{} = struct, params \\ %{}) do
     struct
     |> cast(params, [:identifier, :features])
+    |> generate_identifier()
     |> cast_assoc(:plans, required: false)
     |> cast_assoc(:roles, required: false)
     |> cast_assoc(:extra_features, required: false)
+  end
+
+  def generate_identifier(changeset) do
+    size = Membership.Config.get(:membership_identifier_size, 8)
+    changeset |> put_change(:identifier, Nanoid.generate(size))
   end
 
   @doc """
