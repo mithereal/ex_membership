@@ -21,7 +21,7 @@ defmodule Membership.Member.Server do
 
   @impl true
   def init(init_arg) do
-    {:ok, %{identifier: init_arg.identifier, features: init_arg.features}}
+    {:ok, init_arg}
   end
 
   def start_link(data) do

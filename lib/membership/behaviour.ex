@@ -392,17 +392,27 @@ defmodule Membership.Behaviour do
       @doc false
       def create_membership() do
         quote do
-          import Membership, only: [load_and_store_member!: 1]
+          import Membership, only: [load_and_store_member!: 2]
 
           def load_and_authorize_member(%Membership.Member{id: _id} = member),
-            do: load_and_store_member!(member)
+            do: load_and_store_member!(member, %{})
+
+          def load_and_authorize_member(%Membership.Member{id: _id} = member, opts),
+            do: load_and_store_member!(member, opts)
 
           def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}),
-            do: load_and_store_member!(member)
+            do: load_and_store_member!(member, %{})
+
+          def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}, opts),
+            do: load_and_store_member!(member, opts)
 
           def load_and_authorize_member(%{member_id: member_id})
               when not is_nil(member_id),
-              do: load_and_store_member!(member_id)
+              do: load_and_store_member!(member_id, %{})
+
+          def load_and_authorize_member(%{member_id: member_id}, opts)
+              when not is_nil(member_id),
+              do: load_and_store_member!(member_id, opts)
 
           def load_and_authorize_member(member),
             do: raise(ArgumentError, message: "Invalid member given #{inspect(member)}")

@@ -27,13 +27,13 @@ defmodule Post do
   end
 
   def calculated_function(member, email_confirmed) do
-    member = load_and_authorize_member(member)
+    member = load_and_authorize_member(member, %{email_confirmed: email_confirmed})
 
     permissions(member) do
       calculated(
         member,
-        fn _member ->
-          email_confirmed
+        fn member ->
+          member.email_confirmed
         end,
         :calculated_function
       )
@@ -74,6 +74,8 @@ defmodule Post do
       has_feature("update_post", function_name)
     end
 
+    IO.inspect(member, label: "member_id")
+
     case authorized?(member, function_name) do
       :ok -> {:ok, "Post was Updated"}
       {:error, message} -> {:error, message}
@@ -97,7 +99,7 @@ defmodule Post do
       calculated(
         member,
         fn member ->
-          member.email_confirmed?
+          Post.confirmed_email(member)
         end,
         :calculated_function
       )

@@ -422,20 +422,26 @@ defmodule Membership do
   @doc false
   def create_membership() do
     quote do
-      import Membership, only: [load_and_store_member!: 1]
+      import Membership, only: [load_and_store_member!: 2]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
-        do: load_and_store_member!(member)
+        do: load_and_store_member!(member, %{})
+
+      def load_and_authorize_member(%Membership.Member{id: _id} = member, opts),
+        do: load_and_store_member!(member, opts)
 
       def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}),
-        do: load_and_store_member!(member)
+        do: load_and_store_member!(member, %{})
 
-      def load_and_authorize_member(%{member_id: member_id})
+      def load_and_authorize_member(%{member: %Membership.Member{id: _id} = member}, opts),
+        do: load_and_store_member!(member, opts)
+
+      def load_and_authorize_member(%{member_id: member_id}, opts)
           when is_nil(member_id),
           do: nil
 
-      def load_and_authorize_member(%{member_id: member_id}),
-        do: load_and_store_member!(%Membership.Member{id: member_id})
+      def load_and_authorize_member(%{member_id: member_id}, opts),
+        do: load_and_store_member!(%Membership.Member{id: member_id}, opts)
 
       def load_and_authorize_member(member),
         do: nil
@@ -443,9 +449,15 @@ defmodule Membership do
   end
 
   @doc false
-  @spec load_and_store_member!(integer()) :: {:ok, Membership.Member.t()}
-  def load_and_store_member!(member_id) when is_integer(member_id) do
-    member = Membership.Repo.get!(Membership.Member, member_id)
+  @spec load_and_store_member!(integer(), map()) :: {:ok, Membership.Member.t()}
+  def load_and_store_member!(member_id, opts) when is_integer(member_id) do
+    opts =
+      case is_nil(opts) do
+        true -> %{}
+        false -> opts
+      end
+
+    member = Membership.Repo.get!(Membership.Member, member_id) |> Map.merge(opts)
     status = Membership.Memberships.Supervisor.start(member)
 
     case status do
@@ -456,9 +468,15 @@ defmodule Membership do
   end
 
   @doc false
-  @spec load_and_store_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
-  def load_and_store_member!(%Membership.Member{} = member) do
-    member = Membership.Repo.get!(Membership.Member, member.id)
+  @spec load_and_store_member!(Membership.Member.t(), map()) :: {:ok, Membership.Member.t()}
+  def load_and_store_member!(%Membership.Member{} = member, opts) do
+    opts =
+      case is_nil(opts) do
+        true -> %{}
+        false -> opts
+      end
+
+    member = Membership.Repo.get!(Membership.Member, member.id) |> Map.merge(opts)
     status = Membership.Memberships.Supervisor.start(member)
 
     case status do
