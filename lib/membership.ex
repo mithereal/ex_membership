@@ -443,8 +443,9 @@ defmodule Membership do
       def load_and_authorize_member(%{member_id: member_id}, opts),
         do: load_and_store_member!(%Membership.Member{id: member_id}, opts)
 
-      def load_and_authorize_member(member),
-        do: nil
+      def load_and_authorize_member(member) do
+        load_and_store_member!(%Membership.Member{id: member.member_id}, %{})
+      end
     end
   end
 

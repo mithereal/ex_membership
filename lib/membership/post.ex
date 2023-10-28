@@ -74,8 +74,6 @@ defmodule Post do
       has_feature("update_post", function_name)
     end
 
-    IO.inspect(member, label: "member_id")
-
     case authorized?(member, function_name) do
       :ok -> {:ok, "Post was Updated"}
       {:error, message} -> {:error, message}
@@ -88,7 +86,6 @@ defmodule Post do
       load_and_authorize_member(%Membership.Member{id: member_id})
 
     permissions(member) do
-      IO.inspect(member)
       # or check 1st arg for being an atom vs string
       has_plan("gold", function_name)
       # or
