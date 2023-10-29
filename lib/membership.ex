@@ -35,7 +35,7 @@ defmodule Membership do
 
   """
 
-  @default_features %{required_features: []}
+  @default_features %{required_features: [], calculated_as_authorized: []}
 
   defmacro __using__(opts) do
     quote do

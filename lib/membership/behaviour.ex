@@ -3,7 +3,7 @@ defmodule Membership.Behaviour do
     quote do
       opts = unquote(opts)
       @registry Keyword.fetch!(opts, :registry)
-      @default_features %{required_features: []}
+      @default_features %{required_features: [], calculated_as_authorized: []}
 
       @doc """
       Macro for defining required permissions
