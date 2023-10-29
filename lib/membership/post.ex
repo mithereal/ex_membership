@@ -33,13 +33,13 @@ defmodule Post do
       calculated(
         member,
         fn member ->
-          member.email_confirmed
+          member.email_confirmed == true
         end,
         :calculated_function
       )
     end
 
-    case authorized?(member, "calculated") do
+    case authorized?(member, :calculated_function) do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -102,7 +102,7 @@ defmodule Post do
       )
     end
 
-    #    as_authorized(function_name) do
+    #    as_authorized(member, :calculated_function) do
     #      :ok
     #    end
 

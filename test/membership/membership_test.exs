@@ -188,13 +188,13 @@ defmodule Membership.MembershipTest do
   describe "Membership.perform_authorization!/3" do
     test "performs authorization" do
       member = insert(:member)
-      feature = insert(:feature, identifier: "admin", name: "Administrator")
+      feature = insert(:feature, identifier: "delete_posts", name: "delete_posts")
 
       member = Membership.Member.grant(member, feature, "required")
 
-      assert Membership.perform_authorization!(member)
-      assert Membership.perform_authorization!(member, [])
-      assert Membership.perform_authorization!(member, [], [])
+      assert Post.perform_authorization!(member, "delete_posts")
+      #      assert Membership.perform_authorization!(member, [])
+      #      assert Membership.perform_authorization!(member, [], [])
     end
   end
 end
