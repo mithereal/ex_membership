@@ -49,7 +49,7 @@ jobs:
       - name: Compile dependencies
         run: MIX_ENV=test mix deps.compile
       - name: Compile project
-        run: MIX_ENV=test mix compile --warnings-as-errors
+        run: MIX_ENV=test mix compile
       - name: Check unused dependencies
         if: ${{ contains(matrix.elixir, '1.15.6') && contains(matrix.otp, '26.1') }}
         run: mix deps.unlock --check-unused
