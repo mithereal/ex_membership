@@ -26,8 +26,9 @@ defmodule Membership.Member.Server do
     {:ok, init_arg}
   end
 
-  def add_to_calculated_registry(_member, _module, _data) do
-    :ok
+  def add_to_calculated_registry(_member, _module, data) do
+    {func_name, _data} = data
+    {:ok, func_name}
   end
 
   def start_link(data) do

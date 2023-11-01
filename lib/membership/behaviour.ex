@@ -204,7 +204,7 @@ defmodule Membership.Behaviour do
 
           data = {unquote(func_name), rules}
 
-          Member.Server.add_to_calculated_registry(current_member, @registry, data)
+          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
