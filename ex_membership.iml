@@ -59,6 +59,8 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/yaml_elixir" />
       <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/nanoid" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/nanoid" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/bunt" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/credo" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -187,12 +187,9 @@ defmodule Membership.Behaviour do
 
           rules = %{calculated_as_authorized: unquote(func_name)(current_member)}
 
-          registry =
-            Membership.Registry.add(
-              @registry,
-              unquote(func_name),
-              rules
-            )
+          data = {unquote(func_name), rules}
+
+          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -205,11 +202,9 @@ defmodule Membership.Behaviour do
 
           rules = %{calculated_as_authorized: result}
 
-          Membership.Registry.add(
-            @registry,
-            unquote(func_name),
-            rules
-          )
+          data = {unquote(func_name), rules}
+
+          Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -221,11 +216,9 @@ defmodule Membership.Behaviour do
           result = unquote(func_name)(current_member, unquote(bindings))
           rules = %{calculated_as_authorized: result}
 
-          Membership.Registry.add(
-            @registry,
-            unquote(func_name),
-            rules
-          )
+          data = {unquote(func_name), rules}
+
+          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -238,11 +231,9 @@ defmodule Membership.Behaviour do
           result = apply(unquote(callback), [current_member, unquote(bindings)])
           rules = %{calculated_as_authorized: result}
 
-          Membership.Registry.add(
-            @registry,
-            unquote(func_name),
-            rules
-          )
+          data = {unquote(func_name), rules}
+
+          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 

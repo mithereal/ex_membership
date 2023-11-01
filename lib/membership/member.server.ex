@@ -21,7 +21,13 @@ defmodule Membership.Member.Server do
 
   @impl true
   def init(init_arg) do
+    registry_name = "#{init_arg.identifier}_calculated_modules"
+    GenServer.start_link(Registry, keys: :unique, name: String.to_atom(registry_name))
     {:ok, init_arg}
+  end
+
+  def add_to_calculated_registry(_member, _module, _data) do
+    :ok
   end
 
   def start_link(data) do
@@ -40,6 +46,11 @@ defmodule Membership.Member.Server do
         state
       ) do
     {:stop, {:ok, "Normal Shutdown"}, state}
+  end
+
+  @impl true
+  def handle_call(_msg, _, state) do
+    {:reply, state, state}
   end
 
   @impl true
@@ -68,10 +79,6 @@ defmodule Membership.Member.Server do
   @impl true
   def handle_info(_msg, state) do
     {:noreply, state}
-  end
-
-  def handle_call(_msg, _, state) do
-    {:reply, state, state}
   end
 
   def show(params) do
