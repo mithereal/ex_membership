@@ -4,7 +4,7 @@ defmodule Membership.Calculated.Server do
   ## TODO:: Change this to agent maybe
   @moduledoc """
   Calculated.Server
-    this will store the state of the calculated function then optionally cache the results.
+    this will store the state of the calculated function where the registry key is the module refeered to then optionally cache the results.
   """
 
   require Logger
