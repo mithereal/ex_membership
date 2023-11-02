@@ -47,7 +47,7 @@ defmodule Membership.MixProject do
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
       {:ex_machina, "~> 2.2", only: :test},
       {:faker, "~> 0.16", only: [:test, :dev]},
-      {:excoveralls, "~> 0.10", only: :test},
+      {:excoveralls, "~> 0.10", only: [:test, :dev]},
       {:mock, "~> 0.3.0", only: :test},
       {:inch_ex, only: :docs},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
