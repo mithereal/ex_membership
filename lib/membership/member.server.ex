@@ -23,20 +23,23 @@ defmodule Membership.Member.Server do
   def init(init_arg) do
     registry_name = "#{init_arg.identifier}_calculated_modules"
     supervisor_name = "#{init_arg.identifier}_supervisor"
-    GenServer.start_link(Registry, keys: :unique, name: String.to_atom(registry_name))
-    GenServer.start_link(Membership.Calculated.Supervisor, name: String.to_atom(supervisor_name))
+    #   GenServer.start_link(Registry, keys: :unique, name: String.to_atom(registry_name))
+    #   GenServer.start_link(Membership.Calculated.Supervisor, name: String.to_atom(supervisor_name))
     {:ok, init_arg}
   end
 
   def add_to_calculated_registry(member, module, data) do
-    #    registry =
-    #      Membership.Registry.add(
-    #        __MODULE__,
-    #        unquote(func_name),
-    #        rules
-    #      )
-    data = Tuple.append(data, module)
-    GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
+    #    data = Tuple.append(data, module)
+    #    GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
+    #    rules = []
+    #    func_name = "test"
+    #
+    #    Membership.Registry.add(
+    #      __MODULE__,
+    #      func_name,
+    #      rules
+    #    )
+    %{required_features: [], calculated_as_authorized: []}
   end
 
   def fetch_from_calculated_registry(member, module, data) do

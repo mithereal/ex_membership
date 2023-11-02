@@ -189,7 +189,14 @@ defmodule Membership.Behaviour do
 
           data = {unquote(func_name), rules}
 
-          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
+          registry =
+            Membership.Registry.add(
+              @registry,
+              unquote(func_name),
+              rules
+            )
+
+          # Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -204,7 +211,14 @@ defmodule Membership.Behaviour do
 
           data = {unquote(func_name), rules}
 
-          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
+          registry =
+            Membership.Registry.add(
+              @registry,
+              unquote(func_name),
+              rules
+            )
+
+          # Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -218,7 +232,14 @@ defmodule Membership.Behaviour do
 
           data = {unquote(func_name), rules}
 
-          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
+          registry =
+            Membership.Registry.add(
+              @registry,
+              unquote(func_name),
+              rules
+            )
+
+          #  Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 
@@ -233,7 +254,14 @@ defmodule Membership.Behaviour do
 
           data = {unquote(func_name), rules}
 
-          Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
+          registry =
+            Membership.Registry.add(
+              @registry,
+              unquote(func_name),
+              rules
+            )
+
+          #  Membership.Member.Server.add_to_calculated_registry(current_member, @registry, data)
         end
       end
 

@@ -243,7 +243,13 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      Membership.Registry.add(
+        __MODULE__,
+        unquote(func_name),
+        rules
+      )
+
+      # Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
     end
   end
 
@@ -257,7 +263,13 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      Membership.Registry.add(
+        __MODULE__,
+        unquote(func_name),
+        rules
+      )
+
+      #   Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
     end
   end
 
@@ -269,7 +281,13 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      Membership.Registry.add(
+        __MODULE__,
+        unquote(func_name),
+        rules
+      )
+
+      #      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
     end
   end
 
@@ -282,7 +300,13 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      Membership.Registry.add(
+        __MODULE__,
+        unquote(func_name),
+        rules
+      )
+
+      # Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
     end
   end
 
