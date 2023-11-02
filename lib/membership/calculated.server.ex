@@ -1,14 +1,15 @@
 defmodule Membership.Calculated.Server do
   use GenServer
 
+  ## TODO:: Change this to agent maybe
   @moduledoc """
-  Service
-    this will store the calculated state
+  Calculated.Server
+    this will store the state of the calculated function then optionally cache the results.
   """
 
   require Logger
-  @registry_name :module_permissions
-  @default %{required_features: [], calculated_as_authorized: []}
+  @registry_name :member_calculated_permissions
+  @default %{calculated_as_authorized: []}
 
   def child_spec(data) do
     %{
@@ -79,7 +80,10 @@ defmodule Membership.Calculated.Server do
         {:ok, current} -> current
       end
 
-    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+    uniq = %{
+      current
+      | calculated_as_authorized: Enum.uniq(current.calculated_as_authorized ++ [value])
+    }
 
     :ets.insert(state.ref, {name, uniq})
     {:noreply, state}

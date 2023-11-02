@@ -2,14 +2,14 @@ defmodule Membership.Calculated.Supervisor do
   use DynamicSupervisor
 
   @moduledoc """
-  Module Calculated Supervisor
-    this will supervise the permissions
+  Member Calculated Supervisor
+    this will supervise the calculated permission agents
   """
 
   alias Membership.Calculated.Server, as: SERVER
 
-  @name :module_calculated_supervisor
-  @registry_name :module_permissions
+  @name :member_calculated_supervisor
+  @registry_name :member_calculated_permissions
 
   def child_spec() do
     %{

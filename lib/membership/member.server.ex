@@ -29,8 +29,7 @@ defmodule Membership.Member.Server do
     {:ok, init_arg}
   end
 
-  def add_to_calculated_registry(member, module, data) do
-    #    data = Tuple.append(data, module)
+  def add_to_calculated_registry(member, data) do
     #    GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
     #    rules = []
     #    func_name = "test"
@@ -73,7 +72,8 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_call({:add_to_calculated_registry, data}, _, state) do
-    Membership.Calculated.Supervisor.start(data)
+    supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
+    Membership.Calculated.Supervisor.start(data, supervisor_name)
     {:reply, state, state}
   end
 

@@ -249,7 +249,7 @@ defmodule Membership do
         rules
       )
 
-      # Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      # Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -269,7 +269,7 @@ defmodule Membership do
         rules
       )
 
-      #   Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      #   Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -287,7 +287,7 @@ defmodule Membership do
         rules
       )
 
-      #      Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      #      Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -306,7 +306,7 @@ defmodule Membership do
         rules
       )
 
-      # Membership.Member.Server.add_to_calculated_registry(current_member, __MODULE__, data)
+      # Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
