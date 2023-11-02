@@ -29,6 +29,12 @@ defmodule Membership.Member.Server do
   end
 
   def add_to_calculated_registry(member, module, data) do
+    #    registry =
+    #      Membership.Registry.add(
+    #        __MODULE__,
+    #        unquote(func_name),
+    #        rules
+    #      )
     data = Tuple.append(data, module)
     GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
   end
