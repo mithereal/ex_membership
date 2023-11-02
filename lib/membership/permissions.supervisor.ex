@@ -33,10 +33,9 @@ defmodule Membership.Permissions.Supervisor do
   end
 
   def start(data) do
-    {func_name, data, module} = data
     child_spec = {SERVER, data}
 
-    DynamicSupervisor.start_child(module, child_spec)
+    DynamicSupervisor.start_child(@name, child_spec)
   end
 
   def stop(id) do
