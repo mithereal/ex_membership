@@ -1,14 +1,14 @@
-defmodule Membership.Permissions.Supervisor do
+defmodule Membership.Calculated.Supervisor do
   use DynamicSupervisor
 
   @moduledoc """
-  Module Permissions Supervisor
+  Module Calculated Supervisor
     this will supervise the permissions
   """
 
-  alias Membership.Permission.Server, as: SERVER
+  alias Membership.Calculated.Server, as: SERVER
 
-  @name :module_permissions_supervisor
+  @name :module_calculated_supervisor
   @registry_name :module_permissions
 
   def child_spec() do
@@ -17,6 +17,10 @@ defmodule Membership.Permissions.Supervisor do
       start: {__MODULE__, :start_link, []},
       type: :supervisor
     }
+  end
+
+  def start_link(init_arg, name) do
+    DynamicSupervisor.start_link(__MODULE__, init_arg, name: name)
   end
 
   def start_link(init_arg) do
@@ -33,10 +37,15 @@ defmodule Membership.Permissions.Supervisor do
   end
 
   def start(data) do
-    {func_name, data, module} = data
     child_spec = {SERVER, data}
 
-    DynamicSupervisor.start_child(module, child_spec)
+    DynamicSupervisor.start_child(@name, child_spec)
+  end
+
+  def start(data, name) do
+    child_spec = {SERVER, data}
+
+    DynamicSupervisor.start_child(name, child_spec)
   end
 
   def stop(id) do
