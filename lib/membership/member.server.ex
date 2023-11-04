@@ -80,7 +80,6 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_call({:fetch_from_calculated_registry, data}, _, state) do
-    ## TODO:: logic
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
     reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, data)
