@@ -47,9 +47,9 @@ defmodule Membership.Calculated.Server do
     {:ok, %{ref: ref}}
   end
 
-  def start_link(data) do
-    name = via_tuple(data)
-    GenServer.start_link(__MODULE__, data, name: name)
+  def start_link({registry, data}, module \\ __MODULE__) do
+    name = via_tuple(data, registry)
+    GenServer.start_link(module, data, name: name)
   end
 
   @doc false
