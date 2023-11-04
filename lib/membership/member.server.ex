@@ -29,17 +29,9 @@ defmodule Membership.Member.Server do
     {:ok, init_arg}
   end
 
-  def add_to_calculated_registry(member, data) do
-    #    GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
-    #    rules = []
-    #    func_name = "test"
-    #
-    #    Membership.Registry.add(
-    #      __MODULE__,
-    #      func_name,
-    #      rules
-    #    )
-    %{required_features: [], calculated_as_authorized: []}
+  def add_to_calculated_registry(member, module, data) do
+    data = Tuple.append(data, module)
+    GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
   end
 
   def fetch_from_calculated_registry(member, module, data) do
