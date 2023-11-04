@@ -49,7 +49,8 @@ defmodule Membership.Calculated.Supervisor do
   end
 
   def get(name, registry, data) do
-    {:ok, []}
+    ## fixme return data from server
+    SERVER.lookup(name, registry, data)
   end
 
   def stop(id) do
