@@ -42,7 +42,7 @@ defmodule Membership.Calculated.Supervisor do
     DynamicSupervisor.start_child(@name, child_spec)
   end
 
-  def start(data, name, registry) do
+  def start(name, registry, data) do
     child_spec = {SERVER, {registry, data}}
 
     DynamicSupervisor.start_child(name, child_spec)

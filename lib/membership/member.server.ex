@@ -74,7 +74,7 @@ defmodule Membership.Member.Server do
   def handle_call({:add_to_calculated_registry, data}, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
-    Membership.Calculated.Supervisor.start(data, supervisor_name, registry_name)
+    Membership.Calculated.Supervisor.start(supervisor_name, registry_name, data)
     {:reply, state, state}
   end
 
