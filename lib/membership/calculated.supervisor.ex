@@ -48,6 +48,10 @@ defmodule Membership.Calculated.Supervisor do
     DynamicSupervisor.start_child(name, child_spec)
   end
 
+  def get(name, registry, data) do
+    {:ok, []}
+  end
+
   def stop(id) do
     case Registry.lookup(@registry_name, id) do
       [] ->

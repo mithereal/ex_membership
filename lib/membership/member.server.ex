@@ -83,6 +83,7 @@ defmodule Membership.Member.Server do
     ## TODO:: logic
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
+    Membership.Calculated.Supervisor.get(supervisor_name, registry_name, data)
     {:reply, state, state}
   end
 
