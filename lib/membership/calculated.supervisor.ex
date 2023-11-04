@@ -48,9 +48,9 @@ defmodule Membership.Calculated.Supervisor do
     DynamicSupervisor.start_child(name, child_spec)
   end
 
-  def get(name, registry, data) do
+  def get(module, registry, data) do
     ## fixme return data from server
-    SERVER.lookup(name, registry, data)
+    SERVER.fetch(module, registry, data)
   end
 
   def stop(id) do
