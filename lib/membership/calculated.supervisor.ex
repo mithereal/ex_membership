@@ -49,7 +49,6 @@ defmodule Membership.Calculated.Supervisor do
   end
 
   def get(module, registry, data) do
-    ## fixme return data from server
     SERVER.fetch(module, registry, data)
   end
 

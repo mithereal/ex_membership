@@ -29,13 +29,11 @@ defmodule Membership.Member.Server do
     {:ok, init_arg}
   end
 
-  def add_to_calculated_registry(member, module, data) do
-    data = Tuple.append(data, module)
+  def add_to_calculated_registry(member, data) do
     GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
   end
 
-  def fetch_from_calculated_registry(member, module, data) do
-    data = Tuple.append(data, module)
+  def fetch_from_calculated_registry(member, data) do
     GenServer.call(via_tuple(member.identifier), {:fetch_from_calculated_registry, data})
   end
 
