@@ -1,7 +1,6 @@
 defmodule Membership.Calculated.Server do
   use GenServer
 
-  ## TODO:: Change this to agent maybe
   @moduledoc """
   Calculated.Server
     this will store the state of the calculated function where the registry key is the module refeered to then optionally cache the results.
