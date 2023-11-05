@@ -69,10 +69,10 @@ defmodule Membership.Member.Server do
   end
 
   @impl true
-  def handle_call({:fetch_from_calculated_registry, data}, _, state) do
+  def handle_call({:fetch_from_calculated_registry, key}, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
-    reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, data)
+    reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, key)
     {:reply, reply, state}
   end
 
