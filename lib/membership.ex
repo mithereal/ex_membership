@@ -243,13 +243,7 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Registry.add(
-        __MODULE__,
-        unquote(func_name),
-        rules
-      )
-
-      # Membership.Member.Server.add_to_calculated_registry(current_member, data)
+      Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -263,13 +257,7 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Registry.add(
-        __MODULE__,
-        unquote(func_name),
-        rules
-      )
-
-      #   Membership.Member.Server.add_to_calculated_registry(current_member, data)
+      Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -281,13 +269,7 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Registry.add(
-        __MODULE__,
-        unquote(func_name),
-        rules
-      )
-
-      #      Membership.Member.Server.add_to_calculated_registry(current_member, data)
+      Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -300,13 +282,7 @@ defmodule Membership do
 
       data = {unquote(func_name), rules}
 
-      Membership.Registry.add(
-        __MODULE__,
-        unquote(func_name),
-        rules
-      )
-
-      # Membership.Member.Server.add_to_calculated_registry(current_member, data)
+      Membership.Member.Server.add_to_calculated_registry(current_member, data)
     end
   end
 
@@ -323,6 +299,7 @@ defmodule Membership do
             :ok -> "Member is authorized"
             {:error, message: _message} -> "Member is not authorized"
         end
+      end
       end
   """
   # @spec authorized?() :: :ok | {:error, String.t()}
