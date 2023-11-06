@@ -56,11 +56,6 @@ defmodule Membership.Member.Server do
   end
 
   @impl true
-  def handle_call(_msg, _, state) do
-    {:reply, state, state}
-  end
-
-  @impl true
   def handle_call({:add_to_calculated_registry, data}, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
@@ -74,6 +69,11 @@ defmodule Membership.Member.Server do
     registry_name = "#{state.identifier}_calculated_modules"
     reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, key)
     {:reply, reply, state}
+  end
+
+  @impl true
+  def handle_call(_msg, _, state) do
+    {:reply, state, state}
   end
 
   @impl true

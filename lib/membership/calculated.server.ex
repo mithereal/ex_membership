@@ -97,6 +97,6 @@ defmodule Membership.Calculated.Server do
 
   def fetch(module, registry, key) do
     name = via_tuple(module, registry)
-    Server.lookup(key, name)
+    Membership.Calculated.Server.lookup(key, name)
   end
 end
