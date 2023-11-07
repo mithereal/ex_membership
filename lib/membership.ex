@@ -363,7 +363,7 @@ defmodule Membership do
       rules =
         case is_nil(rules) do
           true -> @default_features
-          false -> rules ++ calculated_rules
+          false -> rules
         end
 
       plan_features =
@@ -394,7 +394,7 @@ defmodule Membership do
             [
               authorize_features(current_member.features, required_features)
             ] ++
-              rules.calculated_as_authorized
+              calculated_rules
           )
 
         if reply == :ok do
