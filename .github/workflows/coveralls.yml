@@ -6,11 +6,9 @@ on:
   - pull_request
   - push
 jobs:
-  runner-job:
-    # You must use a Linux environment when using service containers or container jobs
-    runs-on: ubuntu-latest
-
-    # Service containers to run with `runner-job`
+  linux:
+    name: Test on Ubuntu (Elixir ${{ matrix.elixir }}, OTP ${{ matrix.otp }})
+    runs-on: ubuntu-20.04
     services:
       # Label used to access the service container
       postgres:
@@ -29,9 +27,6 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
-  linux:
-    name: Test on Ubuntu (Elixir ${{ matrix.elixir }}, OTP ${{ matrix.otp }})
-    runs-on: ubuntu-20.04
     strategy:
       matrix:
         elixir:
