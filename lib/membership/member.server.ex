@@ -1,5 +1,6 @@
 defmodule Membership.Member.Server do
   use GenServer
+  import IceCream
 
   @moduledoc """
   Service
@@ -80,6 +81,7 @@ defmodule Membership.Member.Server do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
     reply = Membership.Calculated.Supervisor.list(supervisor_name, registry_name)
+    ic(reply)
     ## todo:: get state od replys
     {:reply, reply, state}
   end

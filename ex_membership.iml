@@ -70,6 +70,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/unicode_util_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/test/lib/ice_cream" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -116,5 +117,10 @@
     <orderEntry type="library" name="yaml_elixir" level="project" />
     <orderEntry type="library" name="credo_naming" level="project" />
     <orderEntry type="library" name="nanoid" level="project" />
+    <orderEntry type="library" name="ice_cream" level="project" />
+    <orderEntry type="library" name="castore" level="project" />
+    <orderEntry type="library" name="bypass" level="project" />
+    <orderEntry type="library" name="sax_map" level="project" />
+    <orderEntry type="library" name="saxy" level="project" />
   </component>
 </module>
