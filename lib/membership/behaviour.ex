@@ -333,10 +333,13 @@ defmodule Membership.Behaviour do
         else
           rules = fetch_rules_from_ets(func_name)
 
+          calculated_rules =
+            Membership.Calculated.Server.fetch_from_calculated_registry(current_member)
+
           rules =
             case is_nil(rules) do
               true -> @default_features
-              false -> rules
+              false -> rules ++ calculated_rules
             end
 
           plan_features =

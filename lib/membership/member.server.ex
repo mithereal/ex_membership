@@ -33,6 +33,10 @@ defmodule Membership.Member.Server do
     GenServer.call(via_tuple(member.identifier), {:add_to_calculated_registry, data})
   end
 
+  def fetch_from_calculated_registry(member) do
+    GenServer.call(via_tuple(member.identifier), :fetch_from_calculated_registry)
+  end
+
   def fetch_from_calculated_registry(member, data) do
     GenServer.call(via_tuple(member.identifier), {:fetch_from_calculated_registry, data})
   end
@@ -68,6 +72,15 @@ defmodule Membership.Member.Server do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
     reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, key)
+    {:reply, reply, state}
+  end
+
+  @impl true
+  def handle_call(:fetch_from_calculated_registry, _, state) do
+    supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
+    registry_name = "#{state.identifier}_calculated_modules"
+    reply = Membership.Calculated.Supervisor.list(supervisor_name, registry_name)
+    ## todo:: get state od replys
     {:reply, reply, state}
   end
 

@@ -52,6 +52,10 @@ defmodule Membership.Calculated.Supervisor do
     SERVER.fetch(module, registry, key)
   end
 
+  def get(module, registry) do
+    SERVER.fetch(module, registry)
+  end
+
   def stop(id) do
     case Registry.lookup(@registry_name, id) do
       [] ->
@@ -129,6 +133,15 @@ defmodule Membership.Calculated.Supervisor do
 
   def list(registry_name) do
     DynamicSupervisor.which_children(@name)
+    |> Enum.map(fn {_, account_proc_pid, _, _} ->
+      Registry.keys(registry_name, account_proc_pid)
+      |> List.first()
+    end)
+    |> Enum.sort()
+  end
+
+  def list(name, registry_name) do
+    DynamicSupervisor.which_children(name)
     |> Enum.map(fn {_, account_proc_pid, _, _} ->
       Registry.keys(registry_name, account_proc_pid)
       |> List.first()
