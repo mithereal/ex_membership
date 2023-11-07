@@ -53,7 +53,7 @@ defmodule Membership.Calculated.Supervisor do
   end
 
   def get(module, registry) do
-    SERVER.fetch(module, registry)
+    SERVER.lookup(module, registry)
   end
 
   def stop(id) do
