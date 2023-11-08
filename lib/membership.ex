@@ -358,7 +358,7 @@ defmodule Membership do
       rules = fetch_rules_from_ets(func_name)
 
       calculated_rules =
-        Membership.Calculated.Supervisor.fetch_from_calculated_registry(current_member, func_name)
+        Membership.Member.Server.fetch_from_calculated_registry(current_member, func_name)
 
       rules =
         case is_nil(rules) do

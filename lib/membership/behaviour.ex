@@ -334,7 +334,7 @@ defmodule Membership.Behaviour do
           rules = fetch_rules_from_ets(func_name)
 
           calculated_rules =
-            Membership.Calculated.Supervisor.fetch_from_calculated_registry(
+            Membership.Member.Server.fetch_from_calculated_registry(
               current_member,
               func_name
             )
