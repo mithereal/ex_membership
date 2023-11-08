@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/travis/mithereal/ex_membership.svg?style=flat-square)](https://travis-ci.org/mithereal/ex_membership)
 [![Version](https://img.shields.io/hexpm/v/ex_membership.svg?style=flat-square)](https://hex.pm/packages/ex_membership)
 ![GitHub](https://img.shields.io/github/license/mithereal/ex_membership)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/mithereal/ex_membership/main)
 
 Membership is toolkit for granular feature management for members. It allows you to define granular features such
 as: [:can_edit, :can_delete] on a per module basis
