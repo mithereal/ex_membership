@@ -75,5 +75,5 @@ jobs:
         run: MIX_ENV=test mix test
         if: ${{ !(contains(matrix.elixir, '1.15.6') && contains(matrix.otp, '26.1')) }}
       - name: Run tests with coverage
-        run: mix coveralls.github
+        run: MIX_ENV=test mix coveralls.github
         if: ${{ contains(matrix.elixir, '1.15.6') && contains(matrix.otp, '26.1') }}
