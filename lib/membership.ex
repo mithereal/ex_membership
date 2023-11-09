@@ -611,7 +611,13 @@ defmodule Membership do
     modules
     |> Enum.map(&Module.split/1)
     |> Enum.reject(fn module ->
-      MapSet.subset?(MapSet.new(module), MapSet.new(["Mix", "Task", "Post"]))
+      Enum.any?(
+        module,
+        &Enum.member?(
+          ["Mix", "Tasks", "Post", "Config", "Application", "Behaviour", "InvalidConfigError"],
+          &1
+        )
+      )
     end)
     |> Enum.map(&Module.concat/1)
   end
