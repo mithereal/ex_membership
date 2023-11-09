@@ -19,7 +19,7 @@ defmodule Membership.Member do
   @typedoc "A member struct"
   @type t :: %Member{}
 
-  @default_alphabet nil
+  @default_alphabet Enum.concat([?0..?9, ?A..?Z, ?a..?z])
   @default_membership_identifier_size 8
 
   schema "membership_members" do

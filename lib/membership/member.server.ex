@@ -64,7 +64,13 @@ defmodule Membership.Member.Server do
   def handle_call({:add_to_calculated_registry, data}, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
-    Membership.Calculated.Supervisor.start(supervisor_name, registry_name, data)
+
+    Membership.Calculated.Supervisor.start(
+      String.to_atom(supervisor_name),
+      String.to_atom(registry_name),
+      data
+    )
+
     {:reply, state, state}
   end
 
@@ -72,7 +78,14 @@ defmodule Membership.Member.Server do
   def handle_call({:fetch_from_calculated_registry, key}, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
-    reply = Membership.Calculated.Supervisor.get(supervisor_name, registry_name, key)
+
+    reply =
+      Membership.Calculated.Supervisor.get(
+        String.to_atom(supervisor_name),
+        String.to_atom(registry_name),
+        key
+      )
+
     {:reply, reply, state}
   end
 
@@ -80,7 +93,13 @@ defmodule Membership.Member.Server do
   def handle_call(:fetch_from_calculated_registry, _, state) do
     supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
     registry_name = "#{state.identifier}_calculated_modules"
-    reply = Membership.Calculated.Supervisor.list(supervisor_name, registry_name)
+
+    reply =
+      Membership.Calculated.Supervisor.list(
+        String.to_atom(supervisor_name),
+        String.to_atom(registry_name)
+      )
+
     ic(reply)
     ## todo:: get state od replys
     {:reply, reply, state}
