@@ -37,6 +37,7 @@ defmodule Membership.Role do
       identifier: identifier,
       name: name
     })
+    |> Ecto.Changeset.apply_changes()
   end
 
   def create(identifier, name, features \\ []) do

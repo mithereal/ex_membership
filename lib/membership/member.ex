@@ -312,6 +312,7 @@ defmodule Membership.Member do
     changeset(%Member{}, %{
       name: name
     })
+    |> Ecto.Changeset.apply_changes()
   end
 
   def create(name) do
