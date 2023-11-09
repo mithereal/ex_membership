@@ -613,6 +613,7 @@ defmodule Membership do
     |> Enum.reject(fn module ->
       Enum.member?(module, "Mix")
     end)
+    |> Enum.map(&Module.concat/1)
   end
 
   @doc """
