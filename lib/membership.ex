@@ -606,7 +606,13 @@ defmodule Membership do
   """
 
   def get_loaded_modules() do
-    :application.get_key(:ex_membership, :modules)
+    {:ok, modules} = :application.get_key(:ex_membership, :modules)
+
+    modules
+    |> Enum.map(&Module.split/1)
+    |> Enum.reject(fn module ->
+      Enum.member?(module, "Mix")
+    end)
   end
 
   @doc """
