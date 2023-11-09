@@ -19,6 +19,9 @@ defmodule Membership.Member do
   @typedoc "A member struct"
   @type t :: %Member{}
 
+  @default_alphabet nil
+  @default_membership_identifier_size 8
+
   schema "membership_members" do
     field(:features, {:array, :string}, default: [])
     field(:identifier, :string, default: nil)
@@ -51,8 +54,9 @@ defmodule Membership.Member do
   end
 
   def generate_identifier(changeset) do
-    size = Membership.Config.get(:membership_identifier_size, 8)
-    changeset |> put_change(:identifier, Nanoid.generate(size))
+    size = Membership.Config.get(:membership_identifier_size, @default_membership_identifier_size)
+    alphabet = Membership.Config.get(:membership_identifier_alphabet, @default_alphabet)
+    changeset |> put_change(:identifier, Nanoid.generate(size, alphabet))
   end
 
   @doc """
