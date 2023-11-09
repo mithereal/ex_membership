@@ -598,6 +598,31 @@ defmodule Membership do
   end
 
   @doc """
+  List membership and related modules.
+
+  ## Examples
+
+      iex> Membership.get_loaded_modules()
+  """
+
+  def get_loaded_modules() do
+    {:ok, modules} = :application.get_key(:ex_membership, :modules)
+
+    modules
+    |> Stream.map(&Module.split/1)
+    |> Stream.filter(fn module ->
+      case module do
+        ["Membership"] -> true
+        ["Membership", "_"] -> true
+        ["Membership", "_", "_"] -> true
+        ["Membership", "_", "_", "_"] -> true
+        _ -> false
+      end
+    end)
+    |> Stream.map(&Module.concat/1)
+  end
+
+  @doc """
   List version.
 
   ## Examples
