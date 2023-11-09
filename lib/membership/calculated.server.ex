@@ -6,7 +6,6 @@ defmodule Membership.Calculated.Server do
     this will store the state of the calculated function where the registry key is the module refeered to then optionally cache the results.
   """
 
-  require Logger
   @registry_name :member_calculated_permissions
   @default %{calculated_as_authorized: []}
 

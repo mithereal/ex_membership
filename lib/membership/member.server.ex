@@ -7,7 +7,6 @@ defmodule Membership.Member.Server do
     this will store the member state
   """
 
-  require Logger
   @registry_name :active_memberships
 
   defstruct identifier: nil, features: []

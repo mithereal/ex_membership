@@ -6,7 +6,6 @@ defmodule Membership.Permission.Server do
     this will store the member state
   """
 
-  require Logger
   @registry_name :module_permissions
   @default %{required_features: [], calculated_as_authorized: []}
 
