@@ -34,7 +34,7 @@ defmodule Post do
       calculated(
         member,
         fn member ->
-          member.email_confirmed == true
+          Post.confirmed_email(member)
         end,
         :calculated_function
       )
