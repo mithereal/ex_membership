@@ -15,16 +15,16 @@ we then can hold each user in a registry and compare features on a function leve
 Here is a small example:
 
 ```elixir
-defmodule Sample.Post do
+defmodule Post do
   use Membership, registry: :post
   
-  alias Sample.Post 
-  alias Sample.Repo 
+  alias Post 
+  alias Membership.Repo 
   alias Membership.Member
   
    def create_post(id, member_id \\ 1) do
     member = Repo.get(Member, member_id)
-    post = %Post{id: 151}
+    post = %Post{id: id}
 
     permissions(member) do
       has_plan(:editor)
@@ -46,7 +46,7 @@ defmodule Sample.Post do
   def delete_post(id, member_id \\ 1) do
     member = Repo.get(Member, member_id)
     member = load_and_authorize_member(member)
-    post = %Post{id: 1}
+    post = %Post{id: id}
 
     permissions do
       has_plan(:admin) # or
@@ -54,7 +54,7 @@ defmodule Sample.Post do
       has_feature(:delete_posts) # or
       has_feature(:delete, post) # Entity related features
       calculated(fn member ->
-        member.email_confirmed?
+        Post.email_confirmed?(member)
       end)
     end
 
