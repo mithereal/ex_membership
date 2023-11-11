@@ -24,7 +24,6 @@ defmodule Membership.Config do
                 "ex_membership config was found, but doesn't contain a keyword list."
         end
 
-      config ->
         config
     end
   end
