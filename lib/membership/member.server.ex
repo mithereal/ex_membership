@@ -19,6 +19,7 @@ defmodule Membership.Member.Server do
     }
   end
 
+  ## todo: figure out how to send to the ref sup processes for calculated funs
   @impl true
   def init(init_arg) do
     registry_name = "#{init_arg.identifier}_calculated_modules"
@@ -101,7 +102,7 @@ defmodule Membership.Member.Server do
       )
 
     ic(reply)
-    ## todo:: get state od replys
+    ## todo:: get state of replys
     {:reply, reply, state}
   end
 

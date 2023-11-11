@@ -26,6 +26,7 @@ defmodule Post do
     end
   end
 
+  ## todo:: figure out how/when to pass args to a calculated_function,
   def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member, %{email_confirmed: email_confirmed})
 
