@@ -19,7 +19,6 @@ defmodule Membership.Member.Server do
     }
   end
 
-  ## todo: figure out how to send to the ref sup processes for calculated funs
   @impl true
   def init(init_arg) do
     registry_name = "#{init_arg.identifier}_calculated_modules"
@@ -40,7 +39,7 @@ defmodule Membership.Member.Server do
 
   def fetch_from_calculated_registry(member, data) do
     name = via_tuple(member.identifier)
-    # GenServer.call(name, {:fetch_from_calculated_registry, data})
+    GenServer.call(name, {:fetch_from_calculated_registry, data})
   end
 
   def start_link(data) do

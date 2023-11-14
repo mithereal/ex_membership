@@ -185,7 +185,7 @@ defmodule Membership.Behaviour do
         quote do
           current_member = Membership.Member.Server.show(unquote(current_member))
 
-          rules = %{calculated_as_authorized: unquote(func_name)(current_member)}
+          rules = unquote(func_name)(current_member)
 
           data = {unquote(func_name), rules}
 
@@ -207,9 +207,7 @@ defmodule Membership.Behaviour do
 
           result = apply(unquote(callback), [current_member])
 
-          rules = %{calculated_as_authorized: result}
-
-          data = {unquote(func_name), rules}
+          data = {unquote(func_name), [result]}
 
           Membership.Member.Server.add_to_calculated_registry(current_member, data)
         end
@@ -221,9 +219,8 @@ defmodule Membership.Behaviour do
             Membership.Member.Server.show(unquote(current_member))
 
           result = unquote(func_name)(current_member, unquote(bindings))
-          rules = %{calculated_as_authorized: result}
 
-          data = {unquote(func_name), rules}
+          data = {unquote(func_name), [result]}
 
           Membership.Member.Server.add_to_calculated_registry(current_member, data)
         end

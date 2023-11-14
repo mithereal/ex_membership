@@ -29,7 +29,7 @@ defmodule Post do
   def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member, %{email_confirmed: email_confirmed})
     function_name = :calculated_function
-    ## FIXME: this needs to access the registry for the function result
+
     permissions(member) do
       calculated(
         member,
