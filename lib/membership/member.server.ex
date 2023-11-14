@@ -26,7 +26,7 @@ defmodule Membership.Member.Server do
     supervisor_name = "#{init_arg.identifier}_calculated_modules_supervisor"
     Registry.start_link(keys: :unique, name: String.to_atom(registry_name))
 
-    GenServer.start_link(Membership.Calculated.Supervisor, name: String.to_atom(supervisor_name))
+    Membership.Calculated.Supervisor.start_link(init_arg, String.to_atom(supervisor_name))
     {:ok, init_arg}
   end
 

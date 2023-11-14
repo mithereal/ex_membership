@@ -26,10 +26,9 @@ defmodule Post do
     end
   end
 
-  ## todo:: figure out how/when to pass args to a calculated_function,
   def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member, %{email_confirmed: email_confirmed})
-
+    function_name = :calculated_function
     ## FIXME: this needs to access the registry for the function result
     permissions(member) do
       calculated(
@@ -37,11 +36,11 @@ defmodule Post do
         fn member ->
           Post.confirmed_email(member)
         end,
-        :calculated_function
+        function_name
       )
     end
 
-    case authorized?(member, :calculated_function) do
+    case authorized?(member, function_name) do
       :ok -> {:ok, "Authorized"}
       _ -> raise ArgumentError, message: "Not authorized"
     end
@@ -60,8 +59,8 @@ defmodule Post do
     end
   end
 
-  def confirmed_email(_member) do
-    false
+  def confirmed_email(member) do
+    member.email_confirmed == true
   end
 
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
