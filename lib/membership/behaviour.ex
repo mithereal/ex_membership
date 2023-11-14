@@ -183,7 +183,7 @@ defmodule Membership.Behaviour do
           rules = unquote(func_name)(current_member)
 
           data = {unquote(func_name), rules}
-          ## TODO: appemnd registry vs replace
+
           registry =
             Membership.Registry.add(
               @registry,

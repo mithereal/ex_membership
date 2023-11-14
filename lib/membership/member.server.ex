@@ -100,8 +100,6 @@ defmodule Membership.Member.Server do
         String.to_atom(registry_name)
       )
 
-    ic(reply)
-    ## todo:: get state of replys
     {:reply, reply, state}
   end
 
