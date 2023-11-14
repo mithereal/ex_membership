@@ -7,7 +7,7 @@ defmodule Membership.Permission.Server do
   """
 
   @registry_name :module_permissions
-  @default %{required_features: [], calculated_as_authorized: []}
+  @default []
 
   def child_spec(data) do
     %{
@@ -78,7 +78,7 @@ defmodule Membership.Permission.Server do
         {:ok, current} -> current
       end
 
-    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+    uniq = Enum.uniq(current ++ [value])
 
     :ets.insert(state.ref, {name, uniq})
     {:noreply, state}

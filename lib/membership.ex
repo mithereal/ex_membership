@@ -35,7 +35,7 @@ defmodule Membership do
 
   """
 
-  @default_features %{required_features: [], calculated_as_authorized: []}
+  @default_features []
 
   defmacro __using__(opts) do
     quote do
@@ -123,12 +123,7 @@ defmodule Membership do
         Map.__info__(:functions)
         |> Enum.filter(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
         |> Enum.each(fn {x, _} ->
-          default = %{
-            required_features: [],
-            calculated_as_authorized: []
-          }
-
-          Membership.Permission.Server.insert(current_module, x, default)
+          Membership.Permission.Server.insert(current_module, x, [])
         end)
     end
   end
@@ -379,7 +374,7 @@ defmodule Membership do
       required_features =
         required_features ++
           plan_features ++
-          role_features ++ rules.required_features
+          role_features ++ rules
 
       # If no as_authorized were required then we can assume member is granted
       if length(required_features) do

@@ -3,7 +3,7 @@ defmodule Membership.Behaviour do
     quote do
       opts = unquote(opts)
       @registry Keyword.fetch!(opts, :registry)
-      @default_features %{required_features: [], calculated_as_authorized: []}
+      @default_features []
 
       @doc """
       Macro for defining required permissions
@@ -69,12 +69,7 @@ defmodule Membership.Behaviour do
             Map.__info__(:functions)
             |> Enum.reject(fn {x, _} -> Enum.member?(ignored_functions(), x) end)
             |> Enum.each(fn {x, _} ->
-              default = %{
-                required_features: [],
-                calculated_as_authorized: []
-              }
-
-              Membership.Permission.Server.insert(current_module, x, default)
+              Membership.Permission.Server.insert(current_module, x, [])
             end)
         end
       end
@@ -188,7 +183,7 @@ defmodule Membership.Behaviour do
           rules = unquote(func_name)(current_member)
 
           data = {unquote(func_name), rules}
-
+          ## TODO: appemnd registry vs replace
           registry =
             Membership.Registry.add(
               @registry,
@@ -359,7 +354,7 @@ defmodule Membership.Behaviour do
           required_features =
             required_features ++
               plan_features ++
-              role_features ++ rules.required_features
+              role_features ++ rules
 
           # If no as_authorized were required then we can assume member is granted
           if length(required_features) == 0 do

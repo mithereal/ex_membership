@@ -3,7 +3,7 @@ defmodule Membership.Registry do
 
   use GenServer
 
-  @default %{required_features: [], calculated_as_authorized: []}
+  @default []
 
   def start_link(args) do
     {:ok, pid} =
@@ -40,7 +40,7 @@ defmodule Membership.Registry do
         {:ok, current} -> current
       end
 
-    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+    uniq = Enum.uniq(current ++ [value])
 
     :ets.insert(identifier, {name, uniq})
   end
@@ -52,7 +52,7 @@ defmodule Membership.Registry do
         {:ok, current} -> current
       end
 
-    uniq = %{current | required_features: Enum.uniq(current.required_features ++ [value])}
+    uniq = Enum.uniq(current ++ [value])
 
     :ets.insert(identifier, {name, uniq})
   end
