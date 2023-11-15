@@ -28,6 +28,7 @@ defmodule Membership.FeatureTest do
           identifier: "admin",
           name: "Global administrator"
         })
+        |> Ecto.Changeset.apply_changes()
 
       built_changeset = Feature.build("admin", "Global administrator")
 
