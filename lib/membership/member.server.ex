@@ -1,6 +1,5 @@
 defmodule Membership.Member.Server do
   use GenServer
-  import IceCream
 
   @moduledoc """
   Service
