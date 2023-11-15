@@ -83,8 +83,12 @@ defmodule Post do
   end
 
   def delete_post(id \\ 1, member_id \\ 1, function_name \\ "delete_post") do
+    email_confirmed_function_result = true
+
     member =
-      load_and_authorize_member(%Membership.Member{id: member_id}, %{email_confirmed: true})
+      load_and_authorize_member(%Membership.Member{id: member_id}, %{
+        email_confirmed: email_confirmed_function_result
+      })
 
     permissions(member) do
       # or check 1st arg for being an atom vs string
