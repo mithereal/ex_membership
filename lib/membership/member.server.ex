@@ -100,6 +100,8 @@ defmodule Membership.Member.Server do
         String.to_atom(registry_name)
       )
 
+    # TODO: make each pid show
+
     {:reply, reply, state}
   end
 

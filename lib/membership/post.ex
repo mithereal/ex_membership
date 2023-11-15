@@ -36,7 +36,7 @@ defmodule Post do
         fn member ->
           Post.confirmed_email(member)
         end,
-        function_name
+        :calculated_function
       )
     end
 
