@@ -329,10 +329,13 @@ defmodule Membership.Behaviour do
               func_name
             )
 
-          rules =
-            case is_nil(rules) do
-              true -> @default_features
-              false -> rules
+          calculated_rules =
+            case calculated_rules do
+              {_, value} ->
+                value
+
+              _ ->
+                calculated_rules
             end
 
           plan_features =
@@ -354,8 +357,14 @@ defmodule Membership.Behaviour do
               plan_features ++
               role_features ++ rules
 
+          required_features =
+            case(required_features) do
+              nil -> []
+              _ -> required_features
+            end
+
           # If no as_authorized were required then we can assume member is granted
-          if length(required_features && required_features) == 0 do
+          if length(required_features) == 0 do
             :ok
           else
             reply =
