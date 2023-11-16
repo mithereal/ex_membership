@@ -228,9 +228,8 @@ defmodule Membership.Behaviour do
             Membership.Member.Server.show(unquote(current_member))
 
           result = apply(unquote(callback), [current_member, unquote(bindings)])
-          rules = %{calculated_as_authorized: result}
 
-          data = {unquote(func_name), rules}
+          data = {unquote(func_name), result}
 
           Membership.Member.Server.add_to_calculated_registry(current_member, data)
         end

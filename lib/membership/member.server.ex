@@ -20,11 +20,8 @@ defmodule Membership.Member.Server do
 
   @impl true
   def init(init_arg) do
-    registry_name = "#{init_arg.identifier}_calculated_modules"
-    supervisor_name = "#{init_arg.identifier}_calculated_modules_supervisor"
-    Registry.start_link(keys: :unique, name: String.to_atom(registry_name))
-
-    Membership.Calculated.Supervisor.start_link(init_arg, String.to_atom(supervisor_name))
+    {:ok, agent} = Agent.start_link(fn -> [] end)
+    init_arg = Map.put(init_arg, :ref, agent)
     {:ok, init_arg}
   end
 
@@ -68,45 +65,23 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_call({:add_to_calculated_registry, data}, _, state) do
-    supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
-    registry_name = "#{state.identifier}_calculated_modules"
-
-    Membership.Calculated.Supervisor.start(
-      String.to_atom(supervisor_name),
-      String.to_atom(registry_name),
-      data
-    )
+    Agent.update(state.ref, fn state -> data end)
 
     {:reply, state, state}
   end
 
   @impl true
   def handle_call({:fetch_from_calculated_registry, key}, _, state) do
-    supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
-    registry_name = "#{state.identifier}_calculated_modules"
-
     reply =
-      Membership.Calculated.Supervisor.get(
-        String.to_atom(supervisor_name),
-        String.to_atom(registry_name),
-        key
-      )
+      Agent.get(state.ref, fn state -> key end)
 
     {:reply, reply, state}
   end
 
   @impl true
   def handle_call(:fetch_from_calculated_registry, _, state) do
-    supervisor_name = "#{state.identifier}_calculated_modules_supervisor"
-    registry_name = "#{state.identifier}_calculated_modules"
-
     reply =
-      Membership.Calculated.Supervisor.list(
-        String.to_atom(supervisor_name),
-        String.to_atom(registry_name)
-      )
-
-    # TODO: make each pid show
+      Agent.get(state.ref, fn state -> state end)
 
     {:reply, reply, state}
   end

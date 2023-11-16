@@ -465,6 +465,7 @@ defmodule Membership do
       end
 
     member = Membership.Repo.get!(Membership.Member, member.id) |> Map.merge(opts)
+
     status = Membership.Memberships.Supervisor.start(member)
 
     case status do
