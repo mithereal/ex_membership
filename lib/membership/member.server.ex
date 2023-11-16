@@ -29,11 +29,13 @@ defmodule Membership.Member.Server do
   end
 
   def add_to_calculated_registry(member, data) do
-    GenServer.call(member.identifier, {:add_to_calculated_registry, data})
+    name = via_tuple(member.identifier)
+    GenServer.call(name, {:add_to_calculated_registry, data})
   end
 
   def fetch_from_calculated_registry(member) do
-    GenServer.call(member.identifier, :fetch_from_calculated_registry)
+    name = via_tuple(member.identifier)
+    GenServer.call(name, :fetch_from_calculated_registry)
   end
 
   def fetch_from_calculated_registry(member, data) do
@@ -44,6 +46,11 @@ defmodule Membership.Member.Server do
   def start_link(data) do
     name = via_tuple(data.identifier)
     GenServer.start_link(__MODULE__, data, name: name)
+  end
+
+  def shutdown(data) do
+    name = via_tuple(data.identifier)
+    GenServer.call(name, :shutdown)
   end
 
   def shutdown() do
