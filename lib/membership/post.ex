@@ -60,7 +60,8 @@ defmodule Post do
   end
 
   def confirmed_email(member) do
-    Map.fetch(member, :email_confirmed) == true
+    {_, reply} = Map.fetch(member, :email_confirmed)
+    reply
   end
 
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do

@@ -65,7 +65,7 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_call({:add_to_calculated_registry, data}, _, state) do
-    Agent.update(state.ref, fn state -> data end)
+    Agent.update(state.ref, fn state -> [data] end)
 
     {:reply, state, state}
   end
@@ -76,6 +76,12 @@ defmodule Membership.Member.Server do
       Agent.get(state.ref, fn state ->
         Enum.find(state, fn {x, _} -> x == key end)
       end)
+
+    reply =
+      case reply do
+        nil -> []
+        _ -> reply
+      end
 
     {:reply, reply, state}
   end

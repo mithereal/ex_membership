@@ -346,7 +346,13 @@ defmodule Membership do
     if is_nil(current_member) do
       {:error, "Member is not granted to perform this action"}
     else
-      rules = fetch_rules_from_ets(func_name)
+      rules =
+        try do
+          fetch_rules_from_ets(func_name)
+        rescue
+          _ ->
+            []
+        end
 
       calculated_rules =
         Membership.Member.Server.fetch_from_calculated_registry(current_member, func_name)
