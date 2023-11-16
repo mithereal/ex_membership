@@ -73,7 +73,9 @@ defmodule Membership.Member.Server do
   @impl true
   def handle_call({:fetch_from_calculated_registry, key}, _, state) do
     reply =
-      Agent.get(state.ref, fn state -> key end)
+      Agent.get(state.ref, fn state ->
+        Enum.find(state, fn {x, _} -> x == key end)
+      end)
 
     {:reply, reply, state}
   end
