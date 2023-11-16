@@ -355,7 +355,7 @@ defmodule Membership.Behaviour do
               role_features ++ rules
 
           # If no as_authorized were required then we can assume member is granted
-          if length(required_features) == 0 do
+          if length(required_features && required_features) == 0 do
             :ok
           else
             reply =

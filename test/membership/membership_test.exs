@@ -145,9 +145,9 @@ defmodule Membership.MembershipTest do
       assert {:ok, "Authorized"} == Post.calculated_function(member, true)
     end
 
-    # fixme: this test fails bc we need to unregister the user first since we are holding old state in genserver
     #    test "rejects calculated permissions" do
     #      member = insert(:member)
+    #      Membership.unload_member!(member)
     #
     #      assert_raise ArgumentError, fn ->
     #        reply = Post.calculated_function(member, false)

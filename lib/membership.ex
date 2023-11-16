@@ -415,7 +415,7 @@ defmodule Membership do
   @doc false
   def create_membership() do
     quote do
-      import Membership, only: [load_and_store_member!: 2]
+      import Membership, only: [load_and_store_member!: 2, unload_member!: 1]
 
       def load_and_authorize_member(%Membership.Member{id: _id} = member),
         do: load_and_store_member!(member, %{})
@@ -456,7 +456,7 @@ defmodule Membership do
 
     case status do
       {:ok, _} -> member
-      {:error, {:already_started, _}} -> member
+      {:error, {:already_started, _}} -> Membership.Memberships.Supervisor.update(member)
       {:error, _} -> nil
     end
   end
@@ -479,6 +479,12 @@ defmodule Membership do
       {:error, {:already_started, _}} -> member
       {:error, _} -> nil
     end
+  end
+
+  @doc false
+  @spec unload_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
+  def unload_member!(%Membership.Member{} = member) do
+    Membership.Memberships.Supervisor.stop(member.identifier)
   end
 
   @doc false

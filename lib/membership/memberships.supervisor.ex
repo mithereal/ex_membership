@@ -67,6 +67,16 @@ defmodule Membership.Memberships.Supervisor do
     end
   end
 
+  def update({:ok, member}) do
+    SERVER.via_tuple(member.identifier)
+    |> GenServer.cast({:update, member})
+  end
+
+  def update(member) do
+    SERVER.via_tuple(member.identifier)
+    |> GenServer.cast({:update, member})
+  end
+
   def update_children() do
     list()
     |> Enum.each(fn x ->

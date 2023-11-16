@@ -71,6 +71,11 @@ defmodule Membership.Member.Server do
   end
 
   @impl true
+  def handle_cast({:update, data}, state) do
+    {:noreply, data}
+  end
+
+  @impl true
   def handle_call({:fetch_from_calculated_registry, key}, _, state) do
     reply =
       Agent.get(state.ref, fn state ->
