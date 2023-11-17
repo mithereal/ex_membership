@@ -357,6 +357,15 @@ defmodule Membership do
       calculated_rules =
         Membership.Member.Server.fetch_from_calculated_registry(current_member, func_name)
 
+      calculated_rules =
+        case calculated_rules do
+          {_, value} ->
+            value
+
+          _ ->
+            calculated_rules
+        end
+
       rules =
         case is_nil(rules) do
           true -> @default_features
@@ -383,7 +392,7 @@ defmodule Membership do
           role_features ++ rules
 
       # If no as_authorized were required then we can assume member is granted
-      if length(required_features) do
+      if length(required_features ++ calculated_rules) == 0 do
         :ok
       else
         reply =
