@@ -20,7 +20,10 @@ defmodule Membership.Memberships.Supervisor do
     }
   end
 
-  def reload(id) do
+  def reload(member) do
+    stop(member)
+    start(member)
+    {:ok, member}
   end
 
   def start_link(init_arg) do
@@ -41,15 +44,11 @@ defmodule Membership.Memberships.Supervisor do
 
     {status, pid} = DynamicSupervisor.start_child(@name, child_spec)
 
-    if status == :ok do
-      send(pid, :load)
-    end
-
     {status, pid}
   end
 
-  def stop(id) do
-    case Registry.lookup(@registry_name, id) do
+  def stop(member) do
+    case Registry.lookup(@registry_name, member.identifier) do
       [] ->
         :ok
 
@@ -77,7 +76,7 @@ defmodule Membership.Memberships.Supervisor do
 
   def update(member) do
     SERVER.via_tuple(member.identifier)
-    |> GenServer.call({:update, member})
+    |> GenServer.cast({:update, member})
   end
 
   def update_children() do

@@ -71,7 +71,8 @@ defmodule Membership.Member.Server do
   end
 
   @impl true
-  def handle_call({:update, data}, _, state) do
+  def handle_cast({:update, data}, state) do
+    data = Map.put(data, :ref, state.ref)
     {:noreply, data}
   end
 
@@ -102,11 +103,6 @@ defmodule Membership.Member.Server do
   @impl true
   def handle_call(_msg, _, state) do
     {:reply, state, state}
-  end
-
-  @impl true
-  def handle_cast(:load, state) do
-    {:noreply, state}
   end
 
   @impl true

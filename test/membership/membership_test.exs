@@ -147,10 +147,10 @@ defmodule Membership.MembershipTest do
 
     test "rejects calculated permissions" do
       member = insert(:member)
-      Membership.unload_member!(member)
+      IO.inspect(Post.calculated_function(member, false))
 
       assert_raise ArgumentError, fn ->
-        reply = Post.calculated_function(member, false)
+        Post.calculated_function(member, false)
       end
     end
 

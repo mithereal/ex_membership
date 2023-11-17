@@ -492,10 +492,23 @@ defmodule Membership do
           status = Membership.Memberships.Supervisor.start(member)
 
           case status do
-            {:ok, _} -> member
+            {:ok, _} ->
+              member
+
             ## reload the member
-            {:error, {:already_started, _}} -> Membership.Memberships.Supervisor.update(member)
-            {:error, _} -> nil
+            {:error, {:already_started, _pid}} ->
+              status = Membership.Memberships.Supervisor.reload(member)
+
+              case status do
+                {:ok, _} ->
+                  member
+
+                {:error, _} ->
+                  member
+              end
+
+            {:error, _} ->
+              nil
           end
       end
   end
