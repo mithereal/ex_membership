@@ -475,42 +475,40 @@ defmodule Membership do
   def load_and_store_member!(%Membership.Member{} = member, opts) do
     member = Membership.Repo.get!(Membership.Member, member.id)
 
-    opts =
-      case is_nil(opts) do
-        true ->
-          status = Membership.Memberships.Supervisor.start(member)
+    case is_nil(opts) do
+      true ->
+        status = Membership.Memberships.Supervisor.start(member)
 
-          case status do
-            {:ok, _} -> member
-            {:error, {:already_started, _}} -> member
-            {:error, _} -> nil
-          end
+        case status do
+          {:ok, _} -> member
+          {:error, {:already_started, _}} -> member
+          {:error, _} -> nil
+        end
 
-        false ->
-          member = member |> Map.merge(opts)
+      false ->
+        member = member |> Map.merge(opts)
 
-          status = Membership.Memberships.Supervisor.start(member)
+        status = Membership.Memberships.Supervisor.start(member)
 
-          case status do
-            {:ok, _} ->
-              member
+        case status do
+          {:ok, _} ->
+            member
 
-            ## reload the member
-            {:error, {:already_started, _pid}} ->
-              status = Membership.Memberships.Supervisor.reload(member)
+          {:error, {:already_started, _pid}} ->
+            status = Membership.Memberships.Supervisor.reload(member)
 
-              case status do
-                {:ok, _} ->
-                  member
+            case status do
+              {:ok, _} ->
+                member
 
-                {:error, _} ->
-                  member
-              end
+              {:error, _} ->
+                member
+            end
 
-            {:error, _} ->
-              nil
-          end
-      end
+          {:error, _} ->
+            nil
+        end
+    end
   end
 
   @doc false

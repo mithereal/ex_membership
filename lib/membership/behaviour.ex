@@ -436,7 +436,7 @@ defmodule Membership.Behaviour do
             Enum.member?(active_features, feature)
           end)
 
-        length(authorized) > 0
+        length(authorized) > 0 || length(required_features) == 0
       end
 
       @doc false
@@ -450,9 +450,7 @@ defmodule Membership.Behaviour do
           end
 
         authorized =
-          Enum.reduce(conditions, false, fn condition, acc ->
-            condition || acc
-          end)
+          !Enum.member?(conditions, false)
 
         case authorized do
           true -> :ok

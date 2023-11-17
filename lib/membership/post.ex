@@ -29,7 +29,6 @@ defmodule Post do
   def calculated_function(member, email_confirmed) do
     member = load_and_authorize_member(member, %{email_confirmed: email_confirmed})
     function_name = :calculated_function
-    #   IO.inspect(member, label: "member")
 
     permissions(member) do
       calculated(
@@ -67,7 +66,7 @@ defmodule Post do
 
     case reply do
       :error -> false
-      {:ok, data} -> true
+      {:ok, data} -> data
       _ -> false
     end
   end

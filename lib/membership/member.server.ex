@@ -65,15 +65,9 @@ defmodule Membership.Member.Server do
 
   @impl true
   def handle_call({:add_to_calculated_registry, data}, _, state) do
-    Agent.update(state.ref, fn state -> [data] end)
+    Agent.update(state.ref, fn _state -> [data] end)
 
     {:reply, state, state}
-  end
-
-  @impl true
-  def handle_cast({:update, data}, state) do
-    data = Map.put(data, :ref, state.ref)
-    {:noreply, data}
   end
 
   @impl true
@@ -111,6 +105,12 @@ defmodule Membership.Member.Server do
         state
       ) do
     {:stop, :normal, state}
+  end
+
+  @impl true
+  def handle_cast({:update, data}, state) do
+    data = Map.put(data, :ref, state.ref)
+    {:noreply, data}
   end
 
   @doc false
