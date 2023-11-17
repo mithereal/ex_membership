@@ -34,7 +34,6 @@ defmodule Post do
       calculated(
         member,
         fn member ->
-          IO.inspect(member, label: "member")
           Post.confirmed_email(member)
         end,
         :calculated_function
