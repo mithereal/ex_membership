@@ -71,7 +71,7 @@ defmodule Membership.Member.Server do
   end
 
   @impl true
-  def handle_cast({:update, data}, state) do
+  def handle_call({:update, data}, _, state) do
     {:noreply, data}
   end
 

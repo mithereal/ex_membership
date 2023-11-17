@@ -20,6 +20,9 @@ defmodule Membership.Memberships.Supervisor do
     }
   end
 
+  def reload(id) do
+  end
+
   def start_link(init_arg) do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: @name)
   end
@@ -74,7 +77,7 @@ defmodule Membership.Memberships.Supervisor do
 
   def update(member) do
     SERVER.via_tuple(member.identifier)
-    |> GenServer.cast({:update, member})
+    |> GenServer.call({:update, member})
   end
 
   def update_children() do
