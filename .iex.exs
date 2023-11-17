@@ -71,7 +71,7 @@ IEx.configure(
 case Code.ensure_compiled(:debugger) do
   {:error, :nofile} ->
     Logger.error(
-      ":debugger not found, ensure :debugger exists under extra_applications in mix.exs"
+      ":debugger not found, ensure :debugger is loaded in the application (extra_applications[:debugger] in mix.exs)"
     )
 
     {:error, "debugger not loaded"}
