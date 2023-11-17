@@ -6,7 +6,6 @@ defmodule Membership.Memberships.Supervisor do
     this will supervise the memberships
   """
 
-  #  alias __MODULE__, as: SUPERVISOR
   alias Membership.Member.Server, as: SERVER
 
   @name :memberships_supervisor
