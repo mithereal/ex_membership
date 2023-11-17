@@ -1,7 +1,7 @@
 defmodule Membership.MixProject do
   use Mix.Project
 
-  @version "0.5.2"
+  @version "1.0.0"
   @source_url "https://github.com/mithereal/ExMembership"
 
   def project do

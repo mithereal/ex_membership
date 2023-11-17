@@ -340,42 +340,6 @@ end
 
 ### Member related features
 
-## TODO: add feature to generic struct
-
-Membership allows you to grant features on any particular struct. Struct needs to have signature
-of `%{__struct__: entity_name, id: entity_id}` to infer correct relations. Lets assume that we want to grant `:delete`
-feature on particular `Post` for our member:
-
-```elixir
-iex> {:ok, member} = %Membership.Member{} |> Membership.Repo.insert()
-iex> post = %Post{id: 1}
-iex> feature = %Feature{identifier: "delete"}
-iex> Membership.Member.grant(member, :delete, post)
-iex> Membership.has_feature?(member, :delete, post)
-true
-```
-
-```elixir
-defmodule Sample.Post do
- use Membership, registry: :post
- 
-  def delete(id \\ 1, member_id \\ 1) do
-    member = Sample.Repo.get(Sample.User, member_id)
-    load_and_authorize_member(member)
-    
-    post = %Post{id: id}
-
-    permissions do
-      has_feature(:delete, post)
-    end
-
-    member_authorized do
-      :ok
-    end
-  end
-end
-```
-
 ### Granting features
 
 Let's assume we want to create new `Plan` - _gold_ which is able to delete accounts inside our system. We want to have
