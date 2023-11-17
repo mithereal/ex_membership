@@ -151,7 +151,6 @@ defmodule Membership.MembershipTest do
 
       assert_raise ArgumentError, fn ->
         reply = Post.calculated_function(member, false)
-        IO.inspect(reply)
       end
     end
 
