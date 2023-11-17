@@ -201,7 +201,7 @@ defmodule Membership do
         end
       end
 
-    For more complex calculation you need to pass bindings to the function
+    For more complex calculations you need to pass bindings to the function
 
         defmodule HelloTest do
         use Membership
