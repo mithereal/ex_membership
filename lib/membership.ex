@@ -29,9 +29,9 @@ defmodule Membership do
 
 
   ## Available as_authorized
-    * `Membership.has_plan/1` - Requires single plan to be present on member
-    * `Membership.has_role/1` - Requires single role to be present on member
-    * `Membership.has_feature/1` - Requires single feature to be present on member
+    * `Membership.has_plan?/3` - Requires single plan to be present on member
+    * `Membership.has_role?/3` - Requires single role to be present on member
+    * `Membership.has_feature?/3` - Requires single feature to be present on member
 
   """
 
