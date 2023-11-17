@@ -1,7 +1,10 @@
 defmodule Membership.Member.Server do
   use GenServer
 
-  @moduledoc false
+  @moduledoc """
+  Service
+    this will store the member state
+  """
 
   @registry_name :active_memberships
 
@@ -110,6 +113,7 @@ defmodule Membership.Member.Server do
     {:noreply, data}
   end
 
+  @doc false
   def via_tuple(id, registry \\ @registry_name) do
     {:via, Registry, {registry, id}}
   end

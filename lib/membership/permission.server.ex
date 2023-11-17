@@ -1,7 +1,10 @@
 defmodule Membership.Permission.Server do
   use GenServer
 
-  @moduledoc false
+  @moduledoc """
+  Service
+    this will store the member state
+  """
 
   @registry_name :module_permissions
   @default []
@@ -47,6 +50,7 @@ defmodule Membership.Permission.Server do
     GenServer.start_link(__MODULE__, data, name: name)
   end
 
+  @doc false
   def via_tuple(id, registry \\ @registry_name) do
     {:via, Registry, {registry, id}}
   end

@@ -1,7 +1,10 @@
 defmodule Membership.Memberships.Supervisor do
   use DynamicSupervisor
 
-  @moduledoc false
+  @moduledoc """
+  Service Supervisor
+    this will supervise the memberships
+  """
 
   #  alias __MODULE__, as: SUPERVISOR
   alias Membership.Member.Server, as: SERVER

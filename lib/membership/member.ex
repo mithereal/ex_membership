@@ -59,6 +59,24 @@ defmodule Membership.Member do
     changeset |> put_change(:identifier, Nanoid.generate(size, alphabet))
   end
 
+  @doc """
+  Grant given grant type to a member.
+
+  ## Examples
+
+  Function accepts either `Membership.Feature` or `Membership.Plan` grants.
+  Function is merging existing grants with the new ones, so calling grant with same
+  grants will not duplicate entries in table.
+
+  To grant particular feature to a given member
+
+      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
+
+  To grant particular plan to a given member
+
+      iex> Membership.Member.grant(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
+
+  """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: plan_id} = _plan) do
     member = Member |> Repo.get!(id)
@@ -125,6 +143,24 @@ defmodule Membership.Member do
   end
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
+
+  @doc """
+  Revoke given grant type from a member.
+
+  ## Examples
+
+  Function accepts either `Membership.Feature` or `Membership.Plan` grants.
+  Function is directly opposite of `Membership.Member.grant/2`
+
+  To revoke particular feature from a given member
+
+      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Feature{id: 1})
+
+  To revoke particular plan from a given member
+
+      iex> Membership.Member.revoke(%Membership.Member{id: 1}, %Membership.Plan{id: 1})
+
+  """
 
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
@@ -222,6 +258,12 @@ defmodule Membership.Member do
     |> Repo.one()
   end
 
+  @doc """
+  Sync features column with the member features and member plans pivot tables.
+  we do this for caching reasons, ie holding the plan[feature] and extra feature identifiers summed
+  into a list and stored in features column of the member, we  query this to see if member has
+  ex feature vs repo lookup by plan and checking if plan has said feature
+  """
   @spec sync_features(Member.t()) :: Member.t()
   def sync_features(%Member{id: id} = _member) do
     member =

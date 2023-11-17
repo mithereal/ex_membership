@@ -1,5 +1,7 @@
 defmodule Membership.Config do
-  @moduledoc false
+  @doc """
+  Return value by key from config.exs file.
+  """
 
   alias Membership.InvalidConfigError
 
