@@ -1,5 +1,6 @@
 defmodule Post do
   use Membership, registry: :test
+  @moduledoc false
 
   def no_macro(member, function_name \\ "no_macro") do
     member = load_and_authorize_member(member)

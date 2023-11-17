@@ -1,10 +1,7 @@
 defmodule Membership.Permissions.Supervisor do
   use DynamicSupervisor
 
-  @moduledoc """
-  Module Permissions Supervisor
-    this will supervise the permissions
-  """
+  @moduledoc false
 
   alias Membership.Permission.Server, as: SERVER
 

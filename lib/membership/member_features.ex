@@ -1,7 +1,5 @@
 defmodule Membership.MemberFeatures do
-  @moduledoc """
-  MemberFeatures is the association linking the member to the feature you can also set specific features for the membership
-  """
+  @moduledoc false
 
   use Membership.Schema, type: :binary_fk
 

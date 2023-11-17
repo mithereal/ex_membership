@@ -3,10 +3,7 @@ defmodule Membership.Role.Server do
 
   @update_check_time 50000
 
-  @moduledoc """
-  Role
-    this will store/fetch the {role, features} into ets
-  """
+  @moduledoc false
 
   require Logger
 

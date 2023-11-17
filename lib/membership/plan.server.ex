@@ -3,10 +3,7 @@ defmodule Membership.Plan.Server do
 
   @update_check_time 50000
 
-  @moduledoc """
-  Plan
-    this will store/fetch the {plan, features} into ets
-  """
+  @moduledoc false
 
   require Logger
 

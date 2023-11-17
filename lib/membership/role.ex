@@ -1,7 +1,5 @@
 defmodule Membership.Role do
-  @moduledoc """
-  Role is main representation of feature flags assigned to a role
-  """
+  @moduledoc false
 
   use Membership.Schema
   import Ecto.Query
@@ -56,25 +54,6 @@ defmodule Membership.Role do
 
   def table, do: :membership_roles
 
-  @doc """
-  Grant given grant type to a feature.
-
-  ## Examples
-
-  Function accepts either `Membership.Role` or `Membership.Feature` grants.
-  Function is merging existing grants with the new ones, so calling grant with same
-  grants will not duplicate entries in table.
-
-  To grant particular feature to a given role
-
-      iex> Membership.Role.grant(%Membership.Feature{id: 1}, %Membership.Role{id: 1})
-
-  To grant particular feature to a given role
-
-      iex> Membership.Role.grant(%Membership.Role{id: 1}, %Membership.Feature{id: 1})
-
-  """
-
   @spec grant(Role.t(), Role.t() | Feature.t()) :: Member.t()
   def grant(%Role{id: id} = _role, %Feature{id: feature_id} = _feature) do
     # Preload Role features
@@ -123,23 +102,6 @@ defmodule Membership.Role do
 
   def grant(_, _, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
-  @doc """
-  Revoke given grant type from a member.
-
-  ## Examples
-
-  Function accepts either `Membership.Role` or `Membership.Feature` grants.
-  Function is directly opposite of `Membership.Member.grant/2`
-
-  To revoke particular feature from a given plan
-
-      iex> Membership.Role.revoke(%Membership.Feature{id: 1}, %Membership.Role{id: 1})
-
-  To revoke particular plan from a given feature
-
-      iex> Membership.Role.revoke(%Membership.Role{id: 1}, %Membership.Feature{id: 1})
-
-  """
   @spec revoke(Role.t(), Role.t() | Feature.t()) :: Member.t()
   def revoke(%Role{id: id} = _, %Feature{id: _id} = feature) do
     from(pa in RoleFeatures)

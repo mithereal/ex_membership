@@ -1,39 +1,5 @@
 defmodule Membership do
-  @moduledoc """
-  Main Membership module for including macros
-
-  Membership has 4 main components:
-
-    * `Membership.Role` -  Representation of a single role e.g. :admin, :luser, :user
-    * `Membership.Plan` -  Representation of a single plan e.g. :gold, :silver, :copper
-    * `Membership.Member` - Main actor which is holding given plans
-    * `Membership.Feature` - Feature of a plan eg. :edit_feature
-
-  ## Relations between models
-
-  `Membership.Member`  -> `Membership.Feature`[1-n] - Any given member have multiple features with this we can have more granular features for each member is adding a specific feature to a member not in his plan
-
-  `Membership.Member` -> `Membership.Plan` [1-n] - Any given member can have multiple plans
-
-  `Membership.Member` -> `Membership.Role` [1-n] - Any given member can have multiple roles
-
-  `Membership.Plan` -> `Membership.Feature` [m-n] - Any given plan can have multiple features
-
-  `Membership.Role` -> `Membership.Feature` [m-n] - Any given role can have multiple features
-
-
-  ## Calculating permissions
-
-  Calculation of permissions is done by 2 ets tables one holding the logged in members permissions the other holds modules function/permissions, then
-    true = Enum.member?(module_permissions, member_permissions)
-
-
-  ## Available as_authorized
-    * `Membership.has_plan/1` - Requires single plan to be present on member
-    * `Membership.has_role/1` - Requires single role to be present on member
-    * `Membership.has_feature/1` - Requires single feature to be present on member
-
-  """
+  @moduledoc false
 
   @default_features []
 
@@ -52,22 +18,6 @@ defmodule Membership do
     create_membership()
   end
 
-  @doc """
-  Macro for defining required permissions
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-          permissions do
-            has_feature(:admin_feature, :test_authorization)
-            has_plan(:gold, :test_authorization)
-          end
-        end
-      end
-  """
   defmacro permissions(do: block) do
     quote do
       load_ets_data(unquote(__MODULE__))
@@ -97,18 +47,12 @@ defmodule Membership do
     {:ok, block}
   end
 
-  @doc """
-  The Function list to ignore when building the permissions registry's
-  """
   def ignored_functions() do
     Membership.module_info()
     |> Keyword.fetch!(:exports)
     |> Enum.map(fn {key, _data} -> key end)
   end
 
-  @doc """
-  Load the plans into ets for the module/functions
-  """
   def load_ets_data(current_module \\ __MODULE__) do
     require Logger
 
@@ -128,24 +72,6 @@ defmodule Membership do
     end
   end
 
-  @doc """
-  Macro for wrapping protected code
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-        member = HelloTest.Repo.get(Membership.Member, 1)
-        {:ok, member }  = load_and_authorize_member(member)
-
-        def test_authorization do
-          as_authorized(member, :test_authorization) do
-            IO.inspect("This code is executed only for authorized member")
-          end
-        end
-      end
-  """
-
   defmacro as_authorized(member, func_name, do: block) do
     quote do
       with :ok <- perform_authorization!(unquote(member), unquote(func_name)) do
@@ -154,81 +80,6 @@ defmodule Membership do
     end
   end
 
-  @doc """
-  Defines calculated permission to be evaluated in runtime
-
-  ## Examples
-
-      defmodule HelloTest do
-        use Membership
-        member = HelloTest.Repo.get(Membership.Member, 1)
-        {:ok, member }  = load_and_authorize_member(member)
-
-        def test_authorization do
-          permissions do
-            calculated(fn member ->
-              member.email_confirmed?
-            end)
-          end
-
-          as_authorized(member) do
-            IO.inspect("This code is executed only for authorized member")
-          end
-        end
-      end
-
-  You can also use DSL form which takes function name as argument
-
-        defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-        use Membership
-        member = HelloTest.Repo.get(Membership.Member, 1)
-       {:ok, member } = load_and_authorize_member(member)
-
-          permissions do
-            calculated(member,:email_confirmed, :calculated)
-          end
-
-          as_authorized(member) do
-            IO.inspect("This code is executed only for authorized member")
-          end
-        end
-
-        def email_confirmed(member) do
-          member.email_confirmed?
-        end
-      end
-
-    For more complex calculation you need to pass bindings to the function
-
-        defmodule HelloTest do
-        use Membership
-        member = HelloTest.Repo.get(Membership.Member, 1)
-        {:ok, member} = load_and_authorize_member(member)
-
-        def test_authorization do
-          post = %Post{owner_id: 1}
-
-          permissions do
-            calculated(member,:is_owner, [post])
-            calculated(fn member, [post] ->
-              post.owner_id == member.id
-            end)
-          end
-
-          as_authorized(member) do
-            IO.inspect("This code is executed only for authorized member")
-          end
-        end
-
-        def is_owner(member, [post]) do
-          post.owner_id == member.id
-        end
-      end
-
-  """
   defmacro calculated(current_member, func_name)
            when is_atom(func_name) do
     quote do
@@ -277,55 +128,27 @@ defmodule Membership do
     end
   end
 
-  @doc ~S"""
-  Returns authorization result on collected member and required features/plans
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-          case authorized? do
-            :ok -> "Member is authorized"
-            {:error, message: _message} -> "Member is not authorized"
-        end
-      end
-      end
-  """
   # @spec authorized?() :: :ok | {:error, String.t()}
   def authorized?(member, func_name) do
     perform_authorization!(member, func_name)
   end
 
-  @doc """
-  Perform authorization on passed member and plans
-  """
   @spec has_plan?(Membership.Member.t(), atom(), String.t()) :: boolean()
   def has_plan?(%Membership.Member{} = member, func_name, plan_name) do
     perform_authorization!(member, func_name, [], [Atom.to_string(plan_name)]) == :ok
   end
 
-  @doc """
-  Perform authorization on passed member and roles
-  """
   @spec has_role?(Membership.Member.t(), atom(), String.t()) :: boolean()
   def has_role?(%Membership.Member{} = member, role_name) do
     roles = Enum.map(member.roles, fn x -> x.identifier end)
     Enum.member?(roles, role_name) == true
   end
 
-  @doc """
-  Perform authorization on passed member and roles
-  """
   @spec has_role?(Membership.Member.t(), atom(), String.t()) :: boolean()
   def has_role?(%Membership.Member{} = member, func_name, role_name) do
     perform_authorization!(member, func_name, [], [], [Atom.to_string(role_name)]) == :ok
   end
 
-  @doc """
-  Perform feature check on passed member and feature
-  """
   def has_feature?(%Membership.Member{} = member, feature_name) do
     Enum.member?(member.features, feature_name)
   end
@@ -334,7 +157,6 @@ defmodule Membership do
     perform_authorization!(member, func_name, [Atom.to_string(feature_name)]) == :ok
   end
 
-  @doc false
   def perform_authorization!(
         current_member \\ nil,
         func_name \\ nil,
@@ -421,7 +243,6 @@ defmodule Membership do
     value
   end
 
-  @doc false
   def create_membership() do
     quote do
       import Membership, only: [load_and_store_member!: 2, unload_member!: 1]
@@ -451,7 +272,6 @@ defmodule Membership do
     end
   end
 
-  @doc false
   @spec load_and_store_member!(integer(), map()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(member_id, opts) when is_integer(member_id) do
     opts =
@@ -470,7 +290,6 @@ defmodule Membership do
     end
   end
 
-  @doc false
   @spec load_and_store_member!(Membership.Member.t(), map()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(%Membership.Member{} = member, opts) do
     member = Membership.Repo.get!(Membership.Member, member.id)
@@ -511,19 +330,16 @@ defmodule Membership do
     end
   end
 
-  @doc false
   @spec unload_member!(Membership.Member.t()) :: {:ok, Membership.Member.t()}
   def unload_member!(%Membership.Member{} = member) do
     Membership.Memberships.Supervisor.stop(member.identifier)
   end
 
-  @doc false
   @spec load_member_features(Membership.Member.t()) :: Membership.Member.t()
   def load_member_features(member) do
     member
   end
 
-  @doc false
   def authorize_features(active_features \\ [], required_features \\ []) do
     active_features = Enum.map(active_features, fn x -> String.to_atom(x) end)
 
@@ -535,7 +351,6 @@ defmodule Membership do
     length(authorized) > 0
   end
 
-  @doc false
   def authorize!(conditions) do
     # Authorize empty conditions as true
 
@@ -556,21 +371,6 @@ defmodule Membership do
     end
   end
 
-  @doc """
-  Requires an plan within permissions block
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-          permissions do
-            has_plan(:gold, :test_authorization)
-          end
-        end
-      end
-  """
   @spec has_plan(atom(), atom()) :: {:ok, atom()}
   def has_plan(plan, func_name) do
     case :ets.lookup(:membership_plans, plan) do
@@ -583,21 +383,6 @@ defmodule Membership do
     end
   end
 
-  @doc """
-  Requires an role within permissions block
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-          permissions do
-            has_role(:gold, :test_authorization)
-          end
-        end
-      end
-  """
   @spec has_role(atom(), atom()) :: {:ok, atom()}
   def has_role(role, func_name) do
     case :ets.lookup(:membership_roles, role) do
@@ -610,34 +395,11 @@ defmodule Membership do
     end
   end
 
-  @doc """
-  Requires a feature within permissions block
-
-  ## Example
-
-      defmodule HelloTest do
-        use Membership
-
-        def test_authorization do
-          permissions do
-            has_feature(:admin)
-          end
-        end
-      end
-  """
   @spec has_feature(atom(), atom()) :: {:ok, atom()}
   def has_feature(feature, func_name) do
     Membership.Registry.add(__MODULE__, func_name, feature)
     {:ok, feature}
   end
-
-  @doc """
-  List membership and related modules.
-
-  ## Examples
-
-      iex> Membership.get_loaded_modules()
-  """
 
   def get_loaded_modules() do
     {:ok, modules} = :application.get_key(:ex_membership, :modules)
@@ -656,13 +418,6 @@ defmodule Membership do
     |> Enum.map(&Module.concat/1)
   end
 
-  @doc """
-  List version.
-
-  ## Examples
-
-      iex> Membership.version()
-  """
   @version Mix.Project.config()[:version]
   def version, do: @version
 end
