@@ -209,13 +209,17 @@ defmodule Sample.Post do
     member = Sample.Repo.get(Sample.User, id)
     load_and_authorize_member(member)
 
-    permissions do
-      calculated(fn member -> do
-        member.email_confirmed?
-      end)
+    permissions(member) do
+          calculated(
+        member,
+        fn member ->
+          Post.confirmed_email(member)
+        end,
+        :create_calculated
+      )
     end
-  end
-end
+    end
+    end
 ```
 
 We can also use DSL form of `calculated` keyword
@@ -227,10 +231,15 @@ defmodule Sample.Post do
   def create(id \\ 1) do
     member = Sample.Repo.get(Sample.User, id)
     load_and_authorize_member(member)
-
-    permissions do
-      calculated(:confirmed_email)
+ 
+      permissions(member) do
+          calculated(
+        member,
+        :confirmed_email,
+        :create_calculated
+      )
     end
+
 
   def confirmed_email(member) do
     member.email_confirmed?
@@ -252,9 +261,9 @@ defmodule Sample.Post do
     load_and_authorize_member(member)
     post = %Post{owner_id: member.id}
 
-    permissions do
-      calculated(:confirmed_email)
-      calculated(:is_owner, [post])
+    permissions(member) do
+      calculated(member,:confirmed_email)
+      calculated(member, :is_owner, [post])
     end
   end
 
@@ -414,11 +423,6 @@ iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
 features: ["ban_accounts"],
 identifier: "asfdcxfdsr42424eq2",
-  extra_features: [
-    %Membership.Feature{
-      identifier: "ban_accounts"
-    }
-  ],
   plan_memberships: [
     %Membership.Plan{
       identifier: "gold"
@@ -438,11 +442,6 @@ iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
 features: [],
 identifier: "asfdcxfdsr42424eq2",
-  extra_features: [
-    %Membership.Feature{
-      identifier: "ban_accounts"
-    }
-  ]
   plan_memberships: []
 }
 iex> Membership.Member.revoke(member, feature_ban)
@@ -450,7 +449,6 @@ iex> member |> Membership.Repo.preload([:plan_memberships, :extra_features])
 %Membership.Member{
 features: [],
 identifier: "asfdcxfdsr42424eq2",
-  extra_features: []
   plan_memberships: []
 }
 ```
