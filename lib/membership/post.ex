@@ -34,6 +34,7 @@ defmodule Post do
       calculated(
         member,
         fn member ->
+          IO.inspect(member, label: "member")
           Post.confirmed_email(member)
         end,
         :calculated_function
@@ -60,8 +61,13 @@ defmodule Post do
   end
 
   def confirmed_email(member) do
-    {_, reply} = Map.fetch(member, :email_confirmed)
-    reply
+    reply = Map.fetch(member, :email_confirmed)
+
+    case reply do
+      :error -> false
+      {:ok, data} -> true
+      _ -> false
+    end
   end
 
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
