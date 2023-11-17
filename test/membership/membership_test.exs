@@ -145,15 +145,15 @@ defmodule Membership.MembershipTest do
       assert {:ok, "Authorized"} == Post.calculated_function(member, true)
     end
 
-    #    test "rejects calculated permissions" do
-    #      member = insert(:member)
-    #      Membership.unload_member!(member)
-    #
-    #      assert_raise ArgumentError, fn ->
-    #        reply = Post.calculated_function(member, false)
-    #        IO.inspect(reply)
-    #      end
-    #    end
+    test "rejects calculated permissions" do
+      member = insert(:member)
+      Membership.unload_member!(member)
+
+      assert_raise ArgumentError, fn ->
+        reply = Post.calculated_function(member, false)
+        IO.inspect(reply)
+      end
+    end
 
     test "rejects macro calculated permissions" do
       member = insert(:member)
