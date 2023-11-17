@@ -42,7 +42,7 @@ defmodule Membership.MixProject do
       {:ecto, "~> 3.10"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, "~> 0.16"},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:optimus, "~> 0.1.0", only: :dev},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
       {:ex_machina, "~> 2.2", only: :test},
