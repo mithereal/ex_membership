@@ -191,6 +191,7 @@ defmodule Membership.Role do
 
   def all() do
     Repo.all(Membership.Role)
+    |> Repo.preload(:features)
     |> Enum.map(fn x ->
       features = Enum.map(x.features, fn f -> f.identifier end)
       {x.identifier, features}

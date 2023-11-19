@@ -203,6 +203,7 @@ defmodule Membership.Plan do
 
   def all() do
     Repo.all(Membership.Plan)
+    |> Repo.preload(:features)
     |> Enum.map(fn x ->
       features = Enum.map(x.features, fn f -> f.identifier end)
       {x.identifier, features}
