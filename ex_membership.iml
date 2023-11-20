@@ -125,5 +125,13 @@
     <orderEntry type="library" name="bypass" level="project" />
     <orderEntry type="library" name="sax_map" level="project" />
     <orderEntry type="library" name="saxy" level="project" />
+    <orderEntry type="library" name="iex_history" level="project" />
+    <orderEntry type="library" name="earmark_parser" level="project" />
+    <orderEntry type="library" name="makeup_erlang" level="project" />
+    <orderEntry type="library" name="makeup_html" level="project" />
+    <orderEntry type="library" name="floki" level="project" />
+    <orderEntry type="library" name="easyhtml" level="project" />
+    <orderEntry type="library" name="unicode_set" level="project" />
+    <orderEntry type="library" name="benchee_markdown" level="project" />
   </component>
 </module>

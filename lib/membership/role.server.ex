@@ -45,7 +45,7 @@ defmodule Membership.Role.Server do
   @impl true
   def handle_cast(:load, state) do
     roles =
-      Membership.Role.all() |> Repo.preload(:features)
+      Membership.Role.all()
 
     :ets.insert(@name, roles)
     {:noreply, state}

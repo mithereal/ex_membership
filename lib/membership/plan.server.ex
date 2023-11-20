@@ -46,7 +46,7 @@ defmodule Membership.Plan.Server do
   @impl true
   def handle_cast(:load, state) do
     plans =
-      Membership.Plan.all() |> Repo.preload(:features)
+      Membership.Plan.all()
 
     :ets.insert(@name, plans)
     {:noreply, state}
