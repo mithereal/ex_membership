@@ -33,6 +33,7 @@ defmodule Membership.Feature do
     struct
     |> cast(params, [:identifier, :name])
     |> cast_assoc(:plans, required: false)
+    |> cast_assoc(:roles, required: false)
     |> validate_required([:identifier, :name])
     |> unique_constraint(:identifier, message: "Feature already exists")
   end
