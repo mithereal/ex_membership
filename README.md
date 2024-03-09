@@ -74,6 +74,14 @@ defmodule Post do
 
 ```
 
+## Mix Tasks
+
+To create the migrations in your elixir project run
+
+```bash
+mix membership.install
+```
+
 ## Features
 
 - [x] `Member` -> `[Feature]` permission schema
