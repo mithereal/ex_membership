@@ -53,7 +53,7 @@ defmodule Membership.MixProject do
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:mix_audit, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:ice_cream, "~> 0.0.5", only: [:dev, :test]},
-      {:nanoid, "2.1.0"}
+      {:nanoid, ">= 2.0.0"}
     ]
   end
 
