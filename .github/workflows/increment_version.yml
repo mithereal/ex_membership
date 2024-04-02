@@ -6,8 +6,10 @@ on:
     branches:
       - master
 jobs:
-  Increment-Version:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -15,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.36.0
+        uses: data-twister/github-tag-action-elixir@v1.64.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
           WITH_V: true
