@@ -27,9 +27,9 @@ defmodule Membership.Behaviour do
           load_ets_data(unquote(@registry))
           data = unquote(block)
 
-          case is_nil(data) do
-            true -> @default_features
-            false -> data
+          case data do
+            nil -> @default_features
+            {:ok, data} -> data
           end
         end
       end
@@ -37,11 +37,10 @@ defmodule Membership.Behaviour do
       defmacro permissions(member, do: block) do
         quote do
           load_ets_data(unquote(@registry))
-          data = unquote(block)
 
-          case is_nil(data) do
-            true -> @default_features
-            false -> data
+          case data do
+            :error -> @default_features
+            {:ok, data} -> data
           end
         end
       end
@@ -358,8 +357,8 @@ defmodule Membership.Behaviour do
               role_features ++ rules
 
           required_features =
-            case(required_features) do
-              nil -> []
+            case(Enum.count(required_features)) do
+              0 -> []
               _ -> required_features
             end
 

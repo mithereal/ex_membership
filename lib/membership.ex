@@ -73,9 +73,11 @@ defmodule Membership do
       load_ets_data(unquote(__MODULE__))
       data = unquote(block)
 
-      case is_nil(data) do
-        true -> @default_features
-        false -> data
+      IO.inspect(data, label: "data")
+
+      case data do
+        :ok -> @default_features
+        _ -> data
       end
     end
   end
@@ -86,15 +88,39 @@ defmodule Membership do
       load_ets_data(unquote(__MODULE__))
       data = unquote(block)
 
-      case is_nil(data) do
-        true -> @default_features
-        false -> data
+      case data do
+        :ok -> @default_features
+        _ -> data
       end
     end
   end
 
   def add_function_param_to_block(block) do
     {:ok, block}
+  end
+
+  @doc """
+  Looks up `Application` config or raises if keyspace is not configured.
+
+  ## Examples
+
+      config :membership, :files, [
+        uploads_dir: Path.expand("../priv/uploads", __DIR__),
+        host: [scheme: "http", host: "localhost", port: 4000],
+      ]
+
+      iex> Membership.config([:files, :uploads_dir])
+      iex> Membership.config([:files, :host, :port])
+  """
+  def config([main_key | rest] = keyspace) when is_list(keyspace) do
+    main = Application.fetch_env!(:membership, main_key)
+
+    Enum.reduce(rest, main, fn next_key, current ->
+      case Keyword.fetch(current, next_key) do
+        {:ok, val} -> val
+        :error -> raise ArgumentError, "no config found under #{inspect(keyspace)}"
+      end
+    end)
   end
 
   @doc """
@@ -391,6 +417,12 @@ defmodule Membership do
           plan_features ++
           role_features ++ rules
 
+      required_features =
+        case(Enum.count(required_features)) do
+          0 -> []
+          _ -> required_features
+        end
+
       # If no as_authorized were required then we can assume member is granted
       if length(required_features ++ calculated_rules) == 0 do
         :ok
@@ -482,7 +514,6 @@ defmodule Membership do
         case status do
           {:ok, _} -> member
           {:error, {:already_started, _}} -> member
-          {:error, _} -> nil
         end
 
       false ->
@@ -501,12 +532,9 @@ defmodule Membership do
               {:ok, _} ->
                 member
 
-              {:error, _} ->
+              _ ->
                 member
             end
-
-          {:error, _} ->
-            nil
         end
     end
   end

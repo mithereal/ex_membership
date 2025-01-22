@@ -133,5 +133,6 @@
     <orderEntry type="library" name="easyhtml" level="project" />
     <orderEntry type="library" name="unicode_set" level="project" />
     <orderEntry type="library" name="benchee_markdown" level="project" />
+    <orderEntry type="library" name="earmark" level="project" />
   </component>
 </module>
