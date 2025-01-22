@@ -68,12 +68,11 @@ defmodule Membership do
         end
       end
   """
+
   defmacro permissions(do: block) do
     quote do
       load_ets_data(unquote(__MODULE__))
       data = unquote(block)
-
-      IO.inspect(data, label: "data")
 
       case data do
         :ok -> @default_features

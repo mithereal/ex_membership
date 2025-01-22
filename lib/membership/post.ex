@@ -18,11 +18,12 @@ defmodule Post do
     member = load_and_authorize_member(member)
 
     permissions do
+      {:ok, []}
     end
 
     case authorized?(member, function_name) do
       :ok -> {:ok, "Authorized"}
-      _ -> raise ArgumentError, message: "Not authorized"
+      data -> raise ArgumentError, message: "Not authorized"
     end
   end
 
@@ -62,7 +63,7 @@ defmodule Post do
   end
 
   def confirmed_email(member) do
-    reply = Map.fetch(member, :email_confirmed)
+    reply = Map.fetch(member, :email_confirmed) || :error
 
     case reply do
       :error -> false
@@ -74,7 +75,7 @@ defmodule Post do
   def update(_id \\ 1, member_id \\ nil, function_name \\ "update_post") do
     member = load_and_authorize_member(%{member_id: member_id})
 
-    permissions do
+    permissions(member) do
       # or check 1st arg for being an atom vs string
       has_plan("gold", function_name)
       # or

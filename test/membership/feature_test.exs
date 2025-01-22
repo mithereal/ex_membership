@@ -51,10 +51,10 @@ defmodule Membership.FeatureTest do
       {_, feature} = Feature.grant(feature, plan)
       feature = Repo.get(Feature, feature.id) |> Repo.preload(:plans)
       plan = List.first(feature.plans)
-      plan = Repo.get(Membership.Plan, plan.id()) |> Repo.preload(:features)
+      plan = Repo.get(Membership.Plan, plan.id) |> Repo.preload(:features)
 
-      assert 1 == length(plan.features())
-      assert feature.identifier == Enum.at(plan.features(), 0).identifier
+      assert 1 == length(plan.features)
+      assert feature.identifier == Enum.at(plan.features, 0).identifier
     end
 
     test "grants multiple abilities to Feature" do
@@ -65,14 +65,14 @@ defmodule Membership.FeatureTest do
       Feature.grant(plan, feature_1)
       Feature.grant(plan, feature_2)
 
-      plan = Repo.get(Plan, plan.id()) |> Repo.preload(:features)
+      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
 
       identifiers =
-        Enum.map(plan.features(), fn x ->
+        Enum.map(plan.features, fn x ->
           x.identifier
         end)
 
-      assert 2 == length(plan.features())
+      assert 2 == length(plan.features)
       assert assert ["first_feature", "second_feature"] == identifiers
     end
   end

@@ -45,7 +45,7 @@ defmodule Membership.Factory do
   def id_sequence() do
     case Membership.Config.key_type() do
       :binary_id -> Ecto.UUID.generate()
-      :uuid -> Ecto.UUID.generate()
+      :integer -> Ecto.UUID.generate()
       _ -> sequence(:id, &"#{&1}")
     end
   end
@@ -53,7 +53,7 @@ defmodule Membership.Factory do
   def identifier_sequence() do
     case Membership.Config.key_type() do
       :binary_id -> Ecto.UUID.generate()
-      :uuid -> Ecto.UUID.generate()
+      :integer -> Ecto.UUID.generate()
       _ -> sequence(:id, &"#{&1}")
     end
   end

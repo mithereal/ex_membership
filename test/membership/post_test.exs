@@ -54,6 +54,7 @@ defmodule PostTest do
     load_and_authorize_member(member)
 
     permissions do
+      {:ok, []}
     end
 
     case authorized?() do

@@ -28,7 +28,7 @@ defmodule Membership.Behaviour do
           data = unquote(block)
 
           case data do
-            nil -> @default_features
+            _ -> @default_features
             {:ok, data} -> data
           end
         end
@@ -37,9 +37,10 @@ defmodule Membership.Behaviour do
       defmacro permissions(member, do: block) do
         quote do
           load_ets_data(unquote(@registry))
+          data = unquote(block)
 
           case data do
-            :error -> @default_features
+            _ -> @default_features
             {:ok, data} -> data
           end
         end
@@ -316,7 +317,12 @@ defmodule Membership.Behaviour do
         else
           rules =
             try do
-              fetch_rules_from_ets(func_name)
+              data = fetch_rules_from_ets(func_name)
+
+              case is_nil(data) do
+                true -> []
+                false -> data
+              end
             rescue
               _ ->
                 []
