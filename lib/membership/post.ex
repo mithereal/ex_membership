@@ -23,7 +23,7 @@ defmodule Post do
 
     case authorized?(member, function_name) do
       :ok -> {:ok, "Authorized"}
-      data -> raise ArgumentError, message: "Not authorized"
+      _ -> raise ArgumentError, message: "Not authorized"
     end
   end
 
