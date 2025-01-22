@@ -101,14 +101,14 @@ mix membership.install
 ```elixir
 def deps do
   [
-    {:membership, "~> 0.5.2"}
+    {:ex_membership, ">= 0.0.0"}
   ]
 end
 ```
 
 ```elixir
 # In your config/config.exs file
-config :membership, Membership.Repo,
+config :ex_membership, Membership.Repo,
   username: "postgres",
   password: "postgres",
   database: "membership_dev",
