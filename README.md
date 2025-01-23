@@ -117,6 +117,7 @@ config :ex_membership, Membership.Repo,
 
 ```elixir
 iex> mix membership.setup
+iex> mix membership.components
 ```
 
 ### Usage with ecto

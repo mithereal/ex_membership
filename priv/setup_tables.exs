@@ -7,7 +7,7 @@ defmodule Membership.Repo.Migrations.SetupTables do
     key_type = Config.key_type(:migration)
 
     create table(:membership_plans, primary_key: false) do
-      add(:id, key_type, primary_key: true)
+      add(:id, key_type, primary_key: {:id, key_type, autogenerate: true})
       add(:identifier, :string)
       add(:name, :string, size: 255)
     end
@@ -15,7 +15,7 @@ defmodule Membership.Repo.Migrations.SetupTables do
     create(unique_index(:membership_plans, [:identifier]))
 
     create table(:membership_features, primary_key: false) do
-      add(:id, key_type, primary_key: true)
+      add(:id, key_type, primary_key: {:id, key_type, autogenerate: true})
       add(:identifier, :string)
       add(:name, :string, size: 255)
     end
@@ -23,7 +23,7 @@ defmodule Membership.Repo.Migrations.SetupTables do
     create(unique_index(:membership_features, [:identifier]))
 
     create table(:membership_members, primary_key: false) do
-      add(:id, key_type, primary_key: true)
+      add(:id, key_type, primary_key: {:id, key_type, autogenerate: true})
       add(:identifier, :string)
       add(:features, {:array, :string}, default: [])
 
@@ -47,7 +47,7 @@ defmodule Membership.Repo.Migrations.SetupTables do
     end
 
     create table(:membership_roles, primary_key: false) do
-      add(:id, key_type, primary_key: true)
+      add(:id, key_type, primary_key: {:id, key_type, autogenerate: true})
       add(:identifier, :string)
       add(:name, :string, size: 255)
     end

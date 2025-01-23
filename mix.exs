@@ -1,7 +1,7 @@
 defmodule Membership.MixProject do
   use Mix.Project
 
-  @version "1.0.5"
+  @version "1.0.6"
   @source_url "https://github.com/mithereal/ex_membership"
 
   def project do
@@ -31,7 +31,7 @@ defmodule Membership.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :observer, :wx, :runtime_tools, :debugger],
+      extra_applications: [:logger, :runtime_tools],
       mod: {Membership.Application, []}
     ]
   end

@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.Membership.Install do
   @moduledoc """
-    After configuring your default ecto repo in `:ecto_repos`
     Run mix membership.install to generates a `setup_membership_tables` migration,
     which Membership tables, as well as required indexes.
   """
