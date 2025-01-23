@@ -3,7 +3,7 @@
 import Config
 
 config :ex_membership,
-  ecto_repos: [Membership.Repo]
+  primary_key_type: :uuid
 
 config :ex_membership, Membership.Repo,
   username: "postgres",
