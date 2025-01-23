@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.Membership.Components do
   @moduledoc """
-    After configuring your default ecto repo in `:ecto_repos`
     Run mix membership.components to generates a `membership_components` component,
     which has basic phoenix membership components.
   """

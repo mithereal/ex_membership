@@ -122,6 +122,20 @@ defmodule Membership do
     end)
   end
 
+  def key_type() do
+    case Application.get_env(:ex_membership, :primary_key_type) do
+      nil -> :integer
+      _ -> :binary_id
+    end
+  end
+
+  def key_type(:migration) do
+    case Application.get_env(:ex_membership, :primary_key_type) do
+      nil -> :serial
+      _ -> :uuid
+    end
+  end
+
   @doc """
   The Function list to ignore when building the permissions registry's
   """
