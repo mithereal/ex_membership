@@ -134,5 +134,7 @@
     <orderEntry type="library" name="unicode_set" level="project" />
     <orderEntry type="library" name="benchee_markdown" level="project" />
     <orderEntry type="library" name="earmark" level="project" />
+    <orderEntry type="library" name="makeup_c" level="project" />
+    <orderEntry type="library" name="doctor" level="project" />
   </component>
 </module>

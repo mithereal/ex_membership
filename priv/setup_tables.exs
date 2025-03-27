@@ -1,10 +1,12 @@
 defmodule Membership.Repo.Migrations.SetupTables do
   use Ecto.Migration
 
-  alias Membership.Config
-
   def change do
-    key_type = Config.key_type(:migration)
+    key_type =
+      case Application.get_env(:ex_membership, :primary_key_type) do
+        nil -> :serial
+        _ -> :uuid
+      end
 
     create table(:membership_plans, primary_key: false) do
       add(:id, key_type, primary_key: {:id, key_type, autogenerate: true})
@@ -31,19 +33,19 @@ defmodule Membership.Repo.Migrations.SetupTables do
     end
 
     create table(:membership_member_plans, primary_key: false) do
-      add(:member_id, references(Membership.Member.table(), type: key_type))
-      add(:plan_id, references(Membership.Plan.table(), type: key_type))
+      add(:member_id, references(:membership_members, type: key_type))
+      add(:plan_id, references(:membership_plans, type: key_type))
     end
 
     create table(:membership_member_features, primary_key: false) do
-      add(:member_id, references(Membership.Member.table(), type: key_type))
-      add(:feature_id, references(Membership.Feature.table(), type: key_type))
+      add(:member_id, references(:membership_members, type: key_type))
+      add(:feature_id, references(:membership_features, type: key_type))
       add(:permission, :string)
     end
 
     create table(:membership_plan_features, primary_key: false) do
-      add(:plan_id, references(Membership.Plan.table(), type: key_type))
-      add(:feature_id, references(Membership.Feature.table(), type: key_type))
+      add(:plan_id, references(:membership_plans, type: key_type))
+      add(:feature_id, references(:membership_features, type: key_type))
     end
 
     create table(:membership_roles, primary_key: false) do
@@ -55,13 +57,13 @@ defmodule Membership.Repo.Migrations.SetupTables do
     create(unique_index(:membership_roles, [:identifier]))
 
     create table(:membership_member_roles, primary_key: false) do
-      add(:member_id, references(Membership.Member.table(), type: key_type))
-      add(:role_id, references(Membership.Role.table(), type: key_type))
+      add(:member_id, references(:membership_members, type: key_type))
+      add(:role_id, references(:membership_roles, type: key_type))
     end
 
     create table(:membership_role_features, primary_key: false) do
-      add(:role_id, references(Membership.Role.table(), type: key_type))
-      add(:feature_id, references(Membership.Feature.table(), type: key_type))
+      add(:role_id, references(:membership_roles, type: key_type))
+      add(:feature_id, references(:membership_features, type: key_type))
     end
   end
 end

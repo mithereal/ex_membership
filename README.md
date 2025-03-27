@@ -108,11 +108,13 @@ end
 
 ```elixir
 # In your config/config.exs file
-config :ex_membership, Membership.Repo,
+config :ex_membership, MYAPP.Repo,
   username: "postgres",
   password: "postgres",
   database: "membership_dev",
   hostname: "localhost"
+
+config :ex_membership, repo: MYAPP.Repo
 ```
 
 ```elixir

@@ -7,9 +7,9 @@ defmodule Membership.Application do
   alias Membership.Role.Server, as: Roles
 
   @impl true
-  def start(_type, args \\ []) do
+  def start(_type, _args \\ []) do
     children = [
-      {Repo, args},
+      {Membership.TestRepo, []},
       {Plans, []},
       {Roles, []},
       {Registry, keys: :unique, name: :active_memberships},

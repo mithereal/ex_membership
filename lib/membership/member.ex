@@ -16,6 +16,8 @@ defmodule Membership.Member do
 
   alias Membership.Member
 
+  @config Membership.Config.new()
+
   @typedoc "A member struct"
   @type t :: %Member{}
 
@@ -79,8 +81,8 @@ defmodule Membership.Member do
   """
   @spec grant(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Member{id: id} = _member, %Plan{id: plan_id} = _plan) do
-    member = Member |> Repo.get!(id)
-    plan = Plan |> Repo.get!(plan_id)
+    member = @config |> Repo.get!(Member, id)
+    plan = @config |> Repo.get!(Plan, plan_id)
 
     revoke(member, plan)
 
@@ -100,13 +102,13 @@ defmodule Membership.Member do
   end
 
   def grant(%Member{id: id} = _member, %Role{id: role_id} = _role) do
-    member = Member |> Repo.get!(id)
-    role = Role |> Repo.get!(role_id)
+    member = @config |> Repo.get!(Member, id)
+    role = @config |> Repo.get!(Role, role_id)
 
     revoke(member, role)
 
-    %MemberRoles{member_id: member.id, role_id: role.id}
-    |> Repo.insert()
+    @config
+    |> Repo.insert(%MemberRoles{member_id: member.id, role_id: role.id})
 
     sync_features(member)
   end
@@ -123,11 +125,15 @@ defmodule Membership.Member do
   def grant(_, _), do: raise(ArgumentError, message: "Bad arguments for giving grant")
 
   def grant(%Member{id: id} = _member, %Feature{id: feature_id} = _feature, permission) do
-    member = Member |> Repo.get!(id)
-    feature = Feature |> Repo.get(feature_id)
+    member = @config |> Repo.get!(Member, id)
+    feature = @config |> Repo.get(Feature, feature_id)
 
-    %MemberFeatures{member_id: member.id, feature_id: feature.id, permission: permission}
-    |> Repo.insert()
+    @config
+    |> Repo.insert(%MemberFeatures{
+      member_id: member.id,
+      feature_id: feature.id,
+      permission: permission
+    })
 
     sync_features(member)
   end
@@ -164,9 +170,11 @@ defmodule Membership.Member do
 
   @spec revoke(Member.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Member{id: id} = _member, %Plan{id: _id} = plan) do
-    from(pa in MemberPlans)
-    |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in MemberPlans)
+      |> where([pr], pr.member_id == ^id and pr.plan_id == ^plan.id)
+
+    @config |> Repo.delete_all(query)
   end
 
   def revoke(%{member: %Member{id: _pid} = member}, %Plan{id: _id} = plan) do
@@ -178,9 +186,11 @@ defmodule Membership.Member do
   end
 
   def revoke(%Member{id: id} = _member, %Role{id: _id} = role) do
-    from(pa in MemberRoles)
-    |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in MemberRoles)
+      |> where([pr], pr.member_id == ^id and pr.role_id == ^role.id)
+
+    @config |> Repo.delete_all(query)
   end
 
   def revoke(%{member: %Member{id: _pid} = member}, %Role{id: _id} = role) do
@@ -210,9 +220,12 @@ defmodule Membership.Member do
         grant != feature.identifier
       end)
 
-    changeset(member)
-    |> put_change(:features, features)
-    |> Repo.update!()
+    changeset =
+      changeset(member)
+      |> put_change(:features, features)
+
+    @config
+    |> Repo.update!(changeset)
   end
 
   def revoke(_, _), do: raise(ArgumentError, message: "Bad arguments for revoking grant")
@@ -224,12 +237,14 @@ defmodule Membership.Member do
         id: feature_id,
         identifier: _identifier
       }) do
-    MemberFeatures
-    |> where(
-      [e],
-      e.member_id == ^member.id and e.feature_id == ^feature_id
-    )
-    |> Repo.one()
+    query =
+      MemberFeatures
+      |> where(
+        [e],
+        e.member_id == ^member.id and e.feature_id == ^feature_id
+      )
+
+    @config |> Repo.one(query)
   end
 
   def load_member_plan(member, %{
@@ -237,12 +252,14 @@ defmodule Membership.Member do
         id: plan_id,
         identifier: _identifier
       }) do
-    MemberPlans
-    |> where(
-      [e],
-      e.member_id == ^member.id and e.plan_id == ^plan_id
-    )
-    |> Repo.one()
+    query =
+      MemberPlans
+      |> where(
+        [e],
+        e.member_id == ^member.id and e.plan_id == ^plan_id
+      )
+
+    @config |> Repo.one(query)
   end
 
   def load_member_role(member, %{
@@ -250,12 +267,14 @@ defmodule Membership.Member do
         id: role_id,
         identifier: _identifier
       }) do
-    MemberRoles
-    |> where(
-      [e],
-      e.member_id == ^member.id and e.role_id == ^role_id
-    )
-    |> Repo.one()
+    query =
+      MemberRoles
+      |> where(
+        [e],
+        e.member_id == ^member.id and e.role_id == ^role_id
+      )
+
+    @config |> Repo.one(query)
   end
 
   @doc """
@@ -267,8 +286,8 @@ defmodule Membership.Member do
   @spec sync_features(Member.t()) :: Member.t()
   def sync_features(%Member{id: id} = _member) do
     member =
-      Member
-      |> Repo.get!(id)
+      @config
+      |> Repo.get!(Member, id)
       |> Repo.preload(plans: :features)
       |> Repo.preload(roles: :features)
       |> Repo.preload(:extra_features)
@@ -303,9 +322,12 @@ defmodule Membership.Member do
           feature_removals
       )
 
-    changeset(member)
-    |> put_change(:features, features)
-    |> Repo.update!()
+    changeset =
+      changeset(member)
+      |> put_change(:features, features)
+
+    @config
+    |> Repo.update!(changeset)
   end
 
   def build(name) do
@@ -316,16 +338,20 @@ defmodule Membership.Member do
   end
 
   def create(name) do
-    changeset(%Member{}, %{
-      name: name
-    })
-    |> Repo.insert_or_update()
+    changeset =
+      changeset(%Member{}, %{
+        name: name
+      })
+
+    @config
+    |> Repo.insert_or_update(changeset)
   end
 
   def table, do: :membership_members
 
   def fetch_removed_features(id) do
-    Repo.all(
+    @config
+    |> Repo.all(
       from(mf in MemberFeatures,
         join: f in Feature,
         on: mf.feature_id == f.id,

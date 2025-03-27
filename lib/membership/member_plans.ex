@@ -5,6 +5,8 @@ defmodule Membership.MemberPlans do
 
   use Membership.Schema, type: :binary_fk
 
+  @config Membership.Config.new()
+
   alias Membership.Member
   alias Membership.Plan
   alias Membership.MemberPlans
@@ -25,10 +27,12 @@ defmodule Membership.MemberPlans do
         %{__struct__: _plan_name, id: plan_id},
         _features \\ []
       ) do
-    changeset(%MemberPlans{
-      member_id: id,
-      plan_id: plan_id
-    })
-    |> Repo.insert!()
+    changeset =
+      changeset(%MemberPlans{
+        member_id: id,
+        plan_id: plan_id
+      })
+
+    @config |> Repo.insert!(changeset)
   end
 end

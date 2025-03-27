@@ -3,6 +3,8 @@ defmodule Membership.FeatureTest do
   alias Membership.Feature
   alias Membership.Plan
 
+  @config Membership.Config.new()
+
   setup do
     :ok
   end
@@ -49,9 +51,9 @@ defmodule Membership.FeatureTest do
 
       ## return feature with plans preload
       {_, feature} = Feature.grant(feature, plan)
-      feature = Repo.get(Feature, feature.id) |> Repo.preload(:plans)
+      feature = Repo.get(@config, Feature, feature.id) |> Repo.preload(:plans)
       plan = List.first(feature.plans)
-      plan = Repo.get(Membership.Plan, plan.id) |> Repo.preload(:features)
+      plan = Repo.get(@config, Membership.Plan, plan.id) |> Repo.preload(:features)
 
       assert 1 == length(plan.features)
       assert feature.identifier == Enum.at(plan.features, 0).identifier
@@ -65,7 +67,7 @@ defmodule Membership.FeatureTest do
       Feature.grant(plan, feature_1)
       Feature.grant(plan, feature_2)
 
-      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
+      plan = Repo.get(@config, Plan, plan.id) |> Repo.preload(:features)
 
       identifiers =
         Enum.map(plan.features, fn x ->
@@ -92,13 +94,13 @@ defmodule Membership.FeatureTest do
       Feature.grant(feature, plan)
       Feature.grant(plan, ban_feature)
 
-      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
+      plan = Repo.get(@config, Plan, plan.id) |> Repo.preload(:features)
 
       assert 2 == length(plan.features)
 
       Feature.revoke(plan, ban_feature)
 
-      plan = Repo.get(Plan, plan.id) |> Repo.preload(:features)
+      plan = Repo.get(@config, Plan, plan.id) |> Repo.preload(:features)
       refute Enum.member?(plan.features, "ban_accounts")
     end
   end

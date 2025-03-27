@@ -3,6 +3,8 @@ defmodule Membership.Feature do
   Feature is main representation of a single feature flag assigned to a plan
   """
   use Membership.Schema
+
+  @config Membership.Config.new()
   import Ecto.Query
 
   alias Membership.Feature
@@ -47,11 +49,14 @@ defmodule Membership.Feature do
   end
 
   def create(identifier, name) do
-    changeset(%Feature{}, %{
-      identifier: identifier,
-      name: name
-    })
-    |> Repo.insert_or_update()
+    changeset =
+      changeset(%Feature{}, %{
+        identifier: identifier,
+        name: name
+      })
+
+    @config
+    |> Repo.insert_or_update(changeset)
   end
 
   def table, do: :membership_features
@@ -78,15 +83,18 @@ defmodule Membership.Feature do
   @spec grant(Feature.t(), Feature.t() | Plan.t()) :: Member.t()
   def grant(%Feature{id: id} = _feature, %Plan{id: plan_id} = _plan) do
     # Preload Feature plans
-    feature = Feature |> Repo.get!(id)
-    plan = Plan |> Repo.get!(plan_id)
+    feature =
+      @config
+      |> Repo.get!(Feature, id)
+
+    plan = @config |> Repo.get!(Plan, plan_id)
 
     revoke(feature, plan)
 
-    %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
-    |> Repo.insert()
+    @config
+    |> Repo.insert(%PlanFeatures{plan_id: plan.id, feature_id: feature.id})
 
-    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:plans)}
+    {:ok, @config |> Repo.get!(Feature, id) |> Repo.preload(:plans)}
   end
 
   def grant(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
@@ -94,21 +102,21 @@ defmodule Membership.Feature do
   end
 
   def grant(%{feature_id: id}, %Plan{id: _id} = plan) do
-    feature = Feature |> Repo.get!(id)
+    feature = @config |> Repo.get!(Feature, id)
     grant(feature, plan)
   end
 
   def grant(%Plan{id: plan_id} = _member, %Feature{id: id} = _feature) do
     # Preload Feature plans
-    feature = Feature |> Repo.get!(id)
-    plan = Plan |> Repo.get!(plan_id)
+    feature = @config |> Repo.get!(Feature, id)
+    plan = @config |> Repo.get!(Plan, plan_id)
 
     revoke(feature, plan)
 
-    %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
-    |> Repo.insert()
+    @config
+    |> Repo.insert(%PlanFeatures{plan_id: plan.id, feature_id: feature.id})
 
-    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:plans)}
+    {:ok, @config |> Repo.get!(Feature, id) |> Repo.preload(:plans)}
   end
 
   def grant(%{plan: %Plan{id: id}}, %Feature{id: _id} = feature) do
@@ -126,15 +134,20 @@ defmodule Membership.Feature do
   @spec grant(Feature.t(), Feature.t() | Role.t()) :: Member.t()
   def grant(%Feature{id: id} = _feature, %Role{id: role_id} = _role) do
     # Preload Feature plans
-    feature = Feature |> Repo.get!(id)
-    role = Role |> Repo.get!(role_id)
+    feature = @config |> Repo.get!(Feature, id)
+    role = @config |> Repo.get!(Role, role_id)
 
     revoke(feature, role)
 
-    RoleFeatures.changeset(%Membership.RoleFeatures{}, %{role_id: role.id, feature_id: feature.id})
-    |> Repo.insert()
+    @config
+    |> Repo.insert(
+      RoleFeatures.changeset(%Membership.RoleFeatures{}, %{
+        role_id: role.id,
+        feature_id: feature.id
+      })
+    )
 
-    {:ok, Feature |> Repo.get!(id) |> Repo.preload(:roles)}
+    {:ok, @config |> Repo.get!(Feature, id) |> Repo.preload(:roles)}
   end
 
   def grant(%{feature: %Feature{id: _id} = feature}, %Role{id: _role_id} = role) do
@@ -168,9 +181,11 @@ defmodule Membership.Feature do
   """
   @spec revoke(Plan.t(), Feature.t() | Plan.t()) :: Member.t()
   def revoke(%Feature{id: id} = _, %Plan{id: _id} = plan) do
-    from(pa in PlanFeatures)
-    |> where([pr], pr.feature_id == ^id and pr.plan_id == ^plan.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in PlanFeatures)
+      |> where([pr], pr.feature_id == ^id and pr.plan_id == ^plan.id)
+
+    @query |> Repo.delete_all()
   end
 
   def revoke(%{feature: %Feature{id: _pid} = feature}, %Plan{id: _id} = plan) do
@@ -182,9 +197,11 @@ defmodule Membership.Feature do
   end
 
   def revoke(%Plan{id: _id} = plan, %Feature{id: feature_id} = _feature) do
-    from(pa in PlanFeatures)
-    |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^plan.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in PlanFeatures)
+      |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^plan.id)
+
+    @query |> Repo.delete_all(query)
   end
 
   def revoke(
@@ -201,15 +218,19 @@ defmodule Membership.Feature do
   ###
 
   def revoke(%Feature{id: id} = _, %Role{id: _id} = role) do
-    from(pa in RoleFeatures)
-    |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in RoleFeatures)
+      |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
+
+    @query |> Repo.delete_all(query)
   end
 
   def revoke(%Role{id: _id} = role, %Feature{id: feature_id} = _feature) do
-    from(pa in RoleFeatures)
-    |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^role.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in RoleFeatures)
+      |> where([pr], pr.feature_id == ^feature_id and pr.plan_id == ^role.id)
+
+    @query |> Repo.delete_all(query)
   end
 
   def revoke(
@@ -232,11 +253,14 @@ defmodule Membership.Feature do
         id: feature_id,
         identifier: _identifier
       }) do
-    PlanFeatures
-    |> where(
-      [e],
-      e.plan_id == ^plan.id and e.feature_id == ^feature_id
-    )
-    |> Repo.one()
+    query =
+      PlanFeatures
+      |> where(
+        [e],
+        e.plan_id == ^plan.id and e.feature_id == ^feature_id
+      )
+
+    @config
+    |> Repo.one(query)
   end
 end

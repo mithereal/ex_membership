@@ -7,6 +7,8 @@ defmodule Membership.RoleFeatures do
   alias Membership.Role
   alias Membership.RoleFeatures
 
+  @config Membership.Config.new()
+
   schema "membership_role_features" do
     belongs_to(:feature, Feature)
     belongs_to(:role, Role)
@@ -23,10 +25,12 @@ defmodule Membership.RoleFeatures do
         %{__struct__: _role_name, id: assoc_id},
         _features \\ []
       ) do
-    changeset(%RoleFeatures{
-      feature_id: id,
-      role_id: assoc_id
-    })
-    |> Repo.insert!()
+    changeset =
+      changeset(%RoleFeatures{
+        feature_id: id,
+        role_id: assoc_id
+      })
+
+    @config |> Repo.insert!(changeset)
   end
 end

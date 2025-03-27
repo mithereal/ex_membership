@@ -5,6 +5,8 @@ defmodule Membership.MemberRoles do
 
   use Membership.Schema, type: :binary_fk
 
+  @config Membership.Config.new()
+
   alias Membership.Member
   alias Membership.Role
   alias Membership.MemberRoles
@@ -24,11 +26,13 @@ defmodule Membership.MemberRoles do
         %Member{id: id},
         %{__struct__: _role_name, id: role_id}
       ) do
-    changeset(%MemberRoles{
-      member_id: id,
-      role_id: role_id
-    })
-    |> Repo.insert!()
+    changeset =
+      changeset(%MemberRoles{
+        member_id: id,
+        role_id: role_id
+      })
+
+    @config |> Repo.insert!(changeset)
   end
 
   def table, do: :membership_features

@@ -10,6 +10,8 @@ defmodule Membership.Role.Server do
 
   require Logger
 
+  @config Membership.Config.new()
+
   @name :membership_roles
 
   def child_spec(data) do
@@ -45,7 +47,7 @@ defmodule Membership.Role.Server do
   @impl true
   def handle_cast(:load, state) do
     roles =
-      Membership.Role.all()
+      Membership.Role.all(@config)
 
     :ets.insert(@name, roles)
     {:noreply, state}
@@ -56,7 +58,7 @@ defmodule Membership.Role.Server do
     Logger.info("Reloading Roles.")
 
     plans =
-      Membership.Role.all()
+      Membership.Role.all(@config)
 
     :ets.insert(@name, plans)
     Process.send_after(self(), :check_update, @update_check_time)

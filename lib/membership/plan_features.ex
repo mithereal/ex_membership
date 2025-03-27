@@ -7,6 +7,8 @@ defmodule Membership.PlanFeatures do
   alias Membership.Plan
   alias Membership.PlanFeatures
 
+  @config Membership.Config.new()
+
   schema "membership_plan_features" do
     belongs_to(:feature, Feature)
     belongs_to(:plan, Plan)
@@ -23,10 +25,12 @@ defmodule Membership.PlanFeatures do
         %{__struct__: _plan_name, id: assoc_id},
         _features \\ []
       ) do
-    changeset(%PlanFeatures{
-      feature_id: id,
-      plan_id: assoc_id
-    })
-    |> Repo.insert!()
+    changeset =
+      changeset(%PlanFeatures{
+        feature_id: id,
+        plan_id: assoc_id
+      })
+
+    @config |> Repo.insert!(changeset)
   end
 end
