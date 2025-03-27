@@ -5,6 +5,8 @@ defmodule Membership.MemberFeatures do
 
   use Membership.Schema, type: :binary_fk
 
+  @config Membership.Config.new()
+
   alias Membership.Member
   alias Membership.Feature
   alias Membership.MemberFeatures
@@ -26,12 +28,14 @@ defmodule Membership.MemberFeatures do
         %{__struct__: _feature_name, id: feature_id},
         permission
       ) do
-    changeset(%MemberFeatures{
-      member_id: id,
-      feature_id: feature_id,
-      permission: permission
-    })
-    |> Repo.insert!()
+    changeset =
+      changeset(%MemberFeatures{
+        member_id: id,
+        feature_id: feature_id,
+        permission: permission
+      })
+
+    @config |> Repo.insert!(changeset)
   end
 
   def table, do: :membership_features

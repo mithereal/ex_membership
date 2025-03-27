@@ -11,6 +11,8 @@ defmodule Membership.Role do
   alias Membership.Feature
   alias Membership.RoleFeatures
 
+  @config Membership.Config.new()
+
   @typedoc "A Role struct"
   @type t :: %Role{}
 
@@ -41,12 +43,13 @@ defmodule Membership.Role do
   end
 
   def create(identifier, name, features \\ []) do
-    role =
+    changeset =
       changeset(%Role{}, %{
         identifier: identifier,
         name: name
       })
-      |> Repo.insert_or_update()
+
+    role = @config |> Repo.insert_or_update(changeset)
 
     Enum.map(features, fn f ->
       Feature.create(f.identifier, f.name)
@@ -78,13 +81,12 @@ defmodule Membership.Role do
   @spec grant(Role.t(), Role.t() | Feature.t()) :: Member.t()
   def grant(%Role{id: id} = _role, %Feature{id: feature_id} = _feature) do
     # Preload Role features
-    role = Role |> Repo.get!(id)
-    feature = Feature |> Repo.get!(feature_id)
+    role = @config |> Repo.get!(Role, id)
+    feature = @config |> Repo.get!(Feature, feature_id)
 
     revoke(feature, role)
 
-    %RoleFeatures{role_id: role.id, feature_id: feature.id}
-    |> Repo.insert()
+    @config |> Repo.insert(%RoleFeatures{role_id: role.id, feature_id: feature.id})
 
     Server.reload()
   end
@@ -94,19 +96,19 @@ defmodule Membership.Role do
   end
 
   def grant(%{role_id: id}, %Feature{id: _id} = feature) do
-    Role
-    |> Repo.get!(id)
+    @config
+    |> Repo.get!(Role, id)
     |> grant(feature)
   end
 
   def grant(%Feature{id: feature_id} = _feature, %Role{id: id} = _role) do
-    role = Role |> Repo.get!(id)
-    feature = Feature |> Repo.get!(feature_id)
+    role = @config |> Repo.get!(Role, id)
+    feature = @config |> Repo.get!(Feature, feature_id)
 
     revoke(feature, role)
 
-    %RoleFeatures{role_id: role.id, feature_id: feature.id}
-    |> Repo.insert()
+    @config
+    |> Repo.insert(%RoleFeatures{role_id: role.id, feature_id: feature.id})
 
     Server.reload()
   end
@@ -142,9 +144,11 @@ defmodule Membership.Role do
   """
   @spec revoke(Role.t(), Role.t() | Feature.t()) :: Member.t()
   def revoke(%Role{id: id} = _, %Feature{id: _id} = feature) do
-    from(pa in RoleFeatures)
-    |> where([pr], pr.role_id == ^id and pr.feature_id == ^feature.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in RoleFeatures)
+      |> where([pr], pr.role_id == ^id and pr.feature_id == ^feature.id)
+
+    @config |> Repo.delete_all(query)
   end
 
   def revoke(%{role: %Role{id: _pid} = role}, %Feature{id: _id} = feature) do
@@ -156,9 +160,11 @@ defmodule Membership.Role do
   end
 
   def revoke(%Feature{id: id} = _, %Role{id: _id} = role) do
-    from(pa in RoleFeatures)
-    |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
-    |> Repo.delete_all()
+    query =
+      from(pa in RoleFeatures)
+      |> where([pr], pr.feature_id == ^id and pr.role_id == ^role.id)
+
+    @config |> Repo.delete_all(query)
   end
 
   def revoke(
@@ -181,16 +187,19 @@ defmodule Membership.Role do
         id: feature_id,
         identifier: _identifier
       }) do
-    FeatureRoles
-    |> where(
-      [e],
-      e.role_id == ^role.id and e.feature_id == ^feature_id
-    )
-    |> Repo.one()
+    query =
+      FeatureRoles
+      |> where(
+        [e],
+        e.role_id == ^role.id and e.feature_id == ^feature_id
+      )
+
+    @config |> Repo.one(query)
   end
 
   def all() do
-    Repo.all(Membership.Role)
+    @config
+    |> Repo.all(Membership.Role)
     |> Repo.preload(:features)
     |> Enum.map(fn x ->
       features = Enum.map(x.features, fn f -> f.identifier end)

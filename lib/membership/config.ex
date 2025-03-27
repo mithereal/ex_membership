@@ -3,6 +3,12 @@ defmodule Membership.Config do
   Return value by key from config.exs file.
   """
 
+  defstruct get_dynamic_repo: nil,
+            prefix: nil,
+            log: false,
+            name: Membership,
+            repo: nil
+
   def get(name, default \\ nil) do
     Application.get_env(:ex_membership, name, default)
   end
@@ -19,5 +25,10 @@ defmodule Membership.Config do
       nil -> :serial
       _ -> :uuid
     end
+  end
+
+  def new(opts \\ []) do
+    repo = Membership.Config.get(:repo)
+    struct!(__MODULE__, [repo: repo] ++ opts)
   end
 end
