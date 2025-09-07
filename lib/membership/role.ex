@@ -211,4 +211,6 @@ defmodule Membership.Role do
       {x.identifier, features}
     end)
   end
+
+  def table, do: :membership_roles
 end

@@ -31,4 +31,6 @@ defmodule Membership.RoleFeatures do
     })
     |> repo.insert!()
   end
+
+  def table, do: :membership_role_features
 end

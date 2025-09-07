@@ -31,4 +31,6 @@ defmodule Membership.PlanFeatures do
     })
     |> repo.insert!()
   end
+
+  def table, do: :membership_plan_features
 end

@@ -33,5 +33,5 @@ defmodule Membership.MemberRoles do
     |> repo.insert!()
   end
 
-  def table, do: :membership_features
+  def table, do: :membership_member_roles
 end

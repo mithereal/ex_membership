@@ -33,4 +33,6 @@ defmodule Membership.MemberPlans do
     })
     |> repo.insert!()
   end
+
+  def table, do: :membership_member_plans
 end
