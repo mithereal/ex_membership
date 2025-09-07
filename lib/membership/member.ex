@@ -4,6 +4,9 @@ defmodule Membership.Member do
   """
   use Membership.Schema
 
+  @primary_key {:id, Membership.Config.key_type(), autogenerate: true}
+  @foreign_key_type Membership.Config.key_type()
+
   import Ecto.Query
 
   alias Membership.Plan

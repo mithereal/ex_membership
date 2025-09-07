@@ -11,6 +11,9 @@ defmodule Membership.Role do
   alias Membership.Feature
   alias Membership.RoleFeatures
 
+  @primary_key {:id, Membership.Config.key_type(), autogenerate: true}
+  @foreign_key_type Membership.Config.key_type()
+
   @typedoc "A Role struct"
   @type t :: %Role{}
 

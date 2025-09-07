@@ -5,6 +5,9 @@ defmodule Membership.Feature do
   use Membership.Schema
   import Ecto.Query
 
+  @primary_key {:id, Membership.Config.key_type(), autogenerate: true}
+  @foreign_key_type Membership.Config.key_type()
+
   alias Membership.Feature
   alias Membership.PlanFeatures
   alias Membership.RoleFeatures

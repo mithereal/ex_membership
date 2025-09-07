@@ -16,6 +16,9 @@ defmodule Membership.Plan do
   @params ~w(identifier name)a
   @required_fields ~w(identifier name)a
 
+  @primary_key {:id, Membership.Config.key_type(), autogenerate: true}
+  @foreign_key_type Membership.Config.key_type()
+
   schema "membership_plans" do
     field(:identifier, :string)
     field(:name, :string)
