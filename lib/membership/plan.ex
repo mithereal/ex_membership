@@ -49,12 +49,14 @@ defmodule Membership.Plan do
   end
 
   def create(identifier, name, features \\ []) do
+    repo = Membership.Repo.repo()
+
     plan =
       changeset(%Plan{}, %{
         identifier: identifier,
         name: name
       })
-      |> Repo.insert_or_update()
+      |> repo.insert_or_update()
 
     Enum.map(features, fn f ->
       Feature.create(f.identifier, f.name)
@@ -90,13 +92,14 @@ defmodule Membership.Plan do
   @spec grant(Plan.t(), Plan.t() | Feature.t()) :: Member.t()
   def grant(%Plan{id: id} = _plan, %Feature{id: feature_id} = _feature) do
     # Preload Plan features
-    plan = Plan |> Repo.get!(id)
-    feature = Feature |> Repo.get!(feature_id)
+    repo = Membership.Repo.repo()
+    plan = Plan |> repo.get!(id)
+    feature = Feature |> repo.get!(feature_id)
 
     revoke(feature, plan)
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
-    |> Repo.insert()
+    |> repo.insert()
 
     Server.reload()
   end
@@ -106,19 +109,22 @@ defmodule Membership.Plan do
   end
 
   def grant(%{plan_id: id}, %Feature{id: _id} = feature) do
+    repo = Membership.Repo.repo()
+
     Plan
-    |> Repo.get!(id)
+    |> repo.get!(id)
     |> grant(feature)
   end
 
   def grant(%Feature{id: feature_id} = _feature, %Plan{id: id} = _plan) do
-    plan = Plan |> Repo.get!(id)
-    feature = Feature |> Repo.get!(feature_id)
+    repo = Membership.Repo.repo()
+    plan = Plan |> repo.get!(id)
+    feature = Feature |> repo.get!(feature_id)
 
     revoke(feature, plan)
 
     %PlanFeatures{plan_id: plan.id, feature_id: feature.id}
-    |> Repo.insert()
+    |> repo.insert()
 
     Server.reload()
   end
@@ -154,9 +160,11 @@ defmodule Membership.Plan do
   """
   @spec revoke(Plan.t(), Plan.t() | Feature.t()) :: Member.t()
   def revoke(%Plan{id: id} = _, %Feature{id: _id} = feature) do
+    repo = Membership.Repo.repo()
+
     from(pa in PlanFeatures)
     |> where([pr], pr.plan_id == ^id and pr.feature_id == ^feature.id)
-    |> Repo.delete_all()
+    |> repo.delete_all()
   end
 
   def revoke(%{plan: %Plan{id: _pid} = plan}, %Feature{id: _id} = feature) do
@@ -168,9 +176,11 @@ defmodule Membership.Plan do
   end
 
   def revoke(%Feature{id: id} = _, %Plan{id: _id} = plan) do
+    repo = Membership.Repo.repo()
+
     from(pa in PlanFeatures)
     |> where([pr], pr.feature_id == ^id and pr.plan_id == ^plan.id)
-    |> Repo.delete_all()
+    |> repo.delete_all()
   end
 
   def revoke(
@@ -193,17 +203,21 @@ defmodule Membership.Plan do
         id: feature_id,
         identifier: _identifier
       }) do
+    repo = Membership.Repo.repo()
+
     FeaturePlans
     |> where(
       [e],
       e.plan_id == ^plan.id and e.feature_id == ^feature_id
     )
-    |> Repo.one()
+    |> repo.one()
   end
 
   def all() do
-    Repo.all(Membership.Plan)
-    |> Repo.preload(:features)
+    repo = Membership.Repo.repo()
+
+    repo.all(Membership.Plan)
+    |> repo.preload(:features)
     |> Enum.map(fn x ->
       features = Enum.map(x.features, fn f -> f.identifier end)
       {x.identifier, features}

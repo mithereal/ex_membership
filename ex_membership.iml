@@ -134,5 +134,15 @@
     <orderEntry type="library" name="unicode_set" level="project" />
     <orderEntry type="library" name="benchee_markdown" level="project" />
     <orderEntry type="library" name="earmark" level="project" />
+    <orderEntry type="library" name="ecto_sqlite3" level="project" />
+    <orderEntry type="library" name="makeup_c" level="project" />
+    <orderEntry type="library" name="doctor" level="project" />
+    <orderEntry type="library" name="geo" level="project" />
+    <orderEntry type="library" name="binpp" level="project" />
+    <orderEntry type="library" name="exqlite" level="project" />
+    <orderEntry type="library" name="temp" level="project" />
+    <orderEntry type="library" name="ex_sqlean" level="project" />
+    <orderEntry type="library" name="elixir_make" level="project" />
+    <orderEntry type="library" name="cc_precompiler" level="project" />
   </component>
 </module>

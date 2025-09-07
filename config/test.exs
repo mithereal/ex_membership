@@ -5,13 +5,18 @@
 import Config
 
 # Configure your database
-config :ex_membership, Membership.Repo,
+config :ex_membership,
+  ecto_repos: [Membership.TestRepo],
+  ecto_repo: Membership.TestRepo,
+  primary_key_type: :uuid
+
+config :ex_membership, Membership.TestRepo,
   username: "postgres",
   password: "postgres",
-  database: "ex_membership",
   hostname: "localhost",
+  database: "ex_membership",
   pool: Ecto.Adapters.SQL.Sandbox,
-  primary_key_type: :uuid
+  pool_size: 10
 
 config :logger,
   level: :info

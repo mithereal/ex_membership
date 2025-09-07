@@ -2,14 +2,14 @@ defmodule Membership.Application do
   @moduledoc false
   use Application
 
-  alias Membership.Repo
+  alias Membership.TestRepo
   alias Membership.Plan.Server, as: Plans
   alias Membership.Role.Server, as: Roles
 
   @impl true
   def start(_type, args \\ []) do
     children = [
-      {Repo, args},
+      {TestRepo, args},
       {Plans, []},
       {Roles, []},
       {Registry, keys: :unique, name: :active_memberships},

@@ -21,8 +21,8 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       feature = insert(:feature, identifier: "delete_accounts")
       Member.grant(member, feature, "required")
-
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
 
       assert 1 == length(member.features)
       assert "delete_accounts" == Enum.at(member.features, 0)
@@ -33,8 +33,8 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
 
       Member.grant(%{member: member}, feature, "required")
-
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
 
       assert 1 == length(member.features)
       assert "delete_accounts" == Enum.at(member.features, 0)
@@ -45,8 +45,8 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "delete_accounts")
 
       Member.grant(%{member_id: member.id}, feature, "required")
-
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
 
       assert 1 == length(member.features)
       assert "delete_accounts" == Enum.at(member.features, 0)
@@ -58,8 +58,8 @@ defmodule Membership.MemberTest do
 
       Member.grant(member, feature, "required")
       Member.grant(member, feature, "required")
-
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
 
       assert 1 == length(member.features)
       assert "delete_accounts" == Enum.at(member.features, 0)
@@ -92,7 +92,8 @@ defmodule Membership.MemberTest do
       plan = insert(:plan, identifier: "admin")
 
       member = Member.grant(%{member: member}, plan)
-      plan = Repo.get(Membership.Plan, plan.id) |> Repo.preload(:features)
+      repo = Membership.Repo.repo()
+      plan = repo.get(Membership.Plan, plan.id) |> repo.preload(:features)
 
       assert 1 == length(member.plans)
       assert plan.identifier == Enum.at(member.plans, 0).identifier
@@ -151,7 +152,8 @@ defmodule Membership.MemberTest do
       assert 2 == length(member.features)
 
       Member.revoke(member, feature)
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
       assert 1 == length(member.features)
       assert "ban_accounts" == Enum.at(member.features, 0)
     end
@@ -167,7 +169,8 @@ defmodule Membership.MemberTest do
       assert 2 == length(member.features)
 
       Member.revoke(%{member: member}, feature)
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
       assert 1 == length(member.features)
       assert "ban_accounts" == Enum.at(member.features, 0)
     end
@@ -183,7 +186,8 @@ defmodule Membership.MemberTest do
       assert 2 == length(member.features)
 
       Member.revoke(%{member_id: member.id}, feature)
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
       assert 1 == length(member.features)
       assert "ban_accounts" == Enum.at(member.features, 0)
     end
@@ -198,7 +202,8 @@ defmodule Membership.MemberTest do
       assert 2 == length(member.plans)
 
       Member.revoke(member, plan_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id) |> repo.preload([:plans])
       assert 1 == length(member.plans)
       assert plan_editor == Enum.at(member.plans, 0)
     end
@@ -207,14 +212,14 @@ defmodule Membership.MemberTest do
       member = insert(:member)
       plan_admin = insert(:plan, identifier: "admin")
       plan_editor = insert(:plan, identifier: "editor")
-
+      repo = Membership.Repo.repo()
       Member.grant(member, plan_admin)
       Member.grant(member, plan_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = repo.get(Member, member.id) |> repo.preload([:plans])
       assert 2 == length(member.plans)
 
       Member.revoke(%{member: member}, plan_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = repo.get(Member, member.id) |> repo.preload([:plans])
       assert 1 == length(member.plans)
       assert plan_editor == Enum.at(member.plans, 0)
     end
@@ -226,11 +231,12 @@ defmodule Membership.MemberTest do
 
       Member.grant(member, plan_admin)
       Member.grant(member, plan_editor)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id) |> repo.preload([:plans])
       assert 2 == length(member.plans)
 
       Member.revoke(%{member_id: member.id}, plan_admin)
-      member = Repo.get(Member, member.id) |> Repo.preload([:plans])
+      member = repo.get(Member, member.id) |> repo.preload([:plans])
       assert 1 == length(member.plans)
       assert plan_editor == Enum.at(member.plans, 0)
     end
@@ -248,7 +254,8 @@ defmodule Membership.MemberTest do
       feature = insert(:feature, identifier: "view_plan")
 
       Member.grant(member, feature, "required")
-      member = Repo.get(Member, member.id)
+      repo = Membership.Repo.repo()
+      member = repo.get(Member, member.id)
 
       assert 1 == length(member.features)
       assert Membership.has_feature?(member, feature.identifier)

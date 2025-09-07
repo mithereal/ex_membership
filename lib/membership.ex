@@ -505,7 +505,9 @@ defmodule Membership do
         false -> opts
       end
 
-    member = Membership.Repo.get!(Membership.Member, member_id) |> Map.merge(opts)
+    repo = Membership.Repo.repo()
+
+    member = repo.get!(Membership.Member, member_id) |> Map.merge(opts)
     status = Membership.Memberships.Supervisor.start(member)
 
     case status do
@@ -518,7 +520,8 @@ defmodule Membership do
   @doc false
   @spec load_and_store_member!(Membership.Member.t(), map()) :: {:ok, Membership.Member.t()}
   def load_and_store_member!(%Membership.Member{} = member, opts) do
-    member = Membership.Repo.get!(Membership.Member, member.id)
+    repo = Membership.Repo.repo()
+    member = repo.get!(Membership.Member, member.id)
 
     case is_nil(opts) do
       true ->

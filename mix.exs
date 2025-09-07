@@ -41,7 +41,9 @@ defmodule Membership.MixProject do
     [
       {:ecto, "~> 3.10"},
       {:ecto_sql, "~> 3.10"},
-      {:postgrex, "~> 0.16"},
+      {:postgrex, ">= 0.0.0", optional: true},
+      {:myxql, ">= 0.0.0", optional: true},
+      {:ecto_sqlite3, ">= 0.0.0", optional: true},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:optimus, "~> 0.1.0", only: :dev},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},

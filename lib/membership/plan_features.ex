@@ -23,10 +23,12 @@ defmodule Membership.PlanFeatures do
         %{__struct__: _plan_name, id: assoc_id},
         _features \\ []
       ) do
+    repo = Membership.Repo.repo()
+
     changeset(%PlanFeatures{
       feature_id: id,
       plan_id: assoc_id
     })
-    |> Repo.insert!()
+    |> repo.insert!()
   end
 end

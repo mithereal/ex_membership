@@ -9,8 +9,8 @@ defmodule Membership.MemberPlansTest do
       features = ["test_feature"]
 
       MemberPlans.create(member, struct, features)
-
-      member = member |> Repo.preload([:plans])
+      repo = Membership.Repo.repo()
+      member = member |> repo.preload([:plans])
 
       assert 1 == length(member.plans)
     end
@@ -20,8 +20,8 @@ defmodule Membership.MemberPlansTest do
       struct = insert(:plan)
 
       MemberPlans.create(member, struct)
-
-      member = member |> Repo.preload([:plans])
+      repo = Membership.Repo.repo()
+      member = member |> repo.preload([:plans])
 
       assert 1 == length(member.plans)
     end

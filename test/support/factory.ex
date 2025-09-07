@@ -1,5 +1,5 @@
 defmodule Membership.Factory do
-  use ExMachina.Ecto, repo: Membership.Repo
+  use ExMachina.Ecto, repo: Membership.TestRepo
   alias Membership.Member
   alias Membership.Feature
   alias Membership.Plan

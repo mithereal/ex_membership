@@ -23,10 +23,12 @@ defmodule Membership.RoleFeatures do
         %{__struct__: _role_name, id: assoc_id},
         _features \\ []
       ) do
+    repo = Membership.Repo.repo()
+
     changeset(%RoleFeatures{
       feature_id: id,
       role_id: assoc_id
     })
-    |> Repo.insert!()
+    |> repo.insert!()
   end
 end

@@ -2,17 +2,14 @@ defmodule Membership.Repo do
   @moduledoc """
   Ecto repository
   """
+  defp env(key, default \\ nil) do
+    Application.get_env(:ex_membership, key, default)
+  end
 
-  use Ecto.Repo,
-    otp_app: :ex_membership,
-    adapter: Ecto.Adapters.Postgres
-
-  @doc """
-  Empty the Database Table
-  """
-  def truncate(schema) do
-    table_name = schema.__schema__(:source)
-
-    query("TRUNCATE #{table_name}", [])
+  def repo() do
+    case env(:ecto_repo) do
+      nil -> raise "Must define :ecto_repo for Membership to work properly."
+      r -> r
+    end
   end
 end

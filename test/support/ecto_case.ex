@@ -3,7 +3,7 @@ defmodule Membership.EctoCase do
 
   using do
     quote do
-      alias Membership.Repo
+      alias Membership.TestRepo
 
       import Ecto
       import Ecto.Query
@@ -15,10 +15,10 @@ defmodule Membership.EctoCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Membership.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Membership.TestRepo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Membership.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Membership.TestRepo, {:shared, self()})
     end
 
     :ok

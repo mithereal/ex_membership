@@ -24,11 +24,13 @@ defmodule Membership.MemberRoles do
         %Member{id: id},
         %{__struct__: _role_name, id: role_id}
       ) do
+    repo = Membership.Repo.repo()
+
     changeset(%MemberRoles{
       member_id: id,
       role_id: role_id
     })
-    |> Repo.insert!()
+    |> repo.insert!()
   end
 
   def table, do: :membership_features

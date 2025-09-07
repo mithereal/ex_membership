@@ -26,12 +26,14 @@ defmodule Membership.MemberFeatures do
         %{__struct__: _feature_name, id: feature_id},
         permission
       ) do
+    repo = Membership.Repo.repo()
+
     changeset(%MemberFeatures{
       member_id: id,
       feature_id: feature_id,
       permission: permission
     })
-    |> Repo.insert!()
+    |> repo.insert!()
   end
 
   def table, do: :membership_features
