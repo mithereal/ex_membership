@@ -6,10 +6,10 @@
 ![GitHub](https://img.shields.io/github/license/mithereal/ex_membership)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/mithereal/ex_membership/main)
 
-Membership is toolkit for granular feature management for members. It allows you to define granular features such
+Membership is toolkit for granular feature management for members. It allows you to define features such
 as: [:can_edit, :can_delete] on a per module basis
 each module has an ets backed registry with {function, permission} tuple.
-this allows us to have plans with multiple features which members can subscribe to
+this allows us to have plans and roles with multiple features which members can subscribe to
 we then can hold each user in a registry and compare features on a function level.
 
 Here is a small example:
@@ -89,12 +89,8 @@ mix membership.install
 - [x] `Role` -> `[Feature]` permission schema
 - [x] `Member` -> `[Plan]` -> `[Feature]` permission schema
 - [x] `Member` -> `[Role]` -> `[Feature]` permission schema
-- [] `Member` -> `Object` -> `[Feature]` permission schema
 - [x] Computed permission in runtime
 - [x] Easily readable DSL
-- [ ] [ueberauth](https://github.com/ueberauth/ueberauth) integration
-- [ ] [absinthe](https://github.com/absinthe-graphql/absinthe) middleware
-- [ ] Session plug to get current_user
 
 ## Installation
 
@@ -108,11 +104,21 @@ end
 
 ```elixir
 # In your config/config.exs file
-config :ex_membership, Membership.Repo,
+
+config :ex_membership,
+  ecto_repos: [MyRepo],
+  ecto_repo: MyRepo,
+  primary_key_type: :uuid
+
+config :ex_membership, MyRepo,
   username: "postgres",
   password: "postgres",
-  database: "membership_dev",
-  hostname: "localhost"
+  hostname: "localhost",
+  database: "ex_membership",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10,
+  port: 55432
 ```
 
 ```elixir

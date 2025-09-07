@@ -8,15 +8,21 @@ defmodule Membership.Application do
 
   @impl true
   def start(_type, args \\ []) do
-    children = [
-      {TestRepo, args},
-      {Plans, []},
-      {Roles, []},
-      {Registry, keys: :unique, name: :active_memberships},
-      {Registry, keys: :unique, name: :module_permissions},
-      {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},
-      {DynamicSupervisor, strategy: :one_for_one, name: :module_permissions_supervisor}
-    ]
+    env =
+      case Mix.env() == :test do
+        true -> [{TestRepo, args}]
+        false -> []
+      end
+
+    children =
+      [
+        {Plans, []},
+        {Roles, []},
+        {Registry, keys: :unique, name: :active_memberships},
+        {Registry, keys: :unique, name: :module_permissions},
+        {DynamicSupervisor, strategy: :one_for_one, name: :memberships_supervisor},
+        {DynamicSupervisor, strategy: :one_for_one, name: :module_permissions_supervisor}
+      ] ++ env
 
     opts = [strategy: :one_for_one, name: Membership.Supervisor]
     Supervisor.start_link(children, opts)
