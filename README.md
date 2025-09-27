@@ -6,8 +6,8 @@
 ![GitHub](https://img.shields.io/github/license/mithereal/ex_membership)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/mithereal/ex_membership/main)
 
-Membership is toolkit for granular feature management for members. It allows you to define features such
-as: [:can_edit, :can_delete] on a per module basis
+Membership is a turnkey membership system and a toolkit for granular feature management systems.
+It allows you to define features such as: [:can_edit, :can_delete] on a per module basis
 each module has an ets backed registry with {function, permission} tuple.
 this allows us to have plans and roles with multiple features which members can subscribe to
 we then can hold each user in a registry and compare features on a function level.
