@@ -144,5 +144,6 @@
     <orderEntry type="library" name="ex_sqlean" level="project" />
     <orderEntry type="library" name="elixir_make" level="project" />
     <orderEntry type="library" name="cc_precompiler" level="project" />
+    <orderEntry type="library" name="sse_phoenix_pubsub" level="project" />
   </component>
 </module>

@@ -432,6 +432,39 @@ identifier: "asfdcxfdsr42424eq2",
 }
 ```
 
+## Kaffy Configuration [config.ex](kaffy/config.ex), add the following to the config file
+
+```elixir
+membership: [
+  resources: [
+    member: [admin: Membership.MemberAdmin, schema: Membership.Member],
+    member_feature: [
+      admin: Membership.MemberFeatureAdmin,
+      schema: Membership.MemberFeatures
+    ],
+    member_plan: [
+      admin: Membership.MemberPlanAdmin,
+      schema: Membership.MemberPlans
+    ],
+    member_role: [
+      admin: Membership.MemberRoleAdmin,
+      schema: Membership.MemberRoles
+    ],
+    feature: [admin: Membership.FeatureAdmin, schema: Membership.Feature],
+    role: [admin: Membership.RoleAdmin, schema: Membership.Role],
+    role_feature: [
+      admin: Membership.RoleFeatureAdmin,
+      schema: Membership.RoleFeatures
+    ],
+    plan: [admin: Membership.PlanAdmin, schema: Membership.Plan],
+    plan_feature: [
+      admin: Membership.PlanFeatureAdmin,
+      schema: Membership.PlanFeatures
+    ]
+  ]
+]
+```
+
 ## License
 
 [MIT © Jason Clark](mailto:mithereal@gmail.com)

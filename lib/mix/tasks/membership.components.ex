@@ -4,6 +4,8 @@ defmodule Mix.Tasks.Membership.Components do
     which has basic phoenix membership components.
   """
 
+  @shortdoc "Generate Phoenix Components"
+
   def run([args]) do
     source =
       Path.join(

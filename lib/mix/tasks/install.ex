@@ -4,6 +4,8 @@ defmodule Mix.Tasks.Membership.Install do
     which Membership tables, as well as required indexes.
   """
 
+  @shortdoc "Generate Membership Migration"
+
   def run(_args) do
     source = Path.join(Application.app_dir(:ex_membership, "/priv/"), "setup_tables.exs")
 

@@ -10,6 +10,9 @@ defmodule Membership.MemberRoles do
   alias Membership.MemberRoles
 
   schema "membership_member_roles" do
+    # Virtual ID field (for Kaffy)
+    field(:id, :string, virtual: true)
+
     belongs_to(:member, Member)
     belongs_to(:role, Role)
   end
@@ -34,4 +37,28 @@ defmodule Membership.MemberRoles do
   end
 
   def table, do: :membership_member_roles
+
+  def index(_conn) do
+    Repo.all(MemberRoles)
+    |> Enum.map(&with_virtual_id/1)
+  end
+
+  def get(%{"member_id" => member_id, "role_id" => role_id}) do
+    Repo.get_by!(MemberRoles, member_id: member_id, role_id: role_id)
+    |> with_virtual_id()
+  end
+
+  def get(id) when is_binary(id) do
+    case String.split(id, ":") do
+      [member_id_str, role_id_str] ->
+        get(%{"member_id" => member_id_str, "role_id" => role_id_str})
+
+      _ ->
+        raise "Invalid ID format. Expected 'member_id:role_id'"
+    end
+  end
+
+  defp with_virtual_id(struct) do
+    %{struct | id: "#{struct.member_id}:#{struct.role_id}"}
+  end
 end
