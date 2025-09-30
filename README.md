@@ -435,6 +435,12 @@ identifier: "asfdcxfdsr42424eq2",
 ## Kaffy Configuration [config.ex](kaffy/config.ex), add the following to the config file
 
 ```elixir
+add "++ Membership.kaffy_resources()" to the list in kaffy.config 
+```
+
+--or--
+
+```elixir
 membership: [
   resources: [
     member: [admin: Membership.MemberAdmin, schema: Membership.Member],

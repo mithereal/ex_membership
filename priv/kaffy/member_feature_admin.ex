@@ -1,13 +1,20 @@
-defmodule Framework.Membership.MemberFeatureAdmin do
+defmodule Membership.MemberFeatureAdmin do
   @behaviour Kaffy.ResourceAdmin
+  @repo Membership.Repo.repo()
 
-  alias Framework.Repo
-  alias Membership.{MemberFeatures, Member, Feature}
+  alias Membership.Member
+  alias Membership.Feature
+  alias Membership.MemberFeatures
+
   import Ecto.Query
 
+  def plural_name(_) do
+    "Member Features"
+  end
+
   # Show all entries
-  def index(_conn) do
-    Repo.all(MemberFeatures)
+  def index(conn) do
+    MemberFeatures.index(conn)
   end
 
   # Create a new changeset
@@ -15,9 +22,8 @@ defmodule Framework.Membership.MemberFeatureAdmin do
 
   # Get an entry using simulated composite key
   def get(%{"member_id" => member_id, "feature_id" => feature_id}) do
-    Repo.get_by!(MemberFeatures, member_id: member_id, feature_id: feature_id)
+    @repo.get_by!(MemberFeatures, member_id: member_id, feature_id: feature_id)
   end
-
 
   # Parse Kaffy's string ID like "123:456"
   def get(id) when is_binary(id) do
@@ -34,19 +40,19 @@ defmodule Framework.Membership.MemberFeatureAdmin do
   def create(attrs) do
     %MemberFeatures{}
     |> MemberFeatures.changeset(attrs)
-    |> Repo.insert()
+    |> @repo.insert()
   end
 
   # Update a record
   def update(member_feature, attrs) do
     member_feature
     |> MemberFeatures.changeset(attrs)
-    |> Repo.update()
+    |> @repo.update()
   end
 
   # Delete a record
   def delete(member_feature) do
-    Repo.delete(member_feature)
+    @repo.delete(member_feature)
   end
 
   # Define how the form looks
@@ -62,12 +68,12 @@ defmodule Framework.Membership.MemberFeatureAdmin do
   end
 
   defp member_choices do
-    Repo.all(Member)
+    @repo.all(Member)
     |> Enum.map(&{&1.identifier, &1.id})
   end
 
   defp feature_choices do
-    Repo.all(Feature)
+    @repo.all(Feature)
     |> Enum.map(&{&1.name, &1.id})
   end
 

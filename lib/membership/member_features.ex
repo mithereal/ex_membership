@@ -42,12 +42,16 @@ defmodule Membership.MemberFeatures do
   def table, do: :membership_member_features
 
   def index(_conn) do
-    Repo.all(MemberFeatures)
+    repo = Membership.Repo.repo()
+
+    repo.all(MemberFeatures)
     |> Enum.map(&with_virtual_id/1)
   end
 
   def get(%{"member_id" => member_id, "feature_id" => feature_id}) do
-    Repo.get_by!(MemberFeatures, member_id: member_id, feature_id: feature_id)
+    repo = Membership.Repo.repo()
+
+    repo.get_by!(MemberFeatures, member_id: member_id, feature_id: feature_id)
     |> with_virtual_id()
   end
 

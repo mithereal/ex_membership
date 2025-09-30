@@ -1,13 +1,17 @@
 defmodule Membership.RoleFeatureAdmin do
   @behaviour Kaffy.ResourceAdmin
+  @repo Membership.Repo.repo()
 
-  alias Membership.Repo
   alias Membership.{RoleFeatures, Role, Feature}
   import Ecto.Query
 
+  def plural_name(_) do
+    "Role Features"
+  end
+
   # Show all entries
-  def index(_conn) do
-    Repo.all(RoleFeatures)
+  def index(conn) do
+    RoleFeatures.index(conn)
   end
 
   # Create a new changeset
@@ -15,7 +19,7 @@ defmodule Membership.RoleFeatureAdmin do
 
   # Get an entry using simulated composite key
   def get(%{"role_id" => role_id, "feature_id" => feature_id}) do
-    Repo.get_by!(RoleFeatures, role_id: role_id, feature_id: feature_id)
+    @repo.get_by!(RoleFeatures, role_id: role_id, feature_id: feature_id)
   end
 
   # Parse Kaffy's string ID like "123:456"
@@ -33,19 +37,19 @@ defmodule Membership.RoleFeatureAdmin do
   def create(attrs) do
     %RoleFeatures{}
     |> RoleFeatures.changeset(attrs)
-    |> Repo.insert()
+    |> @repo.insert()
   end
 
   # Update a record
   def update(role_feature, attrs) do
     role_feature
     |> RoleFeatures.changeset(attrs)
-    |> Repo.update()
+    |> @repo.update()
   end
 
   # Delete a record
   def delete(role_feature) do
-    Repo.delete(role_feature)
+    @repo.delete(role_feature)
   end
 
   # Define how the form looks
@@ -61,24 +65,23 @@ defmodule Membership.RoleFeatureAdmin do
   end
 
   defp role_choices do
-    Repo.all(Role)
+    @repo.all(Role)
     |> Enum.map(&{&1.identifier, &1.id})
   end
 
   defp feature_choices do
-    Repo.all(Feature)
+    @repo.all(Feature)
     |> Enum.map(&{&1.name, &1.id})
   end
 
   # Simulate ordering
-  @impl true
   def ordering(_schema) do
     [asc: :role_id]
   end
 
   # Kaffy uses `to_string/1` to render row IDs in URLs
   # So we override this to use our composite key
-  defimpl String.Chars, for: Roleship.RoleFeatures do
+  defimpl String.Chars, for: RoleFeatures do
     def to_string(struct) do
       "#{struct.role_id}:#{struct.feature_id}"
     end

@@ -1,13 +1,17 @@
 defmodule Membership.PlanFeatureAdmin do
   @behaviour Kaffy.ResourceAdmin
+  @repo Membership.Repo.repo()
 
-  alias Membership.Repo
   alias Membership.{PlanFeatures, Plan, Feature}
   import Ecto.Query
 
+  def plural_name(_) do
+    "Plan Features"
+  end
+
   # Show all entries
-  def index(_conn) do
-    Repo.all(PlanFeatures)
+  def index(conn) do
+    PlanFeatures.index(conn)
   end
 
   # Create a new changeset
@@ -15,7 +19,7 @@ defmodule Membership.PlanFeatureAdmin do
 
   # Get an entry using simulated composite key
   def get(%{"plan_id" => plan_id, "feature_id" => feature_id}) do
-    Repo.get_by!(PlanFeatures, plan_id: plan_id, feature_id: feature_id)
+    @repo.get_by!(PlanFeatures, plan_id: plan_id, feature_id: feature_id)
   end
 
   # Parse Kaffy's string ID like "123:456"
@@ -33,19 +37,19 @@ defmodule Membership.PlanFeatureAdmin do
   def create(attrs) do
     %PlanFeatures{}
     |> PlanFeatures.changeset(attrs)
-    |> Repo.insert()
+    |> @repo.insert()
   end
 
   # Update a record
   def update(plan_feature, attrs) do
     plan_feature
     |> PlanFeatures.changeset(attrs)
-    |> Repo.update()
+    |> @repo.update()
   end
 
   # Delete a record
   def delete(plan_feature) do
-    Repo.delete(plan_feature)
+    @repo.delete(plan_feature)
   end
 
   # Define how the form looks
@@ -61,12 +65,12 @@ defmodule Membership.PlanFeatureAdmin do
   end
 
   defp plan_choices do
-    Repo.all(Plan)
+    @repo.all(Plan)
     |> Enum.map(&{&1.identifier, &1.id})
   end
 
   defp feature_choices do
-    Repo.all(Feature)
+    @repo.all(Feature)
     |> Enum.map(&{&1.name, &1.id})
   end
 

@@ -709,4 +709,37 @@ defmodule Membership do
   """
   @version Mix.Project.config()[:version]
   def version, do: @version
+
+  def kaffy_resources() do
+    [
+      membership: [
+        resources: [
+          member: [admin: Membership.MemberAdmin, schema: Membership.Member],
+          member_features: [
+            admin: Membership.MemberFeatureAdmin,
+            schema: Membership.MemberFeatures
+          ],
+          member_plans: [
+            admin: Membership.MemberPlanAdmin,
+            schema: Membership.MemberPlans
+          ],
+          member_roles: [
+            admin: Membership.MemberRoleAdmin,
+            schema: Membership.MemberRoles
+          ],
+          feature: [admin: Membership.FeatureAdmin, schema: Membership.Feature],
+          role: [admin: Membership.RoleAdmin, schema: Membership.Role],
+          role_features: [
+            admin: Membership.RoleFeatureAdmin,
+            schema: Membership.RoleFeatures
+          ],
+          plan: [admin: Membership.PlanAdmin, schema: Membership.Plan],
+          plan_features: [
+            admin: Membership.PlanFeatureAdmin,
+            schema: Membership.PlanFeatures
+          ]
+        ]
+      ]
+    ]
+  end
 end

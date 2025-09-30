@@ -1,13 +1,16 @@
-defmodule Framework.Membership.MemberRoleAdmin do
+defmodule Membership.MemberRoleAdmin do
   @behaviour Kaffy.ResourceAdmin
+  @repo Membership.Repo.repo()
 
-  alias Framework.Repo
   alias Membership.{MemberRoles, Member, Role}
   import Ecto.Query
 
-  # Show all entries
-  def index(_conn) do
-    Repo.all(MemberRoles)
+  def plural_name(_) do
+    "Member Roles"
+  end
+
+  def index(conn) do
+    MemberRoles.index(conn)
   end
 
   # Create a new changeset
@@ -15,7 +18,7 @@ defmodule Framework.Membership.MemberRoleAdmin do
 
   # Get an entry using simulated composite key
   def get(%{"member_id" => member_id, "role_id" => role_id}) do
-    Repo.get_by!(MemberRoles, member_id: member_id, role_id: role_id)
+    @repo.get_by!(MemberRoles, member_id: member_id, role_id: role_id)
   end
 
   # Parse Kaffy's string ID like "123:456"
@@ -33,19 +36,19 @@ defmodule Framework.Membership.MemberRoleAdmin do
   def create(attrs) do
     %MemberRoles{}
     |> MemberRoles.changeset(attrs)
-    |> Repo.insert()
+    |> @repo.insert()
   end
 
   # Update a record
   def update(member_role, attrs) do
     member_role
     |> MemberRoles.changeset(attrs)
-    |> Repo.update()
+    |> @repo.update()
   end
 
   # Delete a record
   def delete(member_role) do
-    Repo.delete(member_role)
+    @repo.delete(member_role)
   end
 
   # Define how the form looks
@@ -61,12 +64,12 @@ defmodule Framework.Membership.MemberRoleAdmin do
   end
 
   defp member_choices do
-    Repo.all(Member)
+    @repo.all(Member)
     |> Enum.map(&{&1.identifier, &1.id})
   end
 
   defp role_choices do
-    Repo.all(Role)
+    @repo.all(Role)
     |> Enum.map(&{&1.name, &1.id})
   end
 
@@ -74,13 +77,5 @@ defmodule Framework.Membership.MemberRoleAdmin do
   @impl true
   def ordering(_schema) do
     [asc: :member_id]
-  end
-
-  # Kaffy uses `to_string/1` to render row IDs in URLs
-  # So we override this to use our composite key
-  defimpl String.Chars, for: Membership.MemberRoles do
-    def to_string(struct) do
-      "#{struct.member_id}:#{struct.role_id}"
-    end
   end
 end
